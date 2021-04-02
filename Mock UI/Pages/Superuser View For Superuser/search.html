@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+
+  <head>
+    <meta charset="utf-8">
+    <title>Easy Internet Service</title>
+    <link rel="stylesheet" type="text/css" href="./../../CSS/Style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+   
+  </head>
+
+
+  <body>
+    <div>
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+            <div class="container">
+                <h1 class="navbar-brand text-warning font-weight-bold">Fiber@Home</h1>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsenavbar">
+                    <span class="navbar-toggler-icon"> </span>
+                </button>
+
+                <div class="collapse navbar-collapse text-center" id="collapsenavbar">
+                    <ul class="navbar-nav nav-pills ml-auto">
+                        <li class="nav-item" style="padding-right: 20px;">
+                            <a href="index.html" class="nav-link text-white">Home</a>
+                        </li>
+
+                        <li class="nav-item"  style="padding-right: 20px;">
+                            <a href="pendingRequests.html" class="nav-link active text-white">Pending Requests</a>
+                        </li>
+
+                        <li class="nav-item"  style="padding-right: 20px;">
+                            <a href="renewalRequests.html" class="nav-link text-white">Renewal Requests</a>
+                        </li>
+
+                        <li class="nav-item" style="padding-right: 20px;">
+                            <a href="cancelRequests.html" class="nav-link text-white">Cancellation Requests</a>
+                        </li>
+
+                        <li class="nav-item" style="padding-right: 20px;">
+                            <a href="isps.html" class="nav-link text-white">Active ISPs</a>
+                        </li>
+
+                        <li class="nav-item" style="padding-right: 20px;">
+                            <a href="reports.html" class="nav-link text-white">Reports</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="feedback.html" class="nav-link text-white">Feedbacks</a>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
+
+       
+
+        <section class="container search text-center">
+            <div class="container">
+                <h1>Pending Requests</h1>
+                <div class = "settings">
+                    
+                    <div class="row pendingrowsetting">
+                    
+                        <div class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <select class="form-control form-control-lg">
+                                <option disabled>Division</option>
+                                <option selected >Dhaka</option>
+                                <option>Chittagong</option>
+                                <option>Khulna</option>
+                                <option>Sylhet</option>
+                                <option>Mymensingh</option>
+                                <option>Rajshahi</option>
+                                <option>Rangpur</option>
+                                <option>Barishal</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <select class="form-control form-control-lg">
+                                <option disabled>District</option>
+                                <option>Narshingdi</option>
+                                <option>Gajipur</option>
+                                <option>Narayanganj</option>
+                                <option selected >Tangail</option>
+                                <option>Shariyatpur</option>
+                                <option>Kishoreganj</option>
+                                <option>Manikganj</option>
+                                <option>Munshiganj</option>
+                                <option>Madaripur</option>
+                                <option>Gopalganj</option>
+                                <option>Faridpur</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <select class="form-control form-control-lg">
+                                <option disabled>Upazilla</option>
+                                <option>Basail</option>
+                                <option selected >Madhupur</option>
+                                <option>Mirzapur</option>
+                                <option>Ghatail</option>
+                                <option>Nagorpur</option>
+                                <option>Kalihati</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <select class="form-control form-control-lg">
+                                <option disabled>Union</option>
+                                <option selected >Alokdia</option>
+                                <option>Aushnara</option>
+                                <option>Aronkhola</option>
+                                <option>Sholakuri</option>
+                                <option>Golabari</option>
+                                <option>Mirzabari</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <select class="form-control form-control-lg">
+                                <option disabled>Sort By</option>
+                                <option selected>Package Priority</option>
+                                <option>Arrival Time</option>
+                                
+                            </select>
+                        </div>
+
+                        <div  class="col-lg-2 col-md-2 col-10 d-block m-auto">
+                            <a class="btn btn-warning btn-lg text-white" href="search.html">Search</a>
+                        </div>
+                        
+                        
+                    </div>
+                    
+                </div>
+                <div style="overflow-y:auto; overflow-x: auto;">
+                    <table class="table table-striped">
+                        <thead class="thead">
+                            <tr>
+                                <th>Row</th>
+                                <th>ISP Name</th>
+                                <th>License ID</th>
+                                <th>Union</th>
+                                <th>Package Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>KS</td>
+                                <td>123er6yu</td>
+                                <td>Alokdia</td>
+                                <td>6 Month Ultra</td>
+                                <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                    Verify
+                                </button></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>2</td>
+                                <td>Globe</td>
+                                <td>723er6yu</td>
+                                <td>Alokdia</td>
+                                <td>6 Month Ultra</td>
+                                <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                    Verify
+                                </button></td>
+                            </tr>   
+                            
+                            <tr>
+                                <td>3</td>
+                                <td>AK</td>
+                                <td>A23er6yu</td>
+                                <td>Alokdia</td>
+                                <td>3 Month Ultra</td>
+                                <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                    Verify
+                                </button></td>
+                            </tr>    
+                             
+                                   
+                        </tbody>
+                    </table>
+
+                </div>
+            </div> 
+             <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title text-green" id="exampleModalLabel">Licese Verified</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  The license of this ISP is valid. Accept the request and ask for payment.
+                </div>
+                <div class="modal-footer">
+                  <a href="accepted.html" class="btn btn-success">Accept</a>
+                  <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                  
+                </div>
+              </div>
+            </div>
+          </div>         
+        </section>
+        <div id="footer">
+            <footer class="footer">
+                <h6 class="text-center text-white">Copyright &copy; 2021, Fiber@Home</h6>
+            </footer>
+        </div>
+    </div>
+
+    
+    
+
+  </body>
+</html>
