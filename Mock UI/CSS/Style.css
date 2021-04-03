@@ -5,6 +5,7 @@
     width : 100%;
     height : 650px;
    
+   
 }
 
 .navbar {
@@ -46,7 +47,7 @@
 
 .ourservices {
     padding: 400px 0px 100px;
-    padding-top : 400 px;
+    padding-top : 400px;
     padding-bottom: 100px;
     height : 900px;
 }
@@ -95,7 +96,7 @@
 
 .pending {
     padding: 100px 0px 100px;
-    padding-top : 100 px;
+    padding-top : 100px;
     padding-bottom: 100px;
     height : 1200px;
 }
@@ -125,7 +126,7 @@
 
 .search {
     padding: 100px 0px 100px;
-    padding-top : 100 px;
+    padding-top : 100px;
     padding-bottom: 100px;
     height : 700px;
 }
@@ -138,22 +139,22 @@
 
 /* footer */
 .footer {
+    height: 220px;
+    background-color: #021a34;
+    color : white;
+}
+
+.footerpackages {
+    background-color: #021a34;
+    color : white;
     height: 80px;
 }
 
-.footer h6 {
-    padding-top: 20px;
-    line-height: 50px;
-}
-
-#footer {
-    background-color: #021a34;
-}
 
 /*  View Details */
 .view {
     padding: 100px 0px 100px;
-    padding-top : 100 px;
+    padding-top : 100px;
     padding-bottom: 100px;
     height : 900px;
 }
@@ -170,7 +171,7 @@
 /* Feedback */
 .feedback {
     padding: 100px 0px 100px;
-    padding-top : 100 px;
+    padding-top : 100px;
     padding-bottom: 100px;
     height : 1200px;
 }
@@ -185,6 +186,58 @@
     height: 200px;
 }
 
+/* package page */
+
+.packages {
+    padding: 100px 0px 100px;
+    padding-top : 100px;
+    padding-bottom: 100px;
+    height : 1400px;
+}
+
+.packages p {
+   
+    color :dimgrey;
+}
+
+.packages div.card {
+    margin-top: 50px;
+    height: 350px;
+}
+
+
+/*  Registration */
+.registration {
+    padding: 100px 0px 100px;
+    padding-top : 100px;
+    padding-bottom: 100px;
+    height : 1000px;
+}
+
+.registrationForm {
+   
+    border: 1px solid dimgrey;
+    margin-top: 50px;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    
+}
+
+.paymentForm {
+   
+    border: 1px solid dimgrey;
+    margin-top: 50px;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    
+}
+
+
+/* Forms */
 
 
 
