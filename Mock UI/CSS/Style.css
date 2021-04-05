@@ -138,8 +138,20 @@
 
 
 /* footer */
-.footer {
+
+.footerFat {
     height: 220px;
+    background-color: #021a34;
+    color : white;
+}
+.footer {
+    height: 80px;
+    background-color: #021a34;
+    color : white;
+}
+
+#footeruserview {
+    height: 80px;
     background-color: #021a34;
     color : white;
 }
