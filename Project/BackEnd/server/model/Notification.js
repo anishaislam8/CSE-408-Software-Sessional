@@ -19,6 +19,7 @@ var NotificationSchema = new mongoose.Schema({
         type : String,
         trim : true,
         minlength : 1,
+        required : true
     },
     seen_status : {
         type : Boolean,

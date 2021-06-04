@@ -15,11 +15,15 @@ var PendingSchema = new mongoose.Schema({
     },
     license_id : {
         type : String,
-        default : null
+        default : null,
+        minlength : 6,
+        trim : true
     },
     nid : {
         type : String,
-        default : null
+        default : null,
+        minlength : 6,
+        trim : true
     },
     area_id : {
         type : ObjectID,

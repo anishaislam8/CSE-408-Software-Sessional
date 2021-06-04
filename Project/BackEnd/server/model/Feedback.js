@@ -14,8 +14,7 @@ var FeedbackSchema = new mongoose.Schema({
     details: {
         type : String,
         trim : true,
-        minlength : 1,
-        required : true
+        minlength : 1
     },
     rating : {
         type : Boolean,

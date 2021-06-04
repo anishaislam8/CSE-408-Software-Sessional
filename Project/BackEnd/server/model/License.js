@@ -11,7 +11,7 @@ var LicenseSchema = new mongoose.Schema({
     license_id : {
         type : String,
         minlength : 6,
-        require : true
+        required : true
     },
     valid_until : {
         type : Number,

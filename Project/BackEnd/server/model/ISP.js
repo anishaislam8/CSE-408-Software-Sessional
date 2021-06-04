@@ -16,12 +16,14 @@ var ISPSchema = new mongoose.Schema({
     password : {
         type : String,
         minlength : 6,
-        required : true
+        required : true,
+        trim : true
     },
     license_id : {
         type : String,
         minlength : 6,
-        required : true
+        required : true,
+        trim : true
     },
     connection_establishment_date: {
         type: Number,
