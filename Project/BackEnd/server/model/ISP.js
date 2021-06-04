@@ -3,6 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 
 
 var ISPSchema = new mongoose.Schema({
@@ -15,31 +16,23 @@ var ISPSchema = new mongoose.Schema({
     password : {
         type : String,
         minlength : 6,
-        require : true
+        required : true
     },
     license_id : {
         type : String,
         minlength : 6,
-        require : true
+        required : true
     },
     connection_establishment_date: {
         type: Number,
-        required: true,
-        default: null
-    },
-    expiration_date: {
-        type: Number,
-        required: true,
-        default: null
+        default: moment().valueOf()
     },
     connection_status : {
         type : Boolean,
-        required : true,
         default : false
     },
     payment_status : {
         type : Boolean,
-        required : true,
         default : false
     },
     tokens : [{

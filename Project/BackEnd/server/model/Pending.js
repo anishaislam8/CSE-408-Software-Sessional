@@ -39,8 +39,7 @@ var PendingSchema = new mongoose.Schema({
     },
     request_arrival_time : {
         type : Number,
-        default : moment().valueOf(),
-        required : true
+        default : moment().valueOf()
     }
 });
 
