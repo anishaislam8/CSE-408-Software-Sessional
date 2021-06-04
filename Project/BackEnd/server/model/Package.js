@@ -8,7 +8,7 @@ var PackageSchema = new mongoose.Schema({
         trim : true,
         required : true
     },
-    type : {
+    package_type : {
         type : Number,
         required : true
     },
