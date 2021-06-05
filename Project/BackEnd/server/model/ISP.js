@@ -25,17 +25,17 @@ var ISPSchema = new mongoose.Schema({
         required : true,
         trim : true
     },
-    connection_establishment_date: {
-        type: Number,
-        default: moment().valueOf()
+    connection_establishment_time: {
+        type: Date,
+        default: null
     },
     connection_status : {
         type : Boolean,
         default : false
     },
-    payment_status : {
-        type : Boolean,
-        default : false
+    remaining_bandwidth : {
+        type : Number,
+        default : null,
     },
     tokens : [{
         access : {

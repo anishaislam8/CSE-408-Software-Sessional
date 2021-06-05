@@ -11,6 +11,10 @@ var UnionSchema = new mongoose.Schema({
     upazilla_id : {
         type : Number,
         required : true
+    },
+    union_id : {
+        type : Number,
+        required : true
     }
 })
 

@@ -42,8 +42,12 @@ var PendingSchema = new mongoose.Schema({
         default : false
     },
     request_arrival_time : {
-        type : Number,
-        default : moment().valueOf()
+        type : Date,
+        default : new Date()
+    },
+    request_accept_time : {
+        type : Date,
+        default : null
     }
 });
 

@@ -16,7 +16,7 @@ var LicenseSchema = new mongoose.Schema({
     valid_until : {
         type : Number,
         required : true,
-        default : null
+        default : 12
     }
 })
 

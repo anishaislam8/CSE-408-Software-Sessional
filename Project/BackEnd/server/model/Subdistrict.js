@@ -11,6 +11,10 @@ var SubDistrictSchema = new mongoose.Schema({
     district_id : {
         type : Number,
         required : true
+    },
+    upazilla_id : {
+        type : Number,
+        required : true
     }
 })
 

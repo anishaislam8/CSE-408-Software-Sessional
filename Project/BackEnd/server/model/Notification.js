@@ -4,7 +4,7 @@ const moment = require('moment');
 
 var NotificationSchema = new mongoose.Schema({
     request_type : {
-        type : Number,
+        type : Number, // 0- ISP, 1- user, 2 - NTTN
         required : true
     },
     isp_id : {
@@ -26,8 +26,8 @@ var NotificationSchema = new mongoose.Schema({
         default : false
     },
     notification_arrival_time : {
-        type : Number,
-        default : moment().valueOf()
+        type : Date,
+        default : new Date()
     }
 });
 

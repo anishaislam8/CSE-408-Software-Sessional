@@ -17,14 +17,14 @@ var FeedbackSchema = new mongoose.Schema({
         minlength : 1
     },
     rating : {
-        type : Boolean,
+        type : Number,
         min : 1,
         max : 5,
         default : 5
     },
     feedback_arrival_time : {
-        type : Number,
-        default : moment().valueOf()
+        type : Date,
+        default : new Date()
     }
 });
 

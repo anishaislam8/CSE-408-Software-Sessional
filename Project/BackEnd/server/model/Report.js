@@ -29,8 +29,12 @@ var ReportSchema = new mongoose.Schema({
         default : false
     },
     report_arrival_time : {
+        type : Date,
+        default : new Date()
+    },
+    report_resolve_time : {
         type : Number,
-        default : moment().valueOf()
+        default : null
     }
 });
 

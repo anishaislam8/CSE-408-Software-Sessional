@@ -11,6 +11,10 @@ var DistrictSchema = new mongoose.Schema({
     division_id : {
         type : Number,
         required : true
+    },
+    district_id : {
+        type : Number,
+        required : true
     }
 })
 

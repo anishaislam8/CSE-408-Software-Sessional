@@ -9,10 +9,18 @@ var PackageSchema = new mongoose.Schema({
         required : true
     },
     package_type : {
-        type : Number,
+        type : Number,// 0- ISP package, 1 -User package
         required : true
     },
     bandwidth : {
+        type : Number,
+        required : true
+    },
+    up_speed : {
+        type : Number,
+        required : true
+    },
+    down_speed : {
         type : Number,
         required : true
     },
@@ -23,6 +31,11 @@ var PackageSchema = new mongoose.Schema({
     price : {
         type : Number,
         required : true
+    },
+    ongoing : {
+        type : Boolean,
+        required : true,
+        default : true
     }
 })
 
