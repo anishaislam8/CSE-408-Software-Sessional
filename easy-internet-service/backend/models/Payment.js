@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ObjectID = require('mongodb');
+const {ObjectID} = require('mongodb');
 
 var PaymentSchema = new mongoose.Schema({
     user_type : {
@@ -31,7 +31,6 @@ var PaymentSchema = new mongoose.Schema({
     payment_status : {
         type : Boolean,
         default : false,
-        required : true
     },
     payment_time : {
         type : Date,

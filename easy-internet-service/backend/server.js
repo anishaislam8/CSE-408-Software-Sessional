@@ -3,11 +3,8 @@ require('./config/config');
 const express = require('express');
 const cors = require('cors');
 var {mongoose} = require('./db/mongoose');
-var {Division} = require('./models/Division');
-var {District} = require('./models/District');
-var {SubDistrict} = require('./models/Subdistrict');
-var {Union} = require('./models/Union');
-var {Area} = require('./models/Area');
+
+const { Pending } = require('./models/Pending');
 
 //require('dotenv').config();
 
@@ -31,16 +28,8 @@ app.use(express.json());
 // const ispRouter = require('./routes/isp');
 
 
-// app.use('/nttn', nttnRouter);
-// app.use('/user', userRouter);
-// app.use('/isp', ispRouter);
-//end defining the routes
 
-
-
-app.listen(port, ()=>{
-    console.log(`Server is running on port ${port}`);
+app.listen(port, () => {
+    console.log(`Started on port ${port}`);
 })
-
-//server created :)
 
