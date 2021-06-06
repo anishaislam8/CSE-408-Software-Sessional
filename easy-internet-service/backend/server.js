@@ -4,8 +4,7 @@ const express = require('express');
 const cors = require('cors');
 var {mongoose} = require('./db/mongoose');
 
-const { Pending } = require('./models/Pending');
-
+const { Contract } = require('./models/Contract');
 //require('dotenv').config();
 
 const app = express();
@@ -26,7 +25,22 @@ app.use(express.json());
 // const nttnRouter = require('./routes/nttn');
 // const userRouter = require('./routes/user');
 // const ispRouter = require('./routes/isp');
+ 
+app.post('/contract',async (request, response) => {
+    var newContract = new Contract({
+        user_type : request.body.user_type,
+        package_id :request.body.package_id,
+        isp_id : request.body.isp_id,
+        user_id : request.body.user_id,
+        union_id :request.body.union_id,
+        area_id : request.body.area_id,
+        duration : request.body.duration,
+        current : request.body.current
+    })
 
+    let doc = await newContract.save();
+    response.send(doc);
+})
 
 
 app.listen(port, () => {

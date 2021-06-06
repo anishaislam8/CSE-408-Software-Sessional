@@ -30,7 +30,7 @@ var ContractSchema = new mongoose.Schema({
     },
     start_date : {
         type : Date,
-        default : new date()
+        default : new Date()
     },
     duration : {
         type : Number,

@@ -34,7 +34,6 @@ var PackageSchema = new mongoose.Schema({
     },
     ongoing : {
         type : Boolean,
-        required : true,
         default : true
     }
 })

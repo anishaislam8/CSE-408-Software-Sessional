@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
-
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+const moment = require('moment');
 
 var UserSchema  = new mongoose.Schema({
     name : {
@@ -22,7 +26,7 @@ var UserSchema  = new mongoose.Schema({
     },
     connection_establishment_date: {
         type: Date,
-        default: new Date()
+        default: null
     },
     connection_status : {
         type : Boolean,

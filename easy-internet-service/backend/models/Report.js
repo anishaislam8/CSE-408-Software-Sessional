@@ -9,13 +9,15 @@ var ReportSchema = new mongoose.Schema({
     },
     isp_id : {
         type : ObjectID,
-        default : null
+        default : null,
+        required : true
     },
     user_id : {
         type : ObjectID,
-        default : null
+        default : null,
+        required : true
     },
-    category: {
+    category: { //0 - Low Bandwidth, 1 - Physical Connection problem, 2-Platform related Problem
         type : Number,
         required : true,
     },

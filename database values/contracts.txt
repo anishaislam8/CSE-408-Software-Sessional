@@ -1,0 +1,74 @@
+/* 1 */
+{
+    "_id" : ObjectId("60bd4e2989e4206fe2d2dd82"),
+    "isp_id" : ObjectId("60bd37e62101832750353147"),
+    "user_id" : null,
+    "union_id" : "1",
+    "area_id" : null,
+    "start_date" : ISODate("2021-06-06T22:33:50.161Z"),
+    "current" : true,
+    "user_type" : 0,
+    "package_id" : ObjectId("60bd2cc7e06a504060152336"),
+    "duration" : 120,
+    "__v" : 0
+}
+
+/* 2 */
+{
+    "_id" : ObjectId("60bd4f6f89e4206fe2d2dd83"),
+    "isp_id" : ObjectId("60bd3851210183275035314a"),
+    "user_id" : null,
+    "union_id" : "10",
+    "area_id" : null,
+    "start_date" : ISODate("2021-06-06T22:33:50.161Z"),
+    "current" : true,
+    "user_type" : 0,
+    "package_id" : ObjectId("60bd2cace06a504060152335"),
+    "duration" : 90,
+    "__v" : 0
+}
+
+/* 3 */
+{
+    "_id" : ObjectId("60bd4fb589e4206fe2d2dd84"),
+    "isp_id" : ObjectId("60bd3851210183275035314a"),
+    "user_id" : null,
+    "union_id" : "10",
+    "area_id" : null,
+    "start_date" : ISODate("2021-06-06T22:33:50.161Z"),
+    "current" : false,
+    "user_type" : 0,
+    "package_id" : ObjectId("60bd2cc7e06a504060152336"),
+    "duration" : 120,
+    "__v" : 0
+}
+
+/* 4 */
+{
+    "_id" : ObjectId("60bd508189e4206fe2d2dd85"),
+    "isp_id" : ObjectId("60bd3851210183275035314a"),
+    "user_id" : ObjectId("60bd45c5186c075628746633"),
+    "union_id" : "10",
+    "area_id" : ObjectId("60bd2a3f77182c44d88d297f"),
+    "start_date" : ISODate("2021-06-06T22:33:50.161Z"),
+    "current" : true,
+    "user_type" : 0,
+    "package_id" : ObjectId("60bd2cece06a504060152337"),
+    "duration" : 30,
+    "__v" : 0
+}
+
+/* 5 */
+{
+    "_id" : ObjectId("60bd51436585a57f3474829b"),
+    "isp_id" : ObjectId("60bd3851210183275035314a"),
+    "user_id" : ObjectId("60bd45db186c075628746634"),
+    "union_id" : "10",
+    "area_id" : ObjectId("60bd2a3f77182c44d88d297f"),
+    "start_date" : ISODate("2021-06-06T22:50:41.695Z"),
+    "current" : true,
+    "user_type" : 0,
+    "package_id" : ObjectId("60bd2cece06a504060152337"),
+    "duration" : 30,
+    "__v" : 0
+}
