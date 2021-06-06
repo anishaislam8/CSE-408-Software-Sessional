@@ -9,15 +9,15 @@ var SubDistrictSchema = new mongoose.Schema({
         required : true
     },
     district_id : {
-        type : Number,
+        type : String,
         required : true
     },
     upazilla_id : {
-        type : Number,
+        type : String,
         required : true
     }
 })
 
-var SubDistrict = mongoose.Model('SubDistrict', SubDistrictSchema);
+var SubDistrict = mongoose.model('SubDistrict', SubDistrictSchema);
 
 module.exports = {SubDistrict}

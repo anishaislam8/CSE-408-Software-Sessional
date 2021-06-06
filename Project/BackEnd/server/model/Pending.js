@@ -30,7 +30,7 @@ var PendingSchema = new mongoose.Schema({
         default : null
     },
     union_id : {
-        type : Number,
+        type : String,
         default : null
     },
     package_id : {

@@ -9,11 +9,12 @@ var DivisionSchema = new mongoose.Schema({
         required : true
     },
     division_id : {
-        type : Number,
+        type : String,
         required : true
     }
 })
 
-var Division = mongoose.Model('Division', DivisionSchema);
+
+var Division = mongoose.model('Division', DivisionSchema);
 
 module.exports = {Division}

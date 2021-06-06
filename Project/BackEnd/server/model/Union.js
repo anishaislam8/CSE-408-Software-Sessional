@@ -9,15 +9,15 @@ var UnionSchema = new mongoose.Schema({
         required : true
     },
     upazilla_id : {
-        type : Number,
+        type : String,
         required : true
     },
     union_id : {
-        type : Number,
+        type : String,
         required : true
     }
 })
 
-var Union = mongoose.Model('Union', UnionSchema);
+var Union = mongoose.model('Union', UnionSchema);
 
 module.exports = {Union}

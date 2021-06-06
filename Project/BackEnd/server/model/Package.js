@@ -39,6 +39,6 @@ var PackageSchema = new mongoose.Schema({
     }
 })
 
-var Package = mongoose.Model('Package', PackageSchema);
+var Package = mongoose.model('Package', PackageSchema);
 
 module.exports = {Package}

@@ -1,5 +1,6 @@
 require('./config/config');
 
+
 var express = require('express');
 const _ = require('lodash');
 var {ObjectID} = require('mongodb');
@@ -17,12 +18,15 @@ app.use(express.json());
 
 var app = express();
 
-//API ROUTES
+// //API ROUTES
 
-app.use("/api/nttn", nttnRouter);
-app.use("/api/isp", ispRouter);
-app.use("/api/user", userRouter);
+// app.use("/api/nttn", nttnRouter);
+// app.use("/api/isp", ispRouter);
+// app.use("/api/user", userRouter);
 
+app.listen(port, () => {
+    console.log(`Started on port ${port}`);
+})
 
 module.exports = app;
 

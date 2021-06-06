@@ -20,7 +20,7 @@ var PaymentSchema = new mongoose.Schema({
         default : null
     },
     union_id : {
-        type : Number,
+        type : String,
         default : null,
         required : true
     },

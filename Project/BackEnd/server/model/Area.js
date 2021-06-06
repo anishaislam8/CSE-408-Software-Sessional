@@ -9,11 +9,11 @@ var AreaSchema = new mongoose.Schema({
         required : true
     },
     union_id : {
-        type : Number,
+        type : String,
         required : true
     }
 })
 
-var Area = mongoose.Model('Area', AreaSchema);
+var Area = mongoose.model('Area', AreaSchema);
 
 module.exports = {Area}
