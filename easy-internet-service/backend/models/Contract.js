@@ -21,8 +21,7 @@ var ContractSchema = new mongoose.Schema({
     },
     union_id : {
         type : String,
-        default : null,
-        required : true
+        default : null
     },
     area_id : {
         type : ObjectID,

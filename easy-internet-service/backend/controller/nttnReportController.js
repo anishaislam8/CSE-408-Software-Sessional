@@ -3,7 +3,7 @@ let apiController = require('./apiController');
 
 
 const handleReportFetching = async (request, response) => {
-    let reports = await Report.find();
+    let reports = await Report.find().sort({"report_arrival_time": 1});
     try{
         if(reports.length === 0){
             return response.status(404).send({
@@ -31,20 +31,21 @@ const handleReportFetchingSorted = async (request, response) => {
     let sortByDivision = request.body.division_id;
     let sortBySubDistrict = request.body.upazilla_id;
     let sortByUnion = request.body.union_id;
+    let sortByTime = request.body.time || 1 // 1- ascending, -1 : descending 
 
     try{
         let reports;
         if(sortByUnion){
             reports = await Report.find({
                 union_id : sortByUnion
-            }).sort({"report_arrival_time": -1}); // 1- ascending, -1 : descending 
+            }) // 1- ascending, -1 : descending 
 
         } else if(sortBySubDistrict){
 
             let unions = await apiController.findUnionFromSubDistrict(sortBySubDistrict);
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) }
-            }).sort({"report_arrival_time": 1});
+            })
 
         } else if(sortByDistrict){
 
@@ -52,7 +53,7 @@ const handleReportFetchingSorted = async (request, response) => {
             
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) }
-            }).sort({"report_arrival_time": -1});
+            })
 
         } else if(sortByDivision){
 
@@ -60,7 +61,7 @@ const handleReportFetchingSorted = async (request, response) => {
             
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) }
-            }).sort({"report_arrival_time": -1});
+            })
 
 
         }
@@ -69,6 +70,12 @@ const handleReportFetchingSorted = async (request, response) => {
                 message : "No Report Found",
                 data : []
             })
+        }
+        
+        if(sortByTime === 1){
+            reports.sort((a,b) => a.report_arrival_time - b.report_arrival_time);
+        } else if(sortByTime === -1){
+            reports.sort((a,b) => b.report_arrival_time - a.report_arrival_time);
         }
 
        
