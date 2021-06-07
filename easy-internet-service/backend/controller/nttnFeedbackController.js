@@ -58,7 +58,7 @@ const handleFeedbackSorted = async (request, response) => {
     let sortByUnion = request.body.union_id;
     let sortByArea = request.body.area_id;
     let sortByIsp = request.body.isp_id;
-    let sortByRating = request.body.asc_des; // 1 - ascending, -1 - descending
+    let sortByRating = request.body.rating; // 1 - ascending, -1 - descending
     let sortByTime = request.body.time; // 1 - ascending, -1 - descending
 
     try{
@@ -100,17 +100,23 @@ const handleFeedbackSorted = async (request, response) => {
 
         }
 
-        if(!feedbacks || feedbacks.length === 0){
-            if(sortByIsp){
-                feedbacks = Feedback.find({
-                    isp_id : sortByIsp
-                })
-            } else {
+        if(!feedbacks){
+            if(sortByDistrict || sortBySubDistrict || sortByArea || sortByUnion || sortByDivision ){
+                //empty
                 return response.status(404).send({
                     message : "No Feedbacks Found",
                     data : []
                 })
+            } else {
+                if(sortByIsp){
+                    feedbacks = await Feedback.find({
+                        isp_id : sortByIsp
+                    })
+                } else {
+                    feedbacks = await Feedback.find()
+                }
             }
+            
             
         } else {
             // further sorting
@@ -129,18 +135,39 @@ const handleFeedbackSorted = async (request, response) => {
             })
         }
 
-        if(sortbyTime && sortByRating){
-            if(sortByRating === 1){
-                feedbacks.sort((a,b) => a.rating - b.rating);
-            } else if(sortByRating === -1){
-                feedbacks.sort((a,b) => b.rating - a.rating);
+        if(sortByTime && sortByRating){
+            if(sortByTime === 1 && sortByRating === 1){
+                feedbacks.sort((a,b) => {
+                    if (a.rating > b.rating) return 1;
+                    if (a.rating < b.rating) return -1;
+                    if (a.feedback_arrival_time > b.feedback_arrival_time) return 1;
+                    if (a.feedback_arrival_time < b.feedback_arrival_time) return -1;
+                })
+                
+            } else if(sortByTime === 1 && sortByRating === -1){
+                feedbacks.sort((a,b) => {
+                    if (a.rating > b.rating) return 1;
+                    if (a.rating < b.rating) return -1;
+                    if (a.feedback_arrival_time > b.feedback_arrival_time) return -1;
+                    if (a.feedback_arrival_time < b.feedback_arrival_time) return 1;
+                })
+            } else if(sortByTime === -1 && sortByRating === 1){
+                feedbacks.sort((a,b) => {
+                    if (a.rating > b.rating) return -1;
+                    if (a.rating < b.rating) return 1;
+                    if (a.feedback_arrival_time > b.feedback_arrival_time) return 1;
+                    if (a.feedback_arrival_time < b.feedback_arrival_time) return -1;
+                })
+            } else if(sortByTime === -1 && sortByRating === -1){
+                feedbacks.sort((a,b) => {
+                    if (a.rating > b.rating) return -1;
+                    if (a.rating < b.rating) return 1;
+                    if (a.feedback_arrival_time > b.feedback_arrival_time) return -1;
+                    if (a.feedback_arrival_time < b.feedback_arrival_time) return 1;
+                })
             }
-            if(sortByTime === 1){
-                feedbacks.sort((a,b) => a.feedback_arrival_time - b.feedback_arrival_time);
-            } else if(sortByTime === -1){
-                feedbacks.sort((a,b) => b.feedback_arrival_time - a.feedback_arrival_time);
-            }
-        } else if(sortbyRating){
+            
+        } else if(sortByRating){
             if(sortByRating === 1){
                 feedbacks.sort((a,b) => a.rating - b.rating);
             } else if(sortByRating === -1){

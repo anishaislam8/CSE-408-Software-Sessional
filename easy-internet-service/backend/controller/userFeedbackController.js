@@ -4,6 +4,7 @@ const handlePostFeedbacks = async (request, response) => {
     const isp_id = request.body.isp_id;
     const user_id = request.body.user_id;
     const details = request.body.details;
+    const area_id = request.body.area_id;
     const rating = request.body.rating;
 
 
@@ -12,7 +13,8 @@ const handlePostFeedbacks = async (request, response) => {
             isp_id,
             user_id,
             details,
-            rating
+            rating,
+            area_id
         });
 
         let feedback = await newFeedback.save();

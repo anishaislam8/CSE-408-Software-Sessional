@@ -80,15 +80,11 @@ const handleReportFetchingSorted = async (request, response) => {
                     data : []
                 })
             } else {
-                if(sortByTime === 1){
-                    reports = await Report.find({
-                        resolve_status : false
-                    }).sort({"report_arrival_time" : 1});
-                } else if(sortByTime === -1){
-                    reports = await Report.find({
-                        resolve_status : false
-                    }).sort({"report_arrival_time" : -1});
-                }
+                
+                reports = await Report.find({
+                    resolve_status : false
+                })
+                
             }
         }
         

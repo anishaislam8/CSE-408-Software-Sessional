@@ -25,7 +25,7 @@ const findAreaFromSubDistrict = async (subdistrict) => {
 }
 
 const findAreaFromDistrict = async (district) => {
-    let subdistricts = await subDistrict.find({
+    let subdistricts = await SubDistrict.find({
         district_id : district
     });
     let unions = await Union.find({
@@ -42,7 +42,7 @@ const findAreaFromDivision = async (division) => {
     let districts = await District.find({
         division_id : division
     });
-    let subdistricts = await subDistrict.find({
+    let subdistricts = await SubDistrict.find({
         district_id : { $in : districts.map(district => district.district_id)}
     });
     let unions = await Union.find({
