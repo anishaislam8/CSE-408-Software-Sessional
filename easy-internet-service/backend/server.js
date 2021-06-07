@@ -22,9 +22,14 @@ app.use(express.json());
 // Finish connecting database
 
 //define the routes
-// const nttnRouter = require('./routes/nttn');
-// const userRouter = require('./routes/user');
-// const ispRouter = require('./routes/isp');
+const nttnRouter = require('./routes/nttn');
+//const userRouter = require('./routes/user');
+const ispRouter = require('./routes/isp');
+
+
+app.use('/nttn', nttnRouter);
+app.use('/isp', ispRouter);
+//app.use('/user', userRouter);
  
 
 

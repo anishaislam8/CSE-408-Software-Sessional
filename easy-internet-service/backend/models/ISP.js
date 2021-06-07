@@ -37,8 +37,8 @@ var ISPSchema = new mongoose.Schema({
         type : Number,
         default : null,
     },
-    expiration_time : {
-        type : Number,
+    expiration_date : {
+        type : Date,
         default : null
     },
     tokens : [{

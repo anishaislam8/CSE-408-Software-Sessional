@@ -12,13 +12,20 @@ var ReportSchema = new mongoose.Schema({
         default : null,
         required : true
     },
+    union_id : {
+        type : String,
+        default : null
+    },
+    area_id : {
+        type : ObjectID,
+        default : null
+    },
     user_id : {
         type : ObjectID,
-        default : null,
-        required : true
+        default : null
     },
-    category: { //0 - Low Bandwidth, 1 - Physical Connection problem, 2-Platform related Problem
-        type : Number,
+    category: { //0 - Low Bandwidth, 1 - Physical Connection problem, 2 - Platform related Problem, 3 - Others
+        type : String,
         required : true,
     },
     details: {
@@ -35,7 +42,7 @@ var ReportSchema = new mongoose.Schema({
         default : new Date()
     },
     report_resolve_time : {
-        type : Number,
+        type : Date,
         default : null
     }
 });
