@@ -3,7 +3,9 @@ let apiController = require('./apiController');
 
 
 const handleReportFetching = async (request, response) => {
-    let reports = await Report.find().sort({"report_arrival_time": 1});
+    let reports = await Report.find({
+        resolve_status : false
+    }).sort({"report_arrival_time": 1});
     try{
         if(reports.length === 0){
             return response.status(404).send({
@@ -31,20 +33,22 @@ const handleReportFetchingSorted = async (request, response) => {
     let sortByDivision = request.body.division_id;
     let sortBySubDistrict = request.body.upazilla_id;
     let sortByUnion = request.body.union_id;
-    let sortByTime = request.body.time || 1 // 1- ascending, -1 : descending 
+    let sortByTime = request.body.time || 1; // 1- ascending, -1 : descending 
 
     try{
         let reports;
         if(sortByUnion){
             reports = await Report.find({
-                union_id : sortByUnion
-            }) // 1- ascending, -1 : descending 
+                union_id : sortByUnion,
+                resolve_status : false
+            })  
 
         } else if(sortBySubDistrict){
 
             let unions = await apiController.findUnionFromSubDistrict(sortBySubDistrict);
             reports = await Report.find({
-                union_id : { "$in": unions.map(union => union.union_id) }
+                union_id : { "$in": unions.map(union => union.union_id) },
+                resolve_status : false
             })
 
         } else if(sortByDistrict){
@@ -52,7 +56,8 @@ const handleReportFetchingSorted = async (request, response) => {
             let unions = await apiController.findUnionFromDistrict(sortByDistrict);
             
             reports = await Report.find({
-                union_id : { "$in": unions.map(union => union.union_id) }
+                union_id : { "$in": unions.map(union => union.union_id) },
+                resolve_status : false
             })
 
         } else if(sortByDivision){
@@ -60,17 +65,33 @@ const handleReportFetchingSorted = async (request, response) => {
             let unions = await apiController.findUnionFromDivision(sortByDivision);
             
             reports = await Report.find({
-                union_id : { "$in": unions.map(union => union.union_id) }
+                union_id : { "$in": unions.map(union => union.union_id) },
+                resolve_status : false
             })
 
 
         }
-        if(reports.length === 0){
-            return response.status(404).send({
-                message : "No Report Found",
-                data : []
-            })
+
+        if(!reports){
+            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion){
+                //empty
+                return response.status(404).send({
+                    message : "No Report Found",
+                    data : []
+                })
+            } else {
+                if(sortByTime === 1){
+                    reports = await Report.find({
+                        resolve_status : false
+                    }).sort({"report_arrival_time" : 1});
+                } else if(sortByTime === -1){
+                    reports = await Report.find({
+                        resolve_status : false
+                    }).sort({"report_arrival_time" : -1});
+                }
+            }
         }
+        
         
         if(sortByTime === 1){
             reports.sort((a,b) => a.report_arrival_time - b.report_arrival_time);

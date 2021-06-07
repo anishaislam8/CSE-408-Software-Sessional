@@ -24,7 +24,7 @@ router.get('/feedbacks', nttnFeedbackController.handleFeedbacks);
 router.post('/feedbacks/view', nttnFeedbackController.handleOneFeedback);
 
 // sort the feedbacks based on district, division, subdistrict, union, area, isp
-router.post('/feedbacks/sortedBy', nttnFeedbackController.handleFeedbackSorted);
+router.post('/feedbacks/sortBy', nttnFeedbackController.handleFeedbackSorted);
 
 
 module.exports = router;
