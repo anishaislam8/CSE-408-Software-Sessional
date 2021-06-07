@@ -1,5 +1,7 @@
 let { Payment } = require("../models/Payment");
 let { ISP } = require("../models/ISP");
+let { Package } = require("../models/Package");
+let { Contract } = require("../models/Contract");
 
 const findNewPayment = async (response) => {
   //   let status = request.body.payment_status;
@@ -11,9 +13,9 @@ const findNewPayment = async (response) => {
     payments = await Payment.find({
       payment_status: false,
       user_type: 0,
-    }).sort({ payment_time: -1 }); // 1- ascending, -1 : descending
+    }).sort({ payment_time: 1 }); // 1- ascending, -1 : descending
     //}
-    if (paymets.length === 0) {
+    if (!payments || payments.length === 0) {
       return response.status(404).send({
         message: "No New Payment Found",
         data: [],
@@ -22,7 +24,7 @@ const findNewPayment = async (response) => {
 
     return response.status(200).send({
       message: "New Payment Found",
-      data: [],
+      data: payments,
     });
   } catch (e) {
     return response.status(500).send({
@@ -33,7 +35,7 @@ const findNewPayment = async (response) => {
 };
 
 const handlePaymentDone = async (request, response) => {
-  let payment_id = request.body._id;
+  let payment_id = request.body.payment_id;
   if (!payment_id) {
     return response.status(400).send({
       message: "Payment ID invalid",
@@ -42,16 +44,16 @@ const handlePaymentDone = async (request, response) => {
   }
   try {
     let payment = await Payment.findById(payment_id);
-    if (
-      !payment ||
-      payment.user_type !== 0 ||
-      payment.payment_status === true
-    ) {
-      return response.status(404).send({
-        message: "New payment not found",
-        data: [],
-      });
-    }
+    // if (
+    //   !payment ||
+    //   payment.user_type !== 0 ||
+    //   payment.payment_status === true
+    // ) {
+    //   return response.status(404).send({
+    //     message: "New payment not found",
+    //     data: [],
+    //   });
+    // }
     let isp = await ISP.findById(payment.isp_id);
     if (!isp._id) {
       return response.status(400).send({
@@ -60,11 +62,50 @@ const handlePaymentDone = async (request, response) => {
       });
     }
     payment.payment_status = true;
+    let package = await Package.findById(payment.package_id);
+    if (!package._id) {
+      return response.status(400).send({
+        message: "Package ID invalid",
+        data: [],
+      });
+    }
     if (isp.connection_status === false) {
       isp.connection_status = true;
       isp.connection_establishment_time = new Date();
-      isp.expiration_Date = new Date() + 90;
+      isp.expiration_Date = new Date() + package.duration;
+    } else if (isp.connection_status === true) {
+      isp.expiration_Date = new Date() + package.duration;
     }
+
+    let user_type = 0;
+    let isp_id = payment.isp_id;
+    let package_id = payment.package_id;
+    let union_id = payment.union_id;
+    let duration = package.duration;
+    let current = true;
+
+    let newContract = new Contract({
+      user_type,
+      isp_id,
+      union_id,
+      package_id,
+      duration,
+      current,
+    });
+
+    let data = await newContract.save();
+
+    if (data.nInserted === 0) {
+      return response.status(400).send({
+        message: "Insertion Failed",
+        data: [],
+      });
+    }
+
+    return response.status(200).send({
+      message: "Insertion Successful",
+      data,
+    });
 
     let updatedisp = await isp.save();
     let updatedpayment = await payment.save();
