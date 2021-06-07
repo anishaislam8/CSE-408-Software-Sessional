@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const ispController = require('./../controller/ispController');
+const ispReportController = require('../controller/ispReportController');
 
 
 // manage routes
@@ -24,6 +24,6 @@ router.post('/reports/solved', ispController.handleSolvedReport);
 // isp-superuser
 
 // report to the superuser
-router.post('/reports', ispController.handleReporting);
+router.post('/reports', ispReportController.handleReporting);
 
 module.exports = router;

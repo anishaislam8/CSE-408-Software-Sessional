@@ -1,5 +1,5 @@
-let { ISP } = require('./../models/ISP');
-let { Report } = require('./../models/Report');
+let { ISP } = require('../models/ISP');
+let { Report } = require('../models/Report');
 let apiController = require('./apiController');
 
 //insert an entry in report table

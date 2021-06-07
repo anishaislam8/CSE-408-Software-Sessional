@@ -3,6 +3,7 @@ require('./config/config');
 const express = require('express');
 const cors = require('cors');
 var {mongoose} = require('./db/mongoose');
+const {District} = require('./models/District');
 
 const { Contract } = require('./models/Contract');
 //require('dotenv').config();
@@ -25,6 +26,7 @@ app.use(express.json());
 const nttnRouter = require('./routes/nttn');
 //const userRouter = require('./routes/user');
 const ispRouter = require('./routes/isp');
+
 
 
 app.use('/nttn', nttnRouter);

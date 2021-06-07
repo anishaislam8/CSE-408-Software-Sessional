@@ -1,4 +1,5 @@
 const { District } = require('./../models/District');
+const { Division } = require('./../models/Division');
 const { SubDistrict } = require('./../models/Subdistrict');
 const { Union } = require('./../models/Union');
 
@@ -17,7 +18,7 @@ const findUnionFromDistrict = async (district) => {
     });
 
     let unions = await Union.find({
-        upazilla_id : { $in : subdistricts }
+        upazilla_id : { $in : subdistricts.map(subdistrict => subdistrict.upazilla_id) }
     });
 
     return unions;
@@ -27,13 +28,11 @@ const findUnionFromDivision = async (division) => {
     let districts = await District.find({
         division_id : division
     });
-
     let subdistricts = await SubDistrict.find({
-        district_id : { $in : districts}
+        district_id : { $in : districts.map(district => district.district_id)}
     });
-
     let unions = await Union.find({
-        upazilla_id : { $in : subdistricts }
+        upazilla_id : { $in : subdistricts.map(subdistrict => subdistrict.upazilla_id) }
     });
 
     return unions;
