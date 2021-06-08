@@ -120,3 +120,8 @@ const handlePaymentDone = async (request, response) => {
     });
   }
 };
+
+module.exports = {
+  findNewPayment,
+  handlePaymentDone,
+};
