@@ -1,8 +1,8 @@
 /* 1 */
 {
     "_id" : ObjectId("60bd45c5186c075628746633"),
-    "connection_establishment_date" : null,
-    "connection_status" : false,
+    "connection_establishment_date" : "2021-06-06T22:48:25.566Z",
+    "connection_status" : true,
     "name" : "Anisha Islam",
     "password" : "$2a$10$QJKWeDJF6qo/HEIVgaRfsu8dS5dLLzg23kvty0E6rjuJ/YAigMheC",
     "nid" : "123456",
@@ -13,8 +13,8 @@
 /* 2 */
 {
     "_id" : ObjectId("60bd45db186c075628746634"),
-    "connection_establishment_date" : null,
-    "connection_status" : false,
+    "connection_establishment_date" : "2021-06-07T12:48:25.566Z",
+    "connection_status" : true,
     "name" : "Nafisa Islam",
     "password" : "$2a$10$fnthOuEh1bfvdby/7vNAiugCab2xWwfg.O1HIkEf43/UgpHfY75WW",
     "nid" : "123457",
@@ -74,7 +74,7 @@
 {
     "_id" : ObjectId("60bd463a186c075628746639"),
     "connection_establishment_date" : null,
-    "connection_status" : false,
+    "connection_status" : true,
     "name" : "Ruhan Islam",
     "password" : "$2a$10$XUDlyvStJhXSMjGBVVnffeLL.8aFpeiHSkjQGmk3fVQ.eEor7ldVm",
     "nid" : "122509",

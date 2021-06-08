@@ -72,3 +72,16 @@
     "duration" : 30,
     "__v" : 0
 }
+
+/* 6 */
+{
+    "_id" : ObjectId("60be17e37698ffc104b663a2"),
+    "user_id" : "60bd463a186c075628746639",
+    "isp_id" : "60bd37e62101832750353147",
+    "package_id" : "60bd2d02e06a504060152338",
+    "area_id" : "60bd29f377182c44d88d2979",
+    "start_date" : "2021-06-07T12:57:09.652Z",
+    "current" : true,
+    "duration" : 30,
+    "user_type" : 1
+}
