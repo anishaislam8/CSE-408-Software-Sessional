@@ -4,7 +4,9 @@ const { SubDistrict } = require('./../models/Subdistrict');
 const { Union } = require('./../models/Union');
 const { Area } = require('./../models/Area');
 const { ISP } = require('./../models/ISP');
+const { User } = require('./../models/User');
 const { Package } = require('./../models/Package');
+const { Feedback } = require('./../models/Feedback');
 
 const findAreaFromUnion = async(union) => {
     let areas = await Area.find({
@@ -160,6 +162,55 @@ const getArea = async (request, response) => {
    
 }
 
+const getRating = async (request, response) => {
+   
+    try{
+        if(!request.body.isp_id){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let isp = await ISP.findById(request.body.isp_id);
+        if(!isp){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let feedbacks = await Feedback.find({
+            isp_id : request.body.isp_id
+        });
+        if(!feedbacks){
+            return response.status(200).send({
+                message : "Found",
+                data : {
+                    rating : 5
+                }
+            })
+        }
+        let avg = 0;
+        feedbacks.forEach((feedback) => {
+            avg += feedback.rating;
+        })
+
+        avg = avg/feedbacks.length;
+
+        response.status(200).send({
+            message : "Found",
+            data : {
+                rating : avg
+            }
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
 const getPackage = async (request, response) => {
    
     try{
@@ -183,6 +234,29 @@ const getPackage = async (request, response) => {
    
 }
 
+const getUser = async (request, response) => {
+   
+    try{
+        let user = await User.find();
+        if(!user){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : user
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
 
 
 module.exports = {
@@ -196,5 +270,7 @@ module.exports = {
     getISP,
     getArea,
     getUnion,
-    getPackage
+    getPackage,
+    getUser,
+    getRating
 }

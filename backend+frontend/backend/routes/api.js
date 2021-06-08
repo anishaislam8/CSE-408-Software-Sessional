@@ -13,4 +13,10 @@ router.get('/area', apiController.getArea);
 // get all packages
 router.get('/package', apiController.getPackage);
 
+// get all users
+router.get('/user', apiController.getUser);
+
+//find the rating of one isp
+router.post('/isp/rating', apiController.getRating);
+
 module.exports = router;

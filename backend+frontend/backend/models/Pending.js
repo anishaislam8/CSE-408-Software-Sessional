@@ -7,23 +7,13 @@ var PendingSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    name : {
-        type : String,
+    isp_id : {
+        type : ObjectID,
         required : true,
-        minlength : 1,
-        trim : true
     },
-    license_id : {
-        type : String,
-        default : null,
-        minlength : 6,
-        trim : true
-    },
-    nid : {
-        type : String,
-        default : null,
-        minlength : 6,
-        trim : true
+    user_id : {
+        type : ObjectID,
+        default : null
     },
     area_id : {
         type : ObjectID,

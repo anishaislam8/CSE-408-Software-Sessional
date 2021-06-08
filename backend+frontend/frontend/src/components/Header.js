@@ -10,23 +10,23 @@ function Header() {
          
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav nav-pills ms-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="#">Pending Requests</Link>
+              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
+                <Link className="nav-link" to="/nttn/pendings">Pending Requests</Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="#">Renewal Requests</Link>
+              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
+                <Link className="nav-link" to="/nttn/renewals">Renewal Requests</Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
                 <Link className="nav-link" to="#">Confirm Connection</Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="#">Active ISP List</Link>
+              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
+                <Link className="nav-link" to="/nttn/actives">Active ISP List</Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
                 <Link className="nav-link" to="/nttn/reports">Reports</Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="#">Feedbacks</Link>
+              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
+                <Link className="nav-link" to="/nttn/feedbacks">Feedbacks</Link>
               </li>
               
             </ul>

@@ -1,41 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Report = (props) => {
+const Feedback = (props) => {
 
     return(
         
         <tr> 
             <td>{props.count}</td>
             <td>{props.isp_name}</td>
-            <td>{props.union_name}</td>
-            <td>{props.problem_category}</td>
-            <td>{props.report_arrival_time}</td>
+            <td>{props.user_name}</td>
+            <td>{props.rating}</td>
+            <td>{props.feedback_arrival_time}</td>
         </tr>
               
     );
     
 }
 
-class Reports extends React.Component {
+class Feedbacks extends React.Component {
 
     state = {
-        reports : [],
+        feedbacks : [],
         isps : [],
-        unions : [],
+        users :[],
         district : undefined,
         division : undefined,
         subdistrict : undefined,
         union : undefined,
-        time : undefined
+        area : undefined,
+        time : undefined,
+        rating : undefined
     }
   
 
     componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/reports/sortBy";
+        let apiUrl = "http://localhost:7000/nttn/feedbacks/sortBy";
+
         axios.post(apiUrl,{})
         .then(response => {
-          this.setState({ reports: response.data.data })
+          this.setState({ feedbacks: response.data.data })
         })
         .catch((error) => {
           console.log(error);
@@ -51,10 +54,10 @@ class Reports extends React.Component {
           console.log(error);
         })
 
-        apiUrl = "http://localhost:7000/api/union";
+        apiUrl = "http://localhost:7000/api/user";
         axios.get(apiUrl)
         .then(response => {
-            this.setState({ unions: response.data.data })
+            this.setState({ users: response.data.data })
         })
         .catch((error) => {
           console.log(error);
@@ -74,12 +77,12 @@ class Reports extends React.Component {
     }
 
 
-    getUnionName = (union_id) => {
+    getUserName = (user_id) => {
        
 
-        for(let i = 0; i < this.state.unions.length; i++){
-            if(this.state.unions[i].union_id === union_id){
-                return this.state.unions[i].name
+        for(let i = 0; i < this.state.users.length; i++){
+            if(this.state.users[i]._id === user_id){
+                return this.state.users[i].name
             }
         }
     }
@@ -89,28 +92,28 @@ class Reports extends React.Component {
     render() {
         return(
             <div>
-                <center><h3>Reports from ISP</h3><br></br></center>
+                <center><h3>Feedbacks from Users</h3><br></br></center>
                 
                 <table className="table">
                     <thead className="thead-light">
                         <tr>
                         <th></th>
                         <th>ISP Name</th>
-                        <th>Union Name</th>
-                        <th>Problem Category</th>
-                        <th>Report Arrival Time</th>
+                        <th>User Name</th>
+                        <th>Rating</th>
+                        <th>Feedback Arrival Time</th>
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.reports.map((report, index) => {
+                        this.state.feedbacks.map((feedback, index) => {
                            
-                            return <Report 
-                                key={report._id} 
-                                isp_name={this.getIspName(report.isp_id)} 
-                                union_name = {this.getUnionName(report.union_id)} 
-                                problem_category = {(report.category === "0") ? "Low Bandwidth" : (report.category === "1" ? "Physical Connection Problem" : (report.category === "2" ? "Platform Related Problem" : "Others")) } 
-                                report_arrival_time = {report.report_arrival_time} 
+                            return <Feedback 
+                                key={feedback._id} 
+                                isp_name={this.getIspName(feedback.isp_id)} 
+                                user_name = {this.getUserName(feedback.user_id)} 
+                                rating = {feedback.rating} 
+                                feedback_arrival_time = {feedback.feedback_arrival_time} 
                                 count={index + 1}
                             />})
                         }
@@ -121,4 +124,4 @@ class Reports extends React.Component {
     }
 }
 
-export default Reports
+export default Feedbacks
