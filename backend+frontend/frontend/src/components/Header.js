@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 function Header() {
     return (
         <div>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div className="container-fluid">
-          <Link className="navbar-brand" to="/">Fiber@Home</Link>
+          <Link className="navbar-brand" to="/" style={{"paddingLeft":20, "color" : "white"}}>Fiber@Home</Link>
          
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav nav-pills ms-auto">
@@ -16,9 +16,7 @@ function Header() {
               <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
                 <Link className="nav-link" to="/nttn/renewals">Renewal Requests</Link>
               </li>
-              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
-                <Link className="nav-link" to="#">Confirm Connection</Link>
-              </li>
+              
               <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
                 <Link className="nav-link" to="/nttn/actives">Active ISP List</Link>
               </li>

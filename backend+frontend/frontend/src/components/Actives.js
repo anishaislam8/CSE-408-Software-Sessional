@@ -10,6 +10,7 @@ const Active = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.license_id}</td>
             <td>{props.connection_started}</td>
+            <td><button type="button" className="btn btn-info">View</button></td>
         </tr>
               
     );
@@ -66,16 +67,17 @@ class Actives extends React.Component {
     
     render() {
         return(
-            <div>
+            <div className="container">
                 <center><h3>Active ISP List</h3><br></br></center>
                 
-                <table className="table">
+                <table className="table table-bordered table-striped">
                     <thead className="thead-light">
                         <tr>
-                        <th></th>
+                        <th>#</th>
                         <th>ISP Name</th>
                         <th>License ID</th>
                         <th>Connection Started</th>
+                        <th>View Details</th>
                         </tr>
                     </thead>
                     <tbody>

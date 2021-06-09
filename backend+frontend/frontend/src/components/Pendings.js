@@ -10,6 +10,8 @@ const Pending = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.union_name}</td>
             <td>{props.request_arrival_time}</td>
+            <td><button type="button" className="btn btn-success">Accept</button></td>
+            <td><button type="button" className="btn btn-danger">Reject</button></td>
         </tr>
               
     );
@@ -88,16 +90,18 @@ class Pendings extends React.Component {
     
     render() {
         return(
-            <div>
+            <div className="container">
                 <center><h3>Pending Requests From ISP</h3><br></br></center>
                 
-                <table className="table">
-                    <thead className="thead-light">
+                <table className="table table-bordered table-striped">
+                    <thead className="thead-dark">
                         <tr>
-                        <th></th>
+                        <th>#</th>
                         <th>ISP Name</th>
                         <th>Union Name</th>
                         <th>Request Arrival Time</th>
+                        <th>Accept Request</th>
+                        <th>Reject Request</th>
                         </tr>
                     </thead>
                     <tbody>

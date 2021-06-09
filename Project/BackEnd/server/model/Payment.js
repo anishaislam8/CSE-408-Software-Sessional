@@ -49,6 +49,6 @@ var PaymentSchema = new mongoose.Schema({
 });
 
 
-var Contract = mongoose.model('Contract', ContractSchema);
+var Payment = mongoose.model('Payment', PaymentSchema);
 
-module.exports = {Contract};
+module.exports = {Payment};

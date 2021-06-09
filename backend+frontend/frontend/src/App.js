@@ -15,6 +15,8 @@ function App() {
     <Router>
     <Header />
     <br/>
+    <br/>
+    <br/>
       <Route path="/" exact component={Homepage} />
       <Route path="/nttn/reports" exact component={Reports} />
       <Route path="/nttn/feedbacks" exact component={Feedbacks} />

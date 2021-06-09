@@ -11,6 +11,7 @@ const Feedback = (props) => {
             <td>{props.user_name}</td>
             <td>{props.rating}</td>
             <td>{props.feedback_arrival_time}</td>
+            <td><button type="button" className="btn btn-info">View</button></td>
         </tr>
               
     );
@@ -91,17 +92,18 @@ class Feedbacks extends React.Component {
     
     render() {
         return(
-            <div>
+            <div className="container">
                 <center><h3>Feedbacks from Users</h3><br></br></center>
                 
-                <table className="table">
+                <table className="table table-bordered table-striped">
                     <thead className="thead-light">
                         <tr>
-                        <th></th>
+                        <th>#</th>
                         <th>ISP Name</th>
                         <th>User Name</th>
                         <th>Rating</th>
                         <th>Feedback Arrival Time</th>
+                        <th>View Details</th>
                         </tr>
                     </thead>
                     <tbody>

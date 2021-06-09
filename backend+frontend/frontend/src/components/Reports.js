@@ -11,6 +11,7 @@ const Report = (props) => {
             <td>{props.union_name}</td>
             <td>{props.problem_category}</td>
             <td>{props.report_arrival_time}</td>
+            <td><button type="button" className="btn btn-info">View</button></td>
         </tr>
               
     );
@@ -88,17 +89,18 @@ class Reports extends React.Component {
     
     render() {
         return(
-            <div>
+            <div class="container">
                 <center><h3>Reports from ISP</h3><br></br></center>
                 
-                <table className="table">
+                <table className="table table-bordered table-striped">
                     <thead className="thead-light">
                         <tr>
-                        <th></th>
+                        <th>#</th>
                         <th>ISP Name</th>
                         <th>Union Name</th>
                         <th>Problem Category</th>
                         <th>Report Arrival Time</th>
+                        <th>View Report</th>
                         </tr>
                     </thead>
                     <tbody>
