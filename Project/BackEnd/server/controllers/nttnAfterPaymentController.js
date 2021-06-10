@@ -3,7 +3,7 @@ let { ISP } = require("../models/ISP");
 let { Package } = require("../models/Package");
 let { Contract } = require("../models/Contract");
 
-const findNewPayment = async (response) => {
+const findNewPayment = async (request, response) => {
   //   let status = request.body.payment_status;
   //   let type = request.body.user_type;
 
@@ -35,7 +35,7 @@ const findNewPayment = async (response) => {
 };
 
 const handlePaymentDone = async (request, response) => {
-  let payment_id = request.body.payment_id;
+  let payment_id = request.body._id;
   if (!payment_id) {
     return response.status(400).send({
       message: "Payment ID invalid",
@@ -72,9 +72,9 @@ const handlePaymentDone = async (request, response) => {
     if (isp.connection_status === false) {
       isp.connection_status = true;
       isp.connection_establishment_time = new Date();
-      isp.expiration_Date = new Date() + package.duration;
+      isp.expiration_date = new Date() + package.duration;
     } else if (isp.connection_status === true) {
-      isp.expiration_Date = new Date() + package.duration;
+      isp.expiration_date = new Date() + package.duration;
     }
 
     let user_type = 0;
@@ -102,17 +102,17 @@ const handlePaymentDone = async (request, response) => {
       });
     }
 
-    return response.status(200).send({
-      message: "Insertion Successful",
-      data,
-    });
-
     let updatedisp = await isp.save();
     let updatedpayment = await payment.save();
     return response.status(200).send({
-      message: "payment updated",
-      data: updatedpayment,
+      message: "Contract insertion Successful and Payment and ISP updated",
+      data: data + "\n" + updatedisp + "\n" + updatedpayment,
     });
+
+    // return response.status(200).send({
+    //   message: "payment updated",
+    //   data: updatedpayment,
+    // });
   } catch (e) {
     return response.status(500).send({
       message: "EXCEPTION",
