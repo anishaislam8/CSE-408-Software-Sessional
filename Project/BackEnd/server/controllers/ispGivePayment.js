@@ -1,4 +1,4 @@
-let { ISP } = require("../models/ISP");
+//let { ISP } = require("../model/ISP");
 let { Payment } = require("../models/Payment");
 
 //insert an entry in Payment table
