@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom';
 
 const Feedback = (props) => {
 
@@ -11,7 +12,11 @@ const Feedback = (props) => {
             <td>{props.user_name}</td>
             <td>{props.rating}</td>
             <td>{props.feedback_arrival_time}</td>
-            <td><button type="button" className="btn btn-info">View</button></td>
+            <td><Link type="button" className="btn btn-info" to={{
+                pathname : "/nttn/feedbacks/view",
+                state : {
+                    feedback_id : props.feedback_id
+                }}}>View</Link></td>
         </tr>
               
     );
@@ -117,6 +122,7 @@ class Feedbacks extends React.Component {
                                 rating = {feedback.rating} 
                                 feedback_arrival_time = {feedback.feedback_arrival_time} 
                                 count={index + 1}
+                                feedback_id={feedback._id}
                             />})
                         }
                     </tbody>

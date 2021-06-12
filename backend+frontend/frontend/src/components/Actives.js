@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import axios from 'axios'
 
 const Active = (props) => {
@@ -10,6 +10,7 @@ const Active = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.license_id}</td>
             <td>{props.connection_started}</td>
+            <td>{props.average_rating}</td>
             <td><button type="button" className="btn btn-info">View</button></td>
         </tr>
               
@@ -48,21 +49,6 @@ class Actives extends React.Component {
     }
 
 
-    // getRating= (isp_id) => {
-       
-    //     let apiUrl = "http://localhost:7000/api/isp/rating";
-    //     axios.post(apiUrl, {isp_id})
-    //     .then(response => {
-    //         this.setState({ ispRating: response.data.data.rating })
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     })
-
-    //     return this.state.ispRating;
-        
-    // }
-
    
     
     render() {
@@ -77,6 +63,7 @@ class Actives extends React.Component {
                         <th>ISP Name</th>
                         <th>License ID</th>
                         <th>Connection Started</th>
+                        <th>Average Rating</th>
                         <th>View Details</th>
                         </tr>
                     </thead>
@@ -89,6 +76,7 @@ class Actives extends React.Component {
                                 isp_name={isp.name} 
                                 license_id = {isp.license_id} 
                                 connection_started = {isp.connection_establishment_time}
+                                average_rating = {isp.average_rating}
                                 count={index + 1}
                             />})
                         }

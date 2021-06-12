@@ -28,6 +28,10 @@ var UserSchema  = new mongoose.Schema({
         type: Date,
         default: null
     },
+    expiration_date : {
+        type : Date,
+        default : null
+    },
     connection_status : {
         type : Boolean,
         default : false

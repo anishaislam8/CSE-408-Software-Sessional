@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import React from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Report = (props) => {
 
@@ -11,7 +12,11 @@ const Report = (props) => {
             <td>{props.union_name}</td>
             <td>{props.problem_category}</td>
             <td>{props.report_arrival_time}</td>
-            <td><button type="button" className="btn btn-info">View</button></td>
+            <td><Link type="button" className="btn btn-info" to={{
+                pathname : "/nttn/reports/view",
+                state : {
+                    report_id : props.report_id
+                }}}>View</Link></td>
         </tr>
               
     );
@@ -114,6 +119,7 @@ class Reports extends React.Component {
                                 problem_category = {(report.category === "0") ? "Low Bandwidth" : (report.category === "1" ? "Physical Connection Problem" : (report.category === "2" ? "Platform Related Problem" : "Others")) } 
                                 report_arrival_time = {report.report_arrival_time} 
                                 count={index + 1}
+                                report_id={report._id}
                             />})
                         }
                     </tbody>

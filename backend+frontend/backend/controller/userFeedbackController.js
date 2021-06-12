@@ -1,4 +1,5 @@
 const {Feedback} = require('./../models/Feedback');
+const {ISP} = require('./../models/ISP');
 
 const handlePostFeedbacks = async (request, response) => {
     const isp_id = request.body.isp_id;
@@ -25,6 +26,26 @@ const handlePostFeedbacks = async (request, response) => {
                 data : []
             })
         }
+        // calculate the new average rating of the isp
+     
+        let feedbacksOfThisISP = await Feedback.find({
+            isp_id
+        });
+        
+        const numberOfFeedbacks = feedbacksOfThisISP.length;
+  
+        let sum = 0;
+        for (let i= 0; i < numberOfFeedbacks; i++){
+            sum += feedbacksOfThisISP[i].rating;
+        }
+
+        const avgSum = Math.round(sum/numberOfFeedbacks, 1);
+     
+
+        let isp = await ISP.findById(isp_id);
+        isp.average_rating = avgSum;
+        isp.save();
+       
 
         return response.status(200).send({
             message : "Insertion Successful",

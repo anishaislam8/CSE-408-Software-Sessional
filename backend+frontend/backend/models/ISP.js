@@ -41,6 +41,10 @@ var ISPSchema = new mongoose.Schema({
         type : Date,
         default : null
     },
+    average_rating : {
+        type : Number,
+        default : null
+    },
     tokens : [{
         access : {
             type : String,

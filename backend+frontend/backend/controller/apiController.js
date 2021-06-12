@@ -162,54 +162,7 @@ const getArea = async (request, response) => {
    
 }
 
-const getRating = async (request, response) => {
-   
-    try{
-        if(!request.body.isp_id){
-            return response.status(404).send({
-                message : "Not found",
-                data : []
-            })
-        }
-        let isp = await ISP.findById(request.body.isp_id);
-        if(!isp){
-            return response.status(404).send({
-                message : "Not found",
-                data : []
-            })
-        }
-        let feedbacks = await Feedback.find({
-            isp_id : request.body.isp_id
-        });
-        if(!feedbacks){
-            return response.status(200).send({
-                message : "Found",
-                data : {
-                    rating : 5
-                }
-            })
-        }
-        let avg = 0;
-        feedbacks.forEach((feedback) => {
-            avg += feedback.rating;
-        })
 
-        avg = avg/feedbacks.length;
-
-        response.status(200).send({
-            message : "Found",
-            data : {
-                rating : avg
-            }
-        })
-    } catch (e) {
-        return response.status(500).send({
-            message : "EXCEPTION",
-            data : []
-        })
-    }
-   
-}
 
 const getPackage = async (request, response) => {
    
@@ -271,6 +224,5 @@ module.exports = {
     getArea,
     getUnion,
     getPackage,
-    getUser,
-    getRating
+    getUser
 }

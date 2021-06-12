@@ -112,6 +112,7 @@ const handleReportFetchingSorted = async (request, response) => {
 }
 
 const handleOneReport = async (request, response) => {
+   
     let report_id = request.body.report_id;
     if(!report_id){
         return response.status(400).send({
@@ -121,7 +122,7 @@ const handleOneReport = async (request, response) => {
     }
     try{
         let report = await Report.findById(report_id);
-        if(!report){
+        if(!report || report.request_type !== 0){
             return response.status(404).send({
                 message : "Report not found",
                 data : []
@@ -133,7 +134,7 @@ const handleOneReport = async (request, response) => {
         })
     } catch(e) {
         return response.status(500).send({
-            message : "EXCEPTION",
+            message : e.message,
             data : []
         })
     }
