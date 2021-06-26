@@ -44,6 +44,10 @@ var ReportSchema = new mongoose.Schema({
     report_resolve_time : {
         type : Date,
         default : null
+    },
+    rating : {
+        type : Number,
+        default : null
     }
 });
 

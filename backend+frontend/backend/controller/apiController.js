@@ -6,7 +6,7 @@ const { Area } = require('./../models/Area');
 const { ISP } = require('./../models/ISP');
 const { User } = require('./../models/User');
 const { Package } = require('./../models/Package');
-const { Feedback } = require('./../models/Feedback');
+
 
 const findAreaFromUnion = async(union) => {
     let areas = await Area.find({
@@ -162,6 +162,75 @@ const getArea = async (request, response) => {
    
 }
 
+const getDivision = async (request, response) => {
+   
+    try{
+        let division = await Division.find();
+        if(!division){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : division
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
+const getDistrict = async (request, response) => {
+   
+    try{
+        let district = await District.find();
+        if(!district){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : district
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
+const getSubDistrict = async (request, response) => {
+   
+    try{
+        let subdistrict = await SubDistrict.find();
+        if(!subdistrict){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : subdistrict
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
 
 
 const getPackage = async (request, response) => {
@@ -224,5 +293,8 @@ module.exports = {
     getArea,
     getUnion,
     getPackage,
-    getUser
+    getUser,
+    getDistrict,
+    getDivision,
+    getSubDistrict
 }

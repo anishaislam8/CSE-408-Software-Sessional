@@ -5,7 +5,7 @@ function Homepage() {
     return (
     <div className="shadow-lg p-3 mb-5 bg-white rounded" style={{margin : 50}}>
 
-        <div clasName="row">
+        <div className="row">
             <div className="col s12 m6" style={{paddingTop : "10%", paddingLeft : "10%"}}>
                 <h1>Welcome to Fiber@Home</h1>
                 <p>

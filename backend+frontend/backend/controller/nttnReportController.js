@@ -33,14 +33,18 @@ const handleReportFetchingSorted = async (request, response) => {
     let sortByDivision = request.body.division_id;
     let sortBySubDistrict = request.body.upazilla_id;
     let sortByUnion = request.body.union_id;
-    let sortByTime = request.body.time || 1; // 1- ascending, -1 : descending 
+    let sortByTime = request.body.time; // 1- ascending, -1 : descending 
+    let resolve_status = request.body.resolve_status || false;
+    let sortByRating = request.body.rating;
+    let sortByIsp = request.body.isp_id
 
     try{
         let reports;
+
         if(sortByUnion){
             reports = await Report.find({
                 union_id : sortByUnion,
-                resolve_status : false
+                resolve_status
             })  
 
         } else if(sortBySubDistrict){
@@ -48,7 +52,7 @@ const handleReportFetchingSorted = async (request, response) => {
             let unions = await apiController.findUnionFromSubDistrict(sortBySubDistrict);
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) },
-                resolve_status : false
+                resolve_status
             })
 
         } else if(sortByDistrict){
@@ -57,7 +61,7 @@ const handleReportFetchingSorted = async (request, response) => {
             
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) },
-                resolve_status : false
+                resolve_status
             })
 
         } else if(sortByDivision){
@@ -66,7 +70,7 @@ const handleReportFetchingSorted = async (request, response) => {
             
             reports = await Report.find({
                 union_id : { "$in": unions.map(union => union.union_id) },
-                resolve_status : false
+                resolve_status
             })
 
 
@@ -80,19 +84,86 @@ const handleReportFetchingSorted = async (request, response) => {
                     data : []
                 })
             } else {
-                
-                reports = await Report.find({
-                    resolve_status : false
-                })
+               
+
+                if(sortByIsp){
+                    reports = await Report.find({
+                        resolve_status,
+                        isp_id : sortByIsp
+                    })
+                } else {
+                    reports = await Report.find({
+                        resolve_status
+                    })
+                }
                 
             }
+        } else {
+            // further sorting
+            if(sortByIsp){
+                reports = reports.filter((report) => {
+                    return report.isp_id === sortByIsp;
+                })
+            }
+            
+        }
+
+        if(!reports || reports.length === 0){
+            return response.status(404).send({
+                message : "No Reports Found",
+                data : []
+            })
         }
         
         
-        if(sortByTime === 1){
-            reports.sort((a,b) => a.report_arrival_time - b.report_arrival_time);
-        } else if(sortByTime === -1){
-            reports.sort((a,b) => b.report_arrival_time - a.report_arrival_time);
+        if(sortByTime && sortByRating){
+            if(sortByTime === 1 && sortByRating === 1){
+                reports.sort((a,b) => {
+                    if (a.rating > b.rating) return 1;
+                    if (a.rating < b.rating) return -1;
+                    if (a.report_arrival_time > b.report_arrival_time) return 1;
+                    if (a.report_arrival_time < b.report_arrival_time) return -1;
+                })
+                
+            } else if(sortByTime === 1 && sortByRating === -1){
+                reports.sort((a,b) => {
+                    if (a.rating > b.rating) return 1;
+                    if (a.rating < b.rating) return -1;
+                    if (a.report_arrival_time > b.report_arrival_time) return -1;
+                    if (a.report_arrival_time < b.report_arrival_time) return 1;
+                })
+            } else if(sortByTime === -1 && sortByRating === 1){
+                reports.sort((a,b) => {
+                    if (a.rating > b.rating) return -1;
+                    if (a.rating < b.rating) return 1;
+                    if (a.report_arrival_time > b.report_arrival_time) return 1;
+                    if (a.report_arrival_time < b.report_arrival_time) return -1;
+                })
+            } else if(sortByTime === -1 && sortByRating === -1){
+                reports.sort((a,b) => {
+                    if (a.rating > b.rating) return -1;
+                    if (a.rating < b.rating) return 1;
+                    if (a.report_arrival_time > b.report_arrival_time) return -1;
+                    if (a.report_arrival_time < b.report_arrival_time) return 1;
+                })
+            }
+            
+        } else if(sortByRating){
+            if(sortByRating === 1){
+                reports.sort((a,b) => a.rating - b.rating);
+            } else if(sortByRating === -1){
+                reports.sort((a,b) => b.rating - a.rating);
+            }
+        } else{
+            if(sortByTime){
+                if(sortByTime === 1){
+                    reports.sort((a,b) => a.report_arrival_time - b.report_arrival_time);
+                } else if(sortByTime === -1){
+                    reports.sort((a,b) => b.report_arrival_time - a.report_arrival_time);
+                }
+            } else {
+                reports.sort((a,b) => a.report_arrival_time - b.report_arrival_time);
+            }
         }
 
        

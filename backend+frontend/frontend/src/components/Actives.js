@@ -57,7 +57,7 @@ class Actives extends React.Component {
                 <center><h3>Active ISP List</h3><br></br></center>
                 
                 <table className="table table-bordered table-striped">
-                    <thead className="thead-light">
+                    <thead className="thead-dark">
                         <tr>
                         <th>#</th>
                         <th>ISP Name</th>
