@@ -78,7 +78,15 @@ const findUnionFromDistrict = async (district) => {
 
     return unions;
 }
-
+const findSubDistrictFromDivision = async (division) => {
+    let districts = await District.find({
+        division_id : division
+    });
+    let subdistricts = await SubDistrict.find({
+        district_id : { $in : districts.map(district => district.district_id)}
+    });
+    return subdistricts;
+}
 const findUnionFromDivision = async (division) => {
     let districts = await District.find({
         division_id : division
@@ -289,6 +297,7 @@ module.exports = {
     findAreaFromDivision,
     findAreaFromSubDistrict,
     findAreaFromUnion,
+    findSubDistrictFromDivision,
     getISP,
     getArea,
     getUnion,
