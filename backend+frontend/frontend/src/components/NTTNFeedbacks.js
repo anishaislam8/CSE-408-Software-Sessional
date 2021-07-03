@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { Form, Button } from 'react-bootstrap';
 import { Col } from 'react-grid-system';
 import { Link } from 'react-router-dom';
-import Modal from './Modal';
 
 
 const pageSize = 5;
@@ -32,7 +31,7 @@ const Feedback = (props) => {
     
 }
 
-class Feedbacks extends React.Component {
+class NTTNFeedbacks extends React.Component {
 
     constructor(props){
         super(props);
@@ -48,6 +47,8 @@ class Feedbacks extends React.Component {
             pages : [],
             pageCount : 0,
             rating : "",
+            ratingAll : "",
+            timeAll:"",
             time : "",
             districts : [],
             divisions : [],
@@ -59,13 +60,16 @@ class Feedbacks extends React.Component {
             searchupazillas : [],
             searchISPs:[],
             showAreaSearch : false,
-            showSortArrivalOrder:false,
             showSortRatingOrder:false,
-            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:""
+            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
+            searchText:""
            
         }
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
         this.handleChangeArrivalTimeOrder = this.handleChangeArrivalTimeOrder.bind(this);
+        this.handleChangeRatingOrderAll = this.handleChangeRatingOrderAll.bind(this);
+        this.handleChangeArrivalTimeOrderAll = this.handleChangeArrivalTimeOrderAll.bind(this);
+        this.handleChangeSearchText = this.handleChangeSearchText.bind(this);
         this.handleChangeDistrict = this.handleChangeDistrict.bind(this);
         this.handleChangeDivision = this.handleChangeDivision.bind(this);
         this.handleChangeUpazilla = this.handleChangeUpazilla.bind(this);
@@ -80,10 +84,10 @@ class Feedbacks extends React.Component {
         this.paginationFeedbacks= this.paginationFeedbacks.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
-        this.showArrivalDiv = this.showArrivalDiv.bind(this);
         this.findFromDivision = this.findFromDivision.bind(this);
         this.findFromDistrict = this.findFromDistrict.bind(this);
         this.findFromUpazilla = this.findFromUpazilla.bind(this);
+        this.showAllData = this.showAllData.bind(this);
     
         
 
@@ -215,6 +219,47 @@ class Feedbacks extends React.Component {
       })
     }
 
+    showAllData(){
+
+      let apiUrl = "http://localhost:7000/nttn/feedbacks";
+    
+
+      axios.get(apiUrl)
+      .then(response => {
+       
+        this.setState({ feedbacks: response.data.data }, () => {
+          
+          //console.log("here");
+          let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
+          let pagesVal = _.range(1, pageCountVal + 1);
+  
+          this.setState({
+            pageCount : pageCountVal,
+            pages : pagesVal,
+            showAreaSearch : false,
+            showSortRatingOrder:false,
+            rating : "",
+            ratingAll : "",
+            timeAll:"",
+            time : "",
+            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
+
+          }, () => {
+            this.paginationFeedbacks(1);
+          })
+        
+        });
+        
+        
+      })
+      .catch((error) => {
+        console.log(error);
+        //this.setState({ feedbacks: [] });
+      })
+    }
+    handleChangeSearchText(e){
+
+    }
     handleChangeArea(e){
       this.setState({
         selectedArea : e.target.value
@@ -225,27 +270,24 @@ class Feedbacks extends React.Component {
 
     findFromDivision(division){
       let districts = this.state.districts.filter((district) => district.division_id === division);
-      
-      let upazillas = this.state.upazillas.filter((upazilla) => districts.includes(upazilla.district_id.toString()));
-      console.log("BAAL",upazillas);
-      let unions = this.state.unions.filter((union) =>  upazillas.includes(union.upazilla_id));
-      let areas = this.state.areas.filter((area) => unions.includes(area.union_id));
-      console.log("Upper : ",[upazillas, unions, areas]);
+      let upazillas = this.state.upazillas.filter((upazilla) => districts.map((district) => district.district_id).includes(upazilla.district_id));
+      let unions = this.state.unions.filter((union) =>  upazillas.map((upazilla) => upazilla.upazilla_id).includes(union.upazilla_id));
+      let areas = this.state.areas.filter((area) => unions.map((union) => union.union_id).includes(area.union_id));
       return [upazillas, unions, areas];
     }
 
     findFromDistrict(district){
      
       let upazillas = this.state.upazillas.filter((upazilla) => upazilla.district_id === district);
-      let unions = this.state.unions.filter((union) =>  upazillas.includes(union.upazilla_id));
-      let areas = this.state.areas.filter((area) => unions.includes(area.union_id));
+      let unions = this.state.unions.filter((union) =>  upazillas.map(upazilla => upazilla.upazilla_id).includes(union.upazilla_id));
+      let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
 
       return [unions, areas];
     }
 
     findFromUpazilla(upazilla){
       let unions = this.state.unions.filter((union) =>  union.upazilla_id === upazilla);
-      let areas = this.state.areas.filter((area) => unions.includes(area.union_id));
+      let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
 
       return [areas];
 
@@ -254,15 +296,14 @@ class Feedbacks extends React.Component {
 
     handleChangeDivision(e){
       let ans = this.findFromDivision(e.target.value);
-      console.log(ans);
+      
       this.setState({
         selectedDivision : e.target.value,
         searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
-        selectedDistrict:"", selectedUpazilla:"",selectedUnion:"", selectedArea:"",
         searchupazillas: ans[0],
         searchUnions : ans[1],
-        searchAreas : ans[2]
-        
+        searchAreas : ans[2],
+        selectedDistrict:"", selectedUpazilla:"",selectedUnion:"", selectedArea:"",
         
       })
         
@@ -346,7 +387,8 @@ class Feedbacks extends React.Component {
 
     handleChangeRatingOrder(e){
         this.setState({
-          rating : e.target.value
+          rating : e.target.value,
+          ratingAll: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
             this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.rating - b.rating)}))
@@ -360,25 +402,63 @@ class Feedbacks extends React.Component {
         
         
       }
-    
-    
-      handleChangeArrivalTimeOrder(e){
-        // this.setState({
-        //   time : e.target.value
-        // },this.handleRatingTimeOrderChange)
+
+      handleChangeRatingOrderAll(e){
         this.setState({
-          time : e.target.value
+          ratingAll : e.target.value,
+          rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}));
+            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => a.rating - b.rating)}))
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}));
-            
+            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => b.rating - a.rating)}))
           }
-          //this.paginationFeedbacks(this.state.currentPage);
+    
+          this.paginationFeedbacks(1);
+          
         })
-       
+        
+        
       }
+
+      handleChangeArrivalTimeOrder(e){
+        this.setState({
+          time : e.target.value,
+          rating: "", ratingAll : "", timeAll : ""
+        }, () =>{
+          if(e.target.value === "1"){
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+          } else {
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+          }
+    
+          //this.paginationFeedbacks(this.state.currentPage);
+          
+        })
+        
+        
+      }
+
+      handleChangeArrivalTimeOrderAll(e){
+        this.setState({
+          timeAll : e.target.value,
+          rating: "", ratingAll : "", time : ""
+        }, () =>{
+          if(e.target.value === "1"){
+            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+          } else {
+            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+          }
+    
+          this.paginationFeedbacks(1);
+          
+        })
+        
+        
+      }
+    
+    
+    
 
     paginationFeedbacks(pageNo) {
         this.setState({
@@ -443,19 +523,30 @@ class Feedbacks extends React.Component {
         return(
             <div className="container">
                 <center><h3>Feedbacks from Users</h3><br></br></center>
-                <div>
-                  <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":20}} >{this.state.showAreaSearch ? "Hide Search By Location" : "Search by Location"}</Button>
-                  <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":20}} >{this.state.showSortRatingOrder ? "Hide Sort By Rating" : "Sort By Rating"}</Button>
-                  <Button variant="warning" onClick={this.showArrivalDiv} style={{"marginBottom":20}} >{this.state.showSortArrivalOrder ? "Hide Sort By Time" : "Sort By Time"}</Button>
+                <div className = "row">
+                <div className="col">
+                <Button variant="primary" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":20,"width" : 280}} >{this.state.showAreaSearch ? "Hide Search By Location" : "Search by Location"}</Button>
                 </div>
+                <div className="col">
+                <Button variant="primary" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":20, "width" : 280}} >{this.state.showSortRatingOrder ? "Hide Sort By Rating And Time" : "Sort By Rating And Time"}</Button>
+                </div>
+                <div className="col">
+                <Button variant="primary" onClick={this.showAllData} style={{"marginBottom":20, "marginRight":20, "width" : 280}} >Show All Feedbacks</Button>       
+                </div>
+                <div className="col">
+                <input type="text" className="form-control" style={{"marginBottom":20, "width" : 300}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Enter your search"/>
+                </div>
+                  
+                  
+                 </div>
                 <div hidden={!(this.state.showAreaSearch)} style={{"backgroundColor":"#343a40", "color": "white", "padding":10, "borderRadius":5, "marginBottom":20}}>
                   <Form>
                       <Form.Row>
                       <Col>
                       <Form.Group style={{"marginRight":20, "marginLeft":20}}>
                           <Form.Label>Division</Form.Label>
-                          <Form.Control as="select" defaultValue={this.state.selectedDivision} onChange={this.handleChangeDivision}>
-                          <option disabled value={""}>Select Division</option>
+                          <Form.Control as="select" value={this.state.selectedDivision} onChange={this.handleChangeDivision}>
+                          <option disabled hidden value={""}>Select Division</option>
                           {
                             this.state.divisions.map((division) =><option key={division.division_id} value={division.division_id}>{division.name}</option>)
                           }
@@ -466,8 +557,8 @@ class Feedbacks extends React.Component {
                       <Col>
                       <Form.Group style={{"marginRight":20}} >
                           <Form.Label>District</Form.Label>
-                          <Form.Control as="select" defaultValue={this.state.selectedDistrict} onChange={this.handleChangeDistrict}>
-                          <option value={""} disabled>Select District</option>
+                          <Form.Control as="select" value={this.state.selectedDistrict} onChange={this.handleChangeDistrict}>
+                          <option value={""} disabled hidden>Select District</option>
                           {
                             this.state.searchdistricts.map((district) => <option key={district.district_id} value={district.district_id}>{district.name}</option>)
                           }
@@ -479,8 +570,8 @@ class Feedbacks extends React.Component {
                       <Col>
                       <Form.Group style={{"marginRight":20}}>
                           <Form.Label>Upazilla</Form.Label>
-                          <Form.Control as="select" defaultValue={this.state.selectedUpazilla} onChange={this.handleChangeUpazilla}>
-                          <option value={""} disabled>Select Upazilla</option>
+                          <Form.Control as="select" value={this.state.selectedUpazilla} onChange={this.handleChangeUpazilla}>
+                          <option value={""} disabled hidden>Select Upazilla</option>
                           {
                             this.state.searchupazillas.map((upazilla) => <option key={upazilla.upazilla_id} value={upazilla.upazilla_id}>{upazilla.name}</option>)
                           }
@@ -492,8 +583,8 @@ class Feedbacks extends React.Component {
                       <Col>
                       <Form.Group style={{"marginRight":20}}>
                           <Form.Label>Union</Form.Label>
-                          <Form.Control as="select" defaultValue={this.state.selectedUnion} onChange={this.handleChangeUnion}>
-                          <option value={""} disabled>Select Union</option>
+                          <Form.Control as="select" value={this.state.selectedUnion} onChange={this.handleChangeUnion}>
+                          <option value={""} disabled hidden>Select Union</option>
                           {
                             this.state.searchUnions.map((union) => <option key={union.union_id} value={union.union_id}>{union.name}</option>)
                           }
@@ -504,8 +595,8 @@ class Feedbacks extends React.Component {
                       <Col>
                       <Form.Group>
                           <Form.Label>Area</Form.Label>
-                          <Form.Control as="select" defaultValue={this.state.selectedArea} onChange={this.handleChangeArea} >
-                          <option value="" disabled>Select Area</option>
+                          <Form.Control as="select" value={this.state.selectedArea} onChange={this.handleChangeArea} >
+                          <option value="" disabled hidden>Select Area</option>
                           {this.state.searchAreas.length === 0 && <option value="" disabled>No Areas found</option>}
                           {
                             
@@ -538,39 +629,55 @@ class Feedbacks extends React.Component {
                       <Form.Row>
 
                       <Col>
-                      <Form.Group>
-                          <Form.Label>Rating</Form.Label>
-                          <Form.Control as="select" defaultValue={""} onChange={this.handleChangeRatingOrder}>
-                          <option value=""  disabled hidden>Rating Order</option>
+                      <Form.Group style={{"marginRight" : 40}}>
+                          <Form.Label>Sort This Page By Rating</Form.Label>
+                          <Form.Control as="select" value={this.state.rating} onChange={this.handleChangeRatingOrder}>
+                          <option value=""  disabled hidden>Select Rating Order</option>
                           <option value="1">Ascending</option>
                           <option value="-1">Descending</option>
                           </Form.Control>
                       </Form.Group>
                       </Col>
-                      </Form.Row>
-                    </Form>
-                </div>
 
-                <div  hidden={!this.state.showSortArrivalOrder} style={{"backgroundColor":"#343a40", "color": "white", "padding":10, "borderRadius":5,"marginBottom":20}}>
-                <Form style={{"padding" : 10}}>
-                    <Form.Row>
 
-                  
-
-                    <Col>
-                    <Form.Group>
-                        <Form.Label>Arrival Time</Form.Label>
-                        <Form.Control as="select" defaultValue={""} onChange={this.handleChangeArrivalTimeOrder}>
-                        <option value="" disabled hidden>Arrival Time Order</option>
+                      <Col >
+                    <Form.Group style={{ "marginRight" : 40}}>
+                        <Form.Label>Sort This Page By Time</Form.Label>
+                        <Form.Control as="select" value={this.state.time} onChange={this.handleChangeArrivalTimeOrder}>
+                        <option value="" disabled hidden>Select Arrival Time Order</option>
                         <option value="-1">Descending</option>
                         <option value="1">Ascending</option>
                         </Form.Control>
                     </Form.Group>
                     </Col>
-                    
-                    </Form.Row>
-                </Form>
+
+
+                    <Col >
+                    <Form.Group style={{"marginRight" : 40}}>
+                        <Form.Label>Sort All Data By Rating</Form.Label>
+                        <Form.Control as="select" value={this.state.ratingAll} onChange={this.handleChangeRatingOrderAll}>
+                        <option value="" disabled hidden>Select Rating Order</option>
+                        <option value="-1">Descending</option>
+                        <option value="1">Ascending</option>
+                        </Form.Control>
+                    </Form.Group>
+                    </Col>
+
+                    <Col >
+                    <Form.Group>
+                        <Form.Label>Sort All Data By Time</Form.Label>
+                        <Form.Control as="select" value={this.state.timeAll} onChange={this.handleChangeArrivalTimeOrderAll}>
+                        <option value="" disabled hidden>Select Arrival Time Order</option>
+                        <option value="-1">Descending</option>
+                        <option value="1">Ascending</option>
+                        </Form.Control>
+                    </Form.Group>
+                    </Col>
+                      </Form.Row>
+                    </Form>
                 </div>
+
+               
                 
                 
                 <table className="table table-bordered table-striped">
@@ -615,7 +722,7 @@ class Feedbacks extends React.Component {
                     </li>
                     {
                         this.state.pages.map((page) => {
-                            return <li className={
+                            return <li key={page} className={
                                 page === this.state.currentPage ? "page-item active" : "page-item"
                             }><p className="page-link" onClick={()=>this.paginationFeedbacks(page)}>{page}</p></li>
                         })
@@ -637,4 +744,4 @@ class Feedbacks extends React.Component {
     }
 }
 
-export default Feedbacks
+export default NTTNFeedbacks;

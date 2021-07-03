@@ -1,0 +1,10 @@
+.navbar .nav-pills > li > .nav-link:hover {
+    background-color: rgb(255, 193, 7);
+    color: black;
+}
+
+.navbar .nav-pills .active {
+  background-color: rgb(255, 193, 7);
+  color:Black ;
+  font-weight:bold;
+}

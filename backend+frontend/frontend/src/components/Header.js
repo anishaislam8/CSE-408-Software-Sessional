@@ -1,30 +1,31 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { Link , NavLink } from 'react-router-dom';
+import './../styles/header.css';
 
 function Header() {
     return (
         <div>
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <nav className="navbar navbar-expand-lg fixed-top" style={{"backgroundColor":"#343a40", "color": "white"}}>
         <div className="container-fluid">
-          <Link className="navbar-brand" to="/" style={{"paddingLeft":20, "color" : "white"}}>Fiber@Home</Link>
+          <NavLink className="navbar-brand" to="/" style={{"paddingLeft":20, "color" : "white"}}>Fiber@Home</NavLink>
          
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav nav-pills ms-auto">
-              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
-                <Link className="nav-link" to="/nttn/pendings">Pending Requests</Link>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}}  to="/nttn/pendings">Pending Requests</NavLink>
               </li>
-              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
-                <Link className="nav-link" to="/nttn/renewals">Renewal Requests</Link>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/renewals">Renewal Requests</NavLink>
               </li>
               
-              <li className="nav-item" style={{"paddingRight":20, "color" : "white"}}>
-                <Link className="nav-link" to="/nttn/actives">Active ISP List</Link>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/actives">Active ISP List</NavLink>
               </li>
-              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
-                <Link className="nav-link" to="/nttn/reports">Reports</Link>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/reports">Reports</NavLink>
               </li>
-              <li className="nav-item" style={{"paddingRight":20,"color" : "white"}}>
-                <Link className="nav-link" to="/nttn/feedbacks">Feedbacks</Link>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/feedbacks">Feedbacks</NavLink>
               </li>
               
             </ul>

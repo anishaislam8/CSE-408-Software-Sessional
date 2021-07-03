@@ -269,7 +269,7 @@ class NTTNReports extends React.Component {
                 </li>
                 {
                     this.state.pages.map((page) => {
-                        return <li className={
+                        return <li key={page} className={
                             page === this.state.currentPage ? "page-item active" : "page-item"
                         }><p className="page-link" onClick={()=>this.paginationReports(page)}>{page}</p></li>
                     })

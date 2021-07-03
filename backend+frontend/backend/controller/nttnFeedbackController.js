@@ -66,34 +66,34 @@ const handleFeedbackSorted = async (request, response) => {
         if(sortByArea){
             feedbacks = await Feedback.find({
                 area_id : sortByArea
-            })
+            }).sort({"feedback_arrival_time": -1});
         }
         else if(sortByUnion){
             let areas = await apiController.findAreaFromUnion(sortByUnion);
             feedbacks = await Feedback.find({
                 area_id : { "$in": areas.map(area => area._id) }
-            })
+            }).sort({"feedback_arrival_time": -1});
 
         } else if(sortBySubDistrict){
 
             let areas = await apiController.findAreaFromSubDistrict(sortBySubDistrict);
             feedbacks = await Feedback.find({
                 area_id : { "$in": areas.map(area => area._id) }
-            })
+            }).sort({"feedback_arrival_time": -1});
 
         } else if(sortByDistrict){
 
             let areas = await apiController.findAreaFromDistrict(sortByDistrict);
             feedbacks = await Feedback.find({
                 area_id : { "$in": areas.map(area => area._id) }
-            }) 
+            }).sort({"feedback_arrival_time": -1});
 
         } else if(sortByDivision){
 
             let areas = await apiController.findAreaFromDivision(sortByDivision);
             feedbacks = await Feedback.find({
                 area_id : { "$in": areas.map(area => area._id) }
-            })
+            }).sort({"feedback_arrival_time": -1});
 
 
         }
@@ -107,7 +107,7 @@ const handleFeedbackSorted = async (request, response) => {
                 })
             } else {
                 
-                feedbacks = await Feedback.find()
+                feedbacks = await Feedback.find().sort({"feedback_arrival_time": -1});
                 
             }
             
