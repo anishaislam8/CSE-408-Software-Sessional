@@ -26,7 +26,7 @@ const Feedback = (props) => {
             <td>{props.area_name}</td>
             <td>{props.rating}</td>
             <td>{props.details}</td>
-            <td>{props.feedback_arrival_time}</td>
+            <td>{new Date(props.feedback_arrival_time).toString()}</td>
             <td><Link type="button" className="btn btn-danger" to={{
                 pathname : "",
                 state : {
@@ -480,9 +480,9 @@ class NTTNFeedbacks extends React.Component {
           rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => a.rating - b.rating)}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => a.rating - b.rating)}))
           } else {
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => b.rating - a.rating)}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => b.rating - a.rating)}))
           }
     
           this.paginationFeedbacks(1);
@@ -516,9 +516,9 @@ class NTTNFeedbacks extends React.Component {
           rating: "", ratingAll : "", time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
           }
     
           this.paginationFeedbacks(1);
@@ -529,14 +529,15 @@ class NTTNFeedbacks extends React.Component {
       }
 
       handleChangeDate(e){
-        var start = new Date(this.state.selectedStartDate.getTime());
-        var end = new Date(this.state.selectedEndDate.getTime());
+        var start = new Date(this.state.selectedStartDate).setHours(0,0,0,0);
+
+        var end = new Date(this.state.selectedEndDate).setHours(0,0,0,0);
 
         if(start > end){
           [start, end] = [end, start];
         }
         this.setState({
-          filteredFeedbacks:this.state.feedbacks.filter((feedback)=>{
+          filteredFeedbacks:this.state.filteredFeedbacks.filter((feedback)=>{
             var current = new Date(feedback.feedback_arrival_time).getTime(); 
             return  current <= end && current >= start
           })

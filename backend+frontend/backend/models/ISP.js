@@ -25,6 +25,10 @@ var ISPSchema = new mongoose.Schema({
         required : true,
         trim : true
     },
+    physical_connection_establishment_time:{
+        type: Date,
+        default: null
+    },
     connection_establishment_time: {
         type: Date,
         default: null

@@ -25,13 +25,13 @@ const Report = (props) => {
             <td>{props.average_rating}</td>
             <td>{props.problem_category}</td>
             <td>{props.details}</td>
-            <td>{props.report_arrival_time}</td>
+            <td>{new Date(props.report_arrival_time).toString()}</td>
             <td>{props.resolve_status}</td>
             <td>{props.resolve_status === "False" ? <Link type="button" className="btn btn-success" to={{
                 pathname : "",
                 state : {
                     report_id : props.report_id
-                }}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Link> : props.resolve_time}</td>
+                }}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Link> : new Date(props.resolve_time).toString()}</td>
         </tr>
               
     );
@@ -464,9 +464,9 @@ class NTTNReports extends React.Component {
           rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
+            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
           } else {
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
+            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
           }
     
           this.paginationReports(1);
@@ -500,9 +500,9 @@ class NTTNReports extends React.Component {
           rating: "", ratingAll : "", time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
+            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => b.report_arrival_time.localeCompare(a.report_arrival_time))}))
+            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => b.report_arrival_time.localeCompare(a.report_arrival_time))}))
           }
     
           this.paginationReports(1);
@@ -514,15 +514,16 @@ class NTTNReports extends React.Component {
 
       handleChangeDate(){
         
-        var start = new Date(this.state.selectedStartDate.getTime());
-        var end = new Date(this.state.selectedEndDate.getTime());
+        var start = new Date(this.state.selectedStartDate).setHours(0,0,0,0);
+
+        var end = new Date(this.state.selectedEndDate).setHours(0,0,0,0);
 
         if(start > end){
           [start, end] = [end, start];
         }
 
         this.setState({
-          filteredReports:this.state.reports.filter((report)=>{
+          filteredReports:this.state.filteredReports.filter((report)=>{
             var current = new Date(report.report_arrival_time).getTime(); 
             return  current <= end && current >= start
           })
@@ -546,19 +547,22 @@ class NTTNReports extends React.Component {
       handleChangeReportType(e){
         if(e.target.value === "All"){
            this.setState({
-             resolve_status:"All"
+             resolve_status:"All",
+             rating :"", ratingAll:"", time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
         } else if(e.target.value === "Solved"){
            this.setState({
-             resolve_status:"Solved"
+             resolve_status:"Solved",
+             rating :"", ratingAll:"", time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
         } else if(e.target.value === "Unsolved"){
            this.setState({
-             resolve_status:"Unsolved"
+             resolve_status:"Unsolved",
+             rating :"", ratingAll:"", time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
@@ -571,7 +575,7 @@ class NTTNReports extends React.Component {
       handleChangeProblemCategory(e){
         this.setState({
           problem_category:e.target.value,
-         
+          rating :"", ratingAll:"", time:"", timeAll:""
         }, () => {
           this.loadnewData();
         })

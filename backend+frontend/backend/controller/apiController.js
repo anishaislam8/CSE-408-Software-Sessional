@@ -296,7 +296,11 @@ const getISPSorted = async (request, response) => {
     let sortBySubDistrict = request.body.upazilla_id;
     let sortByUnion = request.body.union_id;
     let connection_status = request.body.connection_status;
-   //console.log(sortByDivision);
+    console.log("District :", sortByDistrict);
+    console.log("Division :", sortByDivision);
+    console.log("SubDistrict :", sortBySubDistrict);
+    console.log("Union :", sortByUnion);
+    console.log("Connection status : ", connection_status);
 
     try{
         let isps=[];
@@ -410,7 +414,7 @@ const getISPSorted = async (request, response) => {
 
         }
 
-        if(!isps){
+        if(!isps || isps.length === 0){
             if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion){
                 //empty
                 return response.send({
@@ -432,9 +436,20 @@ const getISPSorted = async (request, response) => {
         }
         
         if(connection_status !== undefined){
-            console.log("Hi");
-            isps = isps.filter((isp)=> isp.connection_status === connection_status);
+            if(connection_status === "1"){
+                //connected
+                isps = isps.filter((isp)=> isp.connection_status === true);
+            } else if(connection_status === "0"){
+                //disconnected
+                isps = isps.filter((isp)=> isp.connection_status === false && isp.connection_establishment_time !== null);
+            } else if(connection_status === "-1"){
+                //not connected
+                isps = isps.filter((isp)=> isp.connection_status === false && isp.connection_establishment_time === null);
+            } 
+            
         }
+
+        console.log(isps);
 
        
         

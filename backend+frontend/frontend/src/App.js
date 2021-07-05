@@ -11,6 +11,7 @@ import ISPList from "./components/ISPList";
 
 
 function App() {
+  
   return (
     <Router>
     <Header />
@@ -23,6 +24,9 @@ function App() {
       <Route path="/nttn/isplist" exact component={ISPList} />
       <Route path="/nttn/renewals" exact component={Renewals} />
       <Route path="/nttn/pendings" exact component={Pendings} />
+      <Route path="/nttn/connection" exact component={Pendings} />
+      <Route path="/nttn/confirmConnection" exact component={Pendings} />
+      <Route path="/nttn/settings" exact component={Pendings} />
 
     </Router>
   );

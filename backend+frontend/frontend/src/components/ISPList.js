@@ -23,7 +23,8 @@ const ISPRow = (props) => {
             
             <td>{props.isp_name}</td>
             <td>{props.license_id}</td>
-            <td>{props.connection_started || "N/A"}</td>
+            <td>{new Date(props.physical).toString()}</td>
+            <td>{props.connection_started ? new Date(props.connection_started).toString(): "N/A"}</td>
             <td>{props.connectionStatus}</td>
             <td>{props.average_rating || "N/A"}</td>
             <td><Link type="button" className="btn btn-info" to={{
@@ -84,6 +85,7 @@ class ISPList extends React.Component {
         this.handleChangeDivision = this.handleChangeDivision.bind(this);
         this.handleChangeUpazilla = this.handleChangeUpazilla.bind(this);
         this.handleChangeUnion = this.handleChangeUnion.bind(this);
+        this.handleChangeISPType = this.handleChangeISPType.bind(this);
        
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate=  this.handleEndDate.bind(this);
@@ -181,7 +183,7 @@ class ISPList extends React.Component {
       
       //console.log("called");
       let apiUrl = "http://localhost:7000/api/isp/sortBy";
-      let connectionStatus = this.state.connection_status === "" ? undefined : (this.state.connection_status === "1" ? true : false ); 
+      let connectionStatus = this.state.connection_status === "" ? undefined : this.state.connection_status
       
       const object = {
         district_id : this.state.selectedDistrict,
@@ -246,7 +248,6 @@ class ISPList extends React.Component {
             showAreaSearch : false,
             showSortRatingOrder:false,
             showDate : false,
-          
             showISP : false,
             rating : "",
             ratingAll : "",
@@ -271,6 +272,14 @@ class ISPList extends React.Component {
       })
     }
 
+    handleChangeISPType(e){
+      this.setState({
+        connection_status : e.target.value
+      },() => {
+        this.loadnewData();
+      })
+    }
+
 
     handleChangeSearchText(e){
       if(e.target.value===""){
@@ -284,7 +293,9 @@ class ISPList extends React.Component {
           filteredISPs : this.state.isps.filter((isp) => {
             return isp.name.toLowerCase().includes((e.target.value).toLowerCase()) || 
             (isp.average_rating && isp.average_rating.toString().toLowerCase().includes((e.target.value).toLowerCase())) ||
-            isp.license_id.toLowerCase().includes((e.target.value).toLowerCase())
+            isp.license_id.toLowerCase().includes((e.target.value).toLowerCase()) ||
+            (isp.connection_establishment_time && isp.connection_establishment_time.toString().toLowerCase().includes((e.target.value).toLowerCase())) ||
+            isp.physical_connection_establishment_time.toString().toLowerCase().includes((e.target.value).toLowerCase())
           })
         }, () => {
           let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
@@ -436,7 +447,19 @@ class ISPList extends React.Component {
       handleChangeRatingOrderAll(e){
         this.setState({
           ratingAll : e.target.value,
-          rating: "", time : "", timeAll : ""
+          searchText:"",
+          showAreaSearch : false,
+         
+          showDate : false,
+          showISP : false,
+          timeAll : "",
+          ratingAll : "",
+          time:"",
+         
+       
+          connection_status:"",
+          selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
+          selectedStartDate:new Date(), selectedEndDate:new Date()
         }, () =>{
           if(e.target.value === "1"){
             this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.average_rating - b.average_rating)}))
@@ -456,11 +479,20 @@ class ISPList extends React.Component {
           time : e.target.value,
           rating: "", ratingAll : "", timeAll : ""
         }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
+          if(this.state.connection_status === ("1" || "0")){
+            if(e.target.value === "1"){
+              this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
+            } else {
+              this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
+            }
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
+            if(e.target.value === "1"){
+              this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.physical_connection_establishment_time.localeCompare(b.physical_connection_establishment_time))}))
+            } else {
+              this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.physical_connection_establishment_time.localeCompare(a.physical_connection_establishment_time))}))
+            }
           }
+          
     
           //this.paginationISPs(this.state.currentPage);
           
@@ -472,13 +504,34 @@ class ISPList extends React.Component {
       handleChangeArrivalTimeOrderAll(e){
         this.setState({
           timeAll : e.target.value,
-          rating: "", ratingAll : "", time : ""
+          searchText:"",
+          showAreaSearch : false,
+          showISP : false,
+          showDate : false,
+       
+          rating : "",
+          ratingAll : "",
+          time:"",
+         
+       
+          connection_status:"",
+          selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
+          selectedStartDate:new Date(), selectedEndDate:new Date()
         }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
+          if(this.state.connection_status === ("1" || "0")){
+            if(e.target.value === "1"){
+              this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
+            } else {
+              this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
+            }
           } else {
-            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
+            if(e.target.value === "1"){
+              this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.physical_connection_establishment_time.localeCompare(b.physical_connection_establishment_time))}))
+            } else {
+              this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => b.physical_connection_establishment_time.localeCompare(a.physical_connection_establishment_time))}))
+            }
           }
+          
     
           this.paginationISPs(1);
           
@@ -488,17 +541,26 @@ class ISPList extends React.Component {
       }
 
       handleChangeDate(){
-        
-        var start = new Date(this.state.selectedStartDate.getTime());
-        var end = new Date(this.state.selectedEndDate.getTime());
+        //console.log(new Date(this.state.selectedStartDate.replace(/-/g, '\/')));
+        var start = new Date(this.state.selectedStartDate).setHours(0,0,0,0);
+
+        var end = new Date(this.state.selectedEndDate).setHours(0,0,0,0);
+
+       
 
         if(start > end){
           [start, end] = [end, start];
         }
+        
 
         this.setState({
-          filteredISPs:this.state.isps.filter((isp)=>{
-            var current = new Date(isp.connection_establishment_time).getTime(); 
+          
+          filteredISPs:this.state.filteredIsps.filter((isp)=>{
+            var current;
+            if(this.state.connection_status === ("1" || "0")) current = new Date(isp.connection_establishment_time).getTime(); 
+            else current = new Date(isp.physical_connection_establishment_time).getTime();
+            //console.log(start, end, current);
+            //if(current <= end && current >= start) console.log("hit")
             return  current <= end && current >= start
           })
         }, () => {
@@ -540,6 +602,7 @@ class ISPList extends React.Component {
         
         
         if(!date){
+         // console.log("here", date);
           date = new Date()
         } 
          
@@ -550,6 +613,7 @@ class ISPList extends React.Component {
       handleEndDate(date){
         
         if(!date){
+         // console.log("here", date);
           date = new Date()
         }
          
@@ -578,8 +642,8 @@ class ISPList extends React.Component {
                 <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20,  "width" : 240}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort ISPs"}</Button>
                 </div>
                 <div className="col">
-                {this.state.connection_status !== "-1" && <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
-                 }</div>
+                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                 </div>
                 <div className="col">
                 <Button variant="warning" onClick={this.showISPArea} style={{"marginBottom":20,  "width" : 240}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showISP ? "  Hide ISP Type" : "  ISP Type"}</Button>       
                 </div>
@@ -665,7 +729,7 @@ class ISPList extends React.Component {
                   <Form style={{"padding" : 10}}>
                       <Form.Row>
 
-                      <Col>
+                      {this.state.connection_status!== "-1" && <Col>
                       <Form.Group style={{"marginRight" : 40}}>
                           <Form.Label>Sort This Page By Rating</Form.Label>
                           <Form.Control as="select" value={this.state.rating} onChange={this.handleChangeRatingOrder}>
@@ -674,7 +738,7 @@ class ISPList extends React.Component {
                           <option value="-1">Descending</option>
                           </Form.Control>
                       </Form.Group>
-                      </Col>
+                      </Col>}
 
 
                       <Col >
@@ -689,7 +753,7 @@ class ISPList extends React.Component {
                     </Col>
 
 
-                    <Col >
+                   {this.state.connection_status!== "-1" && <Col >
                     <Form.Group style={{"marginRight" : 40}}>
                         <Form.Label>Sort  Data By Rating</Form.Label>
                         <Form.Control as="select" value={this.state.ratingAll} onChange={this.handleChangeRatingOrderAll}>
@@ -698,7 +762,7 @@ class ISPList extends React.Component {
                         <option value="1">Ascending</option>
                         </Form.Control>
                     </Form.Group>
-                    </Col>
+                    </Col>}
 
                     <Col >
                     <Form.Group>
@@ -764,6 +828,7 @@ class ISPList extends React.Component {
                           {/* <option disabled hidden value="">Select ISPs</option> */}
                           <option value="">Any</option>
                           <option value="1">Connected</option>
+                          <option value="0">Disonnected</option>
                           <option value="-1">Not Connected</option>
                           {/* <option value="Unselect">Unselect</option> */}
                           </Form.Control>
@@ -784,6 +849,7 @@ class ISPList extends React.Component {
                        
                         <th>ISP Name</th>
                         <th>License ID</th>
+                        <th>Manual Connection Started</th>
                         <th>Connection Started</th>
                         <th>Connection Status</th>
                         <th>Average Rating</th>
@@ -802,6 +868,7 @@ class ISPList extends React.Component {
                             average_rating = {isp.average_rating}
                             count={index + 1}
                             connectionStatus={isp.connection_status === true ? "Connected" :"Not Connected"}
+                            physical = {isp.physical_connection_establishment_time}
                         />})
                         }
                     </tbody>

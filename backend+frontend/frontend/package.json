@@ -10,6 +10,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
     "lodash": "^4.17.21",
+    "mdbreact": "^5.0.2",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.1",
     "react-date-picker": "^8.2.0",
