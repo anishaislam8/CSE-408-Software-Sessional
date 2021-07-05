@@ -9,6 +9,12 @@ const nttnRequestController = require('../controller/nttnRequestController');
 // fetch the reports of all the isps
 router.get('/reports', nttnReportController.handleReportFetching);
 
+// fetch the solved reports of all the isps
+router.get('/solvedReports', nttnReportController.handleReportFetchingSolved);
+
+// fetch the unsolvedreports of all the isps
+router.get('/unsolvedReports', nttnReportController.handleReportFetchingUnsolved);
+
 // fetch the reports sorted by
 router.post('/reports/sortBy', nttnReportController.handleReportFetchingSorted);
 

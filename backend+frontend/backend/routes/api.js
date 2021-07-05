@@ -4,6 +4,9 @@ const apiController = require('./../controller/apiController');
 // get all isps
 router.get('/isp', apiController.getISP);
 
+// get isp sorted
+router.post('/isp/sortBy', apiController.getISPSorted);
+
 // get all districts
 router.get('/district', apiController.getDistrict);
 

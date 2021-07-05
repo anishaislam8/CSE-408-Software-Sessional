@@ -15,37 +15,35 @@ import * as VscIcons from 'react-icons/vsc';
 
 const pageSize = 5;
 
-const Report = (props) => {
+const ISPRow = (props) => {
 
     return(
         
         <tr> 
+            
             <td>{props.isp_name}</td>
-            <td>{props.union_name}</td>
-            <td>{props.average_rating}</td>
-            <td>{props.problem_category}</td>
-            <td>{props.details}</td>
-            <td>{props.report_arrival_time}</td>
-            <td>{props.resolve_status}</td>
-            <td>{props.resolve_status === "False" ? <Link type="button" className="btn btn-success" to={{
+            <td>{props.license_id}</td>
+            <td>{props.connection_started || "N/A"}</td>
+            <td>{props.connectionStatus}</td>
+            <td>{props.average_rating || "N/A"}</td>
+            <td><Link type="button" className="btn btn-info" to={{
                 pathname : "",
                 state : {
-                    report_id : props.report_id
-                }}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Link> : props.resolve_time}</td>
+                    isp_id : props.isp_id
+                }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
         </tr>
               
     );
     
 }
 
-class NTTNReports extends React.Component {
+class ISPList extends React.Component {
 
     constructor(props){
         super(props);
 
         this.state = {
-            reports : [],
-            filteredReports : [],
+            filteredISPs:[],
             isps : [],
             unions : [],
            
@@ -55,25 +53,25 @@ class NTTNReports extends React.Component {
             pageCount : 0,
             rating : "",
             ratingAll : "",
-            timeAll:"",
-            time : "",
+            time:"",
+            timeAll : "",
             districts : [],
             divisions : [],
             upazillas : [],
             searchUnions : [],
-            resolve_status : "All",
+            connection_status:"",
             searchdistricts : [],
             searchdivisions : [],
             searchupazillas : [],
-            searchISPs:[],
+       
             showAreaSearch : false,
             showSortRatingOrder:false,
-            showProblem:false,
+            
             showDate : false,
-            showReport : false,
+           
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
             searchText:"",
-            problem_category:"",
+            
             selectedStartDate:new Date(),selectedEndDate:new Date()
            
         }
@@ -86,29 +84,25 @@ class NTTNReports extends React.Component {
         this.handleChangeDivision = this.handleChangeDivision.bind(this);
         this.handleChangeUpazilla = this.handleChangeUpazilla.bind(this);
         this.handleChangeUnion = this.handleChangeUnion.bind(this);
-        this.handleChangeReportType = this.handleChangeReportType.bind(this);
-        this.handleChangeProblemCategory = this.handleChangeProblemCategory.bind(this);
+       
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate=  this.handleEndDate.bind(this);
      
         this.loadnewData = this.loadnewData.bind(this);
-        this.getIspName = this.getIspName.bind(this);
-        this.getUnionName = this.getUnionName.bind(this);
-        this.getISPRating = this.getISPRating.bind(this);
+       
         
-        this.paginationReports= this.paginationReports.bind(this);
+        this.paginationISPs= this.paginationISPs.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
         this.findFromDivision = this.findFromDivision.bind(this);
         this.findFromDistrict = this.findFromDistrict.bind(this);
       
-        this.showAllData = this.showAllData.bind(this);
-        // this.showSolvedData = this.showSolvedData.bind(this);
-        // this.showUnsolvedData = this.showUnsolvedData.bind(this);
+        this.showData = this.showData.bind(this);
+        // this.show1Data = this.show1Data.bind(this);
+        // this.show-1Data = this.show-1Data.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.showDatePicker = this.showDatePicker.bind(this);
-        this.showReportArea = this.showReportArea.bind(this);
-        this.showReportProblemArea = this.showReportProblemArea.bind(this);
+        
         
 
     
@@ -119,12 +113,12 @@ class NTTNReports extends React.Component {
     
 
     componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/reports";
+        let apiUrl = "http://localhost:7000/api/isp";
 
         axios.get(apiUrl)
         .then(response => {
-          this.setState({ reports: response.data.data, filteredReports : response.data.data }, () => {
-            let pageCountVal = this.state.reports ? Math.ceil(this.state.reports.length / pageSize) : 0;
+            this.setState({ isps: response.data.data, filteredISPs : response.data.data }, () => {
+            let pageCountVal = this.state.isps ? Math.ceil(this.state.isps.length / pageSize) : 0;
             let pagesVal = _.range(1, pageCountVal + 1);
     
             this.setState({
@@ -132,21 +126,13 @@ class NTTNReports extends React.Component {
               pages : pagesVal 
             })
           });
-          this.paginationReports(1);
+          this.paginationISPs(1);
         })
         .catch((error) => {
           console.log(error);
         })
         
 
-        apiUrl = "http://localhost:7000/api/isp";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ isps: response.data.data, searchISPs : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
 
         apiUrl = "http://localhost:7000/api/union";
         axios.get(apiUrl)
@@ -194,33 +180,32 @@ class NTTNReports extends React.Component {
       }
       
       //console.log("called");
-      let apiUrl = "http://localhost:7000/nttn/reports/sortBy";
-      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
-      let problemCategory = this.state.problem_category === "" ? undefined : this.state.problem_category;
+      let apiUrl = "http://localhost:7000/api/isp/sortBy";
+      let connectionStatus = this.state.connection_status === "" ? undefined : (this.state.connection_status === "1" ? true : false ); 
+      
       const object = {
         district_id : this.state.selectedDistrict,
         division_id :  this.state.selectedDivision,
         union_id :  this.state.selectedUnion,
         upazilla_id :  this.state.selectedUpazilla,
-        resolve_status : resolveStatus,
-        problem_category:problemCategory
+        connection_status : connectionStatus
       }
       //console.log(object);
 
       axios.post(apiUrl, object)
       .then(response => {
         //console.log(response.data.data);
-        this.setState({filteredReports:response.data.data }, () => {
+        this.setState({filteredISPs:response.data.data }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationReports(1);
+            this.paginationISPs(1);
           })
         
         });
@@ -229,21 +214,21 @@ class NTTNReports extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ reports: [] });
+        //this.setState({ isps: [] });
       })
     }
 
 
-    showAllData(){
+    showData(){
 
-      let apiUrl = "http://localhost:7000/nttn/reports";
+      let apiUrl = "http://localhost:7000/api/isp";
     
 
       axios.get(apiUrl)
       .then(response => {
        
         this.setState({
-          filteredReports:response.data.data, 
+          filteredISPs:response.data.data, 
           searchdistricts:this.state.districts, 
           searchupazillas : this.state.upazillas, 
           searchUnions : this.state.unions, 
@@ -251,7 +236,7 @@ class NTTNReports extends React.Component {
         }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
@@ -261,19 +246,19 @@ class NTTNReports extends React.Component {
             showAreaSearch : false,
             showSortRatingOrder:false,
             showDate : false,
-            showProblem:false,
-            showReport : false,
+          
+            showISP : false,
             rating : "",
             ratingAll : "",
-            timeAll:"",
-            time : "",
-            problem_category:"",
-            resolve_status:"All",
+            time:"",
+            timeAll : "",
+         
+            connection_status:"",
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
             selectedStartDate:new Date(), selectedEndDate:new Date()
 
           }, () => {
-            this.paginationReports(1);
+            this.paginationISPs(1);
           })
         
         });
@@ -282,7 +267,7 @@ class NTTNReports extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ reports: [] });
+        //this.setState({ isps: [] });
       })
     }
 
@@ -292,25 +277,24 @@ class NTTNReports extends React.Component {
         this.setState({
           searchText:""
         })
-        this.showAllData();
+        this.showData();
       } else {
         this.setState({
           searchText : e.target.value,
-          filteredReports : this.state.reports.filter((report) => {
-            return this.getIspName(report.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
-            this.getUnionName(report.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            this.getISPRating(report.isp_id).toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
-            report.details.toLowerCase().includes((e.target.value).toLowerCase())
+          filteredISPs : this.state.isps.filter((isp) => {
+            return isp.name.toLowerCase().includes((e.target.value).toLowerCase()) || 
+            (isp.average_rating && isp.average_rating.toString().toLowerCase().includes((e.target.value).toLowerCase())) ||
+            isp.license_id.toLowerCase().includes((e.target.value).toLowerCase())
           })
         }, () => {
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationReports(1);
+            this.paginationISPs(1);
           })
           
         });
@@ -418,25 +402,16 @@ class NTTNReports extends React.Component {
       
     };
 
-    showReportArea = () => {
-      if(this.state.showReport){
-        this.setState({ showReport: false });
+    showISPArea = () => {
+      if(this.state.showISP){
+        this.setState({ showISP: false });
       } else {
-        this.setState({showReport : true});
+        this.setState({showISP : true});
       }
 
       
     };
 
-    showReportProblemArea = () => {
-      if(this.state.showProblem){
-        this.setState({ showProblem: false });
-      } else {
-        this.setState({showProblem : true});
-      }
-
-      
-    };
    
 
   
@@ -446,12 +421,12 @@ class NTTNReports extends React.Component {
           ratingAll: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.average_rating - b.average_rating)}))
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) =>this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) =>b.average_rating - a.average_rating)}))
           }
     
-          //this.paginationReports(this.state.currentPage);
+          //this.paginationISPs(this.state.currentPage);
           
         })
         
@@ -464,12 +439,12 @@ class NTTNReports extends React.Component {
           rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
+            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.average_rating - b.average_rating)}))
           } else {
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
+            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => b.average_rating - a.average_rating)}))
           }
     
-          this.paginationReports(1);
+          this.paginationISPs(1);
           
         })
         
@@ -482,12 +457,12 @@ class NTTNReports extends React.Component {
           rating: "", ratingAll : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.report_arrival_time.localeCompare(a.report_arrival_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
           }
     
-          //this.paginationReports(this.state.currentPage);
+          //this.paginationISPs(this.state.currentPage);
           
         })
         
@@ -500,12 +475,12 @@ class NTTNReports extends React.Component {
           rating: "", ratingAll : "", time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
+            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => a.connection_establishment_time.localeCompare(b.connection_establishment_time))}))
           } else {
-            this.setState((prevstate) => ({filteredReports : prevstate.reports.sort((a,b) => b.report_arrival_time.localeCompare(a.report_arrival_time))}))
+            this.setState((prevstate) => ({filteredISPs : prevstate.isps.sort((a,b) => b.connection_establishment_time.localeCompare(a.connection_establishment_time))}))
           }
     
-          this.paginationReports(1);
+          this.paginationISPs(1);
           
         })
         
@@ -522,19 +497,19 @@ class NTTNReports extends React.Component {
         }
 
         this.setState({
-          filteredReports:this.state.reports.filter((report)=>{
-            var current = new Date(report.report_arrival_time).getTime(); 
+          filteredISPs:this.state.isps.filter((isp)=>{
+            var current = new Date(isp.connection_establishment_time).getTime(); 
             return  current <= end && current >= start
           })
         }, () => {
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationReports(1);
+            this.paginationISPs(1);
           })
         });
 
@@ -542,52 +517,13 @@ class NTTNReports extends React.Component {
       }
 
       
-
-      handleChangeReportType(e){
-        if(e.target.value === "All"){
-           this.setState({
-             resolve_status:"All"
-           }, () => {
-             this.loadnewData();
-           })
-        } else if(e.target.value === "Solved"){
-           this.setState({
-             resolve_status:"Solved"
-           }, () => {
-             this.loadnewData();
-           })
-        } else if(e.target.value === "Unsolved"){
-           this.setState({
-             resolve_status:"Unsolved"
-           }, () => {
-             this.loadnewData();
-           })
-        } else if(e.target.value === "Unselect"){
-          this.showAllData();
-        }
-      }
-
-
-      handleChangeProblemCategory(e){
-        this.setState({
-          problem_category:e.target.value,
-         
-        }, () => {
-          this.loadnewData();
-        })
-          
-      }
-    
-    
-    
-
-    paginationReports(pageNo) {
+    paginationISPs(pageNo) {
         this.setState({
           currentPage : pageNo
         }, () => {
           const startIndex = (pageNo - 1) * pageSize;
           
-          const newPaginatedData = this.state.filteredReports.length === 0 ? [] :  _(this.state.filteredReports).slice(startIndex).take(pageSize).value();
+          const newPaginatedData = this.state.filteredISPs.length === 0 ? [] :  _(this.state.filteredISPs).slice(startIndex).take(pageSize).value();
           //console.log ("Paginated :" ,newPaginatedData);
           this.setState({
             paginatedData : newPaginatedData
@@ -597,35 +533,8 @@ class NTTNReports extends React.Component {
       }
 
       
-    getIspName = (isp_id) => {
-       
-
-        for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id === isp_id){
-                return this.state.isps[i].name
-            }
-        }
-    }
-
-
-    getISPRating(isp_id){
-        for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id === isp_id){
-                return this.state.isps[i].average_rating
-            }
-        }
-      }
-   
-
-    getUnionName(union_id) {
-   
-
-        for(let i = 0; i < this.state.unions.length; i++){
-            if(this.state.unions[i].union_id === union_id){
-                return this.state.unions[i].name
-            }
-        }
-      }
+ 
+    
 
       handleStartDate(date){
         
@@ -652,34 +561,33 @@ class NTTNReports extends React.Component {
     render() {
         return(
             <div className="container">
-                <center><h3 style={{"margin":20}}>Reports from ISPs</h3><br></br></center>
-                {/* <center> */}
+                <center><h3 style={{"margin":20}}>ISP List</h3><br></br></center>
+                <center>
                   <div className="row">
-                    <div className="col">
-                    <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Reports"/>
-                    </div>
-                    <div className="col">
-                    <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20}} ><BsIcons.BsClipboardData size={20}/>  Show All Data</Button>
-                    </div>
+                  <div className="col">
+                  <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search ISPs"/>
+                </div>
+                   
                   </div>
-                 {/* </center> */}
+                 </center>
                 <div className = "row">
                 <div className="col">
                 <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20,"width" : 240}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20,  "width" : 240}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Reports"}</Button>
+                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20,  "width" : 240}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort ISPs"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                {this.state.connection_status !== "-1" && <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                 }</div>
+                <div className="col">
+                <Button variant="warning" onClick={this.showISPArea} style={{"marginBottom":20,  "width" : 240}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showISP ? "  Hide ISP Type" : "  ISP Type"}</Button>       
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 240}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Show Report" : "  Show Reports"}</Button>       
+                    <Button variant="success" onClick={this.showData} style={{"marginBottom":20, "width" : 240}} ><BsIcons.BsClipboardData size={30}/>  Show All</Button>
                 </div>
-                <div className="col">
-                <Button variant="warning" onClick={this.showReportProblemArea} style={{"marginBottom":20,  "width" : 240}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showProblem ? "  Hide Problem Type" : "  Problem Category"}</Button>       
-                </div>
-                  
+               
+               
                   
                  </div>
                 <div hidden={!(this.state.showAreaSearch)} style={{"backgroundColor":"#e6e6e6", "padding":10, "borderRadius":5, "marginBottom":20}}>
@@ -783,7 +691,7 @@ class NTTNReports extends React.Component {
 
                     <Col >
                     <Form.Group style={{"marginRight" : 40}}>
-                        <Form.Label>Sort All Data By Rating</Form.Label>
+                        <Form.Label>Sort  Data By Rating</Form.Label>
                         <Form.Control as="select" value={this.state.ratingAll} onChange={this.handleChangeRatingOrderAll}>
                         <option value="" disabled hidden>Select Rating Order</option>
                         <option value="-1">Descending</option>
@@ -794,7 +702,7 @@ class NTTNReports extends React.Component {
 
                     <Col >
                     <Form.Group>
-                        <Form.Label>Sort All Data By Time</Form.Label>
+                        <Form.Label>Sort  Data By Time</Form.Label>
                         <Form.Control as="select" value={this.state.timeAll} onChange={this.handleChangeArrivalTimeOrderAll}>
                         <option value="" disabled hidden>Select Arrival Time Order</option>
                         <option value="-1">Descending</option>
@@ -846,17 +754,17 @@ class NTTNReports extends React.Component {
                 </div>
                </div>
 
-               <div hidden={!(this.state.showReport)} style={{"backgroundColor":"#e6e6e6", "padding":10, "width":300, "borderRadius":5, "marginBottom":20}}>
+               <div hidden={!(this.state.showISP)} style={{"backgroundColor":"#e6e6e6", "padding":10, "width":300, "borderRadius":5, "marginBottom":20}}>
                   <Form>
                       <Form.Row>
                       <Col>
                       <Form.Group style={{"marginRight":20, "marginLeft":20}}>
-                          <Form.Label>Select Report type</Form.Label>
-                          <Form.Control as="select" value={this.state.resolve_status} onChange={this.handleChangeReportType}>
-                          {/* <option disabled hidden value="">Select Reports</option> */}
-                          <option value="All">All</option>
-                          <option value="Solved">Solved</option>
-                          <option value="Unsolved">Unsolved</option>
+                          <Form.Label>Select ISP type</Form.Label>
+                          <Form.Control as="select" value={this.state.connection_status} onChange={this.handleChangeISPType}>
+                          {/* <option disabled hidden value="">Select ISPs</option> */}
+                          <option value="">Any</option>
+                          <option value="1">Connected</option>
+                          <option value="-1">Not Connected</option>
                           {/* <option value="Unselect">Unselect</option> */}
                           </Form.Control>
                       </Form.Group>
@@ -867,60 +775,34 @@ class NTTNReports extends React.Component {
                   </Form>
                 </div>
 
-                <div hidden={!(this.state.showProblem)} style={{"backgroundColor":"#e6e6e6", "padding":10, "width":300, "borderRadius":5, "marginBottom":20}}>
-                  <Form>
-                      <Form.Row>
-                      <Col>
-                      <Form.Group style={{"marginRight":20, "marginLeft":20}}>
-                          <Form.Label>Select Problem Category</Form.Label>
-                          <Form.Control as="select" value={this.state.problem_category} onChange={this.handleChangeProblemCategory}>
-                          <option value="">Any</option>
-                          <option value="0">Low Bandwidth</option>
-                          <option value="1">Physical Connection Related Problem</option>
-                          <option value="2">Platform Related Problem</option>
-                          <option value="3">Others</option>
-                          </Form.Control>
-                      </Form.Group>
-                      </Col>
-
-                     
-                    </Form.Row>
-                  </Form>
-                </div>
+                
                 
                 
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
-                        <tr>
-                        
-                            <th>ISP Name</th>
-                            <th>Union Name</th>
-                            <th>Rating</th>
-                            <th>Problem Category</th>
-                            <th>Details</th>
-                            <th>Report Arrival Time</th>
-                            <th>Resolve Status</th>
-                            <th>Solve</th>
-
+                    <tr>
+                       
+                        <th>ISP Name</th>
+                        <th>License ID</th>
+                        <th>Connection Started</th>
+                        <th>Connection Status</th>
+                        <th>Average Rating</th>
+                        <th>View Details</th>
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((report, index) => {
+                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((isp, index) => {
                            
-                             return <Report 
-                                key={report._id} 
-                                isp_name={this.getIspName(report.isp_id)} 
-                                union_name = {this.getUnionName(report.union_id)} 
-                                problem_category = {(report.category === "0") ? "Low Bandwidth" : (report.category === "1" ? "Physical Connection Problem" : (report.category === "2" ? "Platform Related Problem" : "Others")) } 
-                                report_arrival_time = {report.report_arrival_time} 
-                                count={index + 1}
-                                report_id={report._id}
-                                details = {report.details}
-                                average_rating={this.getISPRating(report.isp_id)}
-                                resolve_status={report.resolve_status===false ? "False" : "True"}
-                                resolve_time={report.report_resolve_time}
-                            />})
+                            return <ISPRow 
+                            key={isp._id} 
+                            isp_name={isp.name} 
+                            license_id = {isp.license_id} 
+                            connection_started = {isp.connection_establishment_time}
+                            average_rating = {isp.average_rating}
+                            count={index + 1}
+                            connectionStatus={isp.connection_status === true ? "Connected" :"Not Connected"}
+                        />})
                         }
                     </tbody>
                 </table>
@@ -928,7 +810,7 @@ class NTTNReports extends React.Component {
                 <nav className="d-flex justify-content-center">
                     <ul className="pagination">
                     <li className={this.state.currentPage === 1 ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationReports(this.state.currentPage - 1)} aria-label="Previous">
+                    <p className="page-link"  onClick={()=>this.paginationISPs(this.state.currentPage - 1)} aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -937,13 +819,13 @@ class NTTNReports extends React.Component {
                         this.state.pages.map((page) => {
                             return <li key={page} className={
                                 page === this.state.currentPage ? "page-item active" : "page-item"
-                            }><p className="page-link" onClick={()=>this.paginationReports(page)}>{page}</p></li>
+                            }><p className="page-link" onClick={()=>this.paginationISPs(page)}>{page}</p></li>
                         })
 
                         
                     }
                     <li className={this.state.currentPage === this.state.pageCount ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationReports(this.state.currentPage + 1)} aria-label="Next">
+                    <p className="page-link"  onClick={()=>this.paginationISPs(this.state.currentPage + 1)} aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -951,10 +833,10 @@ class NTTNReports extends React.Component {
                     
                     </ul>
                 </nav>
-                {this.state.filteredReports.length === 0 && <h4>"No reports found"</h4>}
+                {this.state.filteredISPs.length === 0 && <h4>"No isps found"</h4>}
             </div>
         );
     }
 }
 
-export default NTTNReports;
+export default ISPList;

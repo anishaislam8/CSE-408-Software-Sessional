@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const {ObjectID} = require('mongodb');
 
 var ContractSchema = new mongoose.Schema({
-    user_type : {
+    user_type : { // 0- ISP, 1- user, 2 - NTTN
         type : Number,
         required : true
     },

@@ -4,6 +4,13 @@ import _ from 'lodash';
 import { Form, Button } from 'react-bootstrap';
 import { Col } from 'react-grid-system';
 import { Link } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'
+import * as FaIcons from 'react-icons/fa';
+import * as FcIcons from 'react-icons/fc';
+import * as BsIcons from 'react-icons/bs';
+import * as AiIcons from 'react-icons/ai';
+
 
 
 const pageSize = 5;
@@ -24,7 +31,7 @@ const Feedback = (props) => {
                 pathname : "",
                 state : {
                     feedback_id : props.feedback_id
-                }}}>Warn ISP</Link></td>
+                }}}><AiIcons.AiFillNotification/>  Warn ISP</Link></td>
         </tr>
               
     );
@@ -38,6 +45,7 @@ class NTTNFeedbacks extends React.Component {
 
         this.state = {
             feedbacks : [],
+            filteredFeedbacks : [],
             isps : [],
             users :[],
             unions : [],
@@ -61,8 +69,10 @@ class NTTNFeedbacks extends React.Component {
             searchISPs:[],
             showAreaSearch : false,
             showSortRatingOrder:false,
-            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
-            searchText:""
+            showDate : false,
+            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",
+            searchText:"",
+            selectedStartDate:new Date(),selectedEndDate:new Date()
            
         }
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
@@ -88,7 +98,10 @@ class NTTNFeedbacks extends React.Component {
         this.findFromDistrict = this.findFromDistrict.bind(this);
         this.findFromUpazilla = this.findFromUpazilla.bind(this);
         this.showAllData = this.showAllData.bind(this);
-    
+        this.handleChangeDate = this.handleChangeDate.bind(this);
+        this.showDatePicker = this.showDatePicker.bind(this);
+        this.handleStartDate = this.handleStartDate.bind(this);
+        this.handleEndDate = this.handleEndDate.bind(this);
         
 
     }
@@ -100,7 +113,7 @@ class NTTNFeedbacks extends React.Component {
 
         axios.get(apiUrl)
         .then(response => {
-          this.setState({ feedbacks: response.data.data }, () => {
+          this.setState({ feedbacks: response.data.data, filteredFeedbacks : response.data.data }, () => {
             let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
             let pagesVal = _.range(1, pageCountVal + 1);
     
@@ -196,10 +209,10 @@ class NTTNFeedbacks extends React.Component {
       axios.post(apiUrl, object)
       .then(response => {
        
-        this.setState({ feedbacks: response.data.data }, () => {
+        this.setState({filteredFeedbacks:response.data.data }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
@@ -227,22 +240,31 @@ class NTTNFeedbacks extends React.Component {
       axios.get(apiUrl)
       .then(response => {
        
-        this.setState({ feedbacks: response.data.data }, () => {
+        this.setState({
+          filteredFeedbacks:response.data.data, 
+          searchdistricts:this.state.districts, 
+          searchupazillas : this.state.upazillas, 
+          searchUnions : this.state.unions, 
+          searchAreas:this.state.areas 
+        }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal,
+            searchText:"",
             showAreaSearch : false,
             showSortRatingOrder:false,
+            showDate : false,
             rating : "",
             ratingAll : "",
             timeAll:"",
             time : "",
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
+            selectedStartDate:new Date(), selectedEndDate:new Date()
 
           }, () => {
             this.paginationFeedbacks(1);
@@ -257,9 +279,60 @@ class NTTNFeedbacks extends React.Component {
         //this.setState({ feedbacks: [] });
       })
     }
-    handleChangeSearchText(e){
 
+
+    handleChangeSearchText(e){
+      if(e.target.value===""){
+        this.setState({
+          searchText:""
+        })
+        this.showAllData();
+      } else {
+        this.setState({
+          searchText : e.target.value,
+          filteredFeedbacks : this.state.feedbacks.filter((feedback) => {
+            return this.getIspName(feedback.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
+            this.getUserName(feedback.user_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+            feedback.rating.toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
+            this.getAreaName(feedback.area_id).toLowerCase().includes((e.target.value).toLowerCase())||
+            feedback.details.toLowerCase().includes((e.target.value).toLowerCase())
+          })
+        }, () => {
+          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pagesVal = _.range(1, pageCountVal + 1);
+  
+          this.setState({
+            pageCount : pageCountVal,
+            pages : pagesVal 
+          }, () => {
+            this.paginationFeedbacks(1);
+          })
+          
+        });
+      }
     }
+
+    handleStartDate(date){
+        
+        
+      if(!date){
+        date = new Date()
+      } 
+       
+      this.setState({selectedStartDate : date})
+      
+    }
+
+    handleEndDate(date){
+      
+      if(!date){
+        date = new Date()
+      }
+       
+      this.setState({selectedEndDate : date})
+    }
+
+
     handleChangeArea(e){
       this.setState({
         selectedArea : e.target.value
@@ -296,7 +369,7 @@ class NTTNFeedbacks extends React.Component {
 
     handleChangeDivision(e){
       let ans = this.findFromDivision(e.target.value);
-      
+      //console.log(ans);
       this.setState({
         selectedDivision : e.target.value,
         searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
@@ -364,17 +437,15 @@ class NTTNFeedbacks extends React.Component {
       
     };
 
-    showArrivalDiv = () => {
-      if(this.state.showSortArrivalOrder){
-        this.setState({ showSortArrivalOrder: false });
+    showDatePicker = () => {
+      if(this.state.showDate){
+        this.setState({ showDate: false });
       } else {
-        this.setState({showSortArrivalOrder : true});
+        this.setState({showDate : true});
       }
 
       
     };
-  
-
    
 
     handleChangeISP(e){
@@ -409,9 +480,9 @@ class NTTNFeedbacks extends React.Component {
           rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => a.rating - b.rating)}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => a.rating - b.rating)}))
           } else {
-            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => b.rating - a.rating)}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => b.rating - a.rating)}))
           }
     
           this.paginationFeedbacks(1);
@@ -445,9 +516,9 @@ class NTTNFeedbacks extends React.Component {
           rating: "", ratingAll : "", time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({feedbacks : prevstate.feedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredFeedbacks : prevstate.feedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
           }
     
           this.paginationFeedbacks(1);
@@ -455,6 +526,33 @@ class NTTNFeedbacks extends React.Component {
         })
         
         
+      }
+
+      handleChangeDate(e){
+        var start = new Date(this.state.selectedStartDate.getTime());
+        var end = new Date(this.state.selectedEndDate.getTime());
+
+        if(start > end){
+          [start, end] = [end, start];
+        }
+        this.setState({
+          filteredFeedbacks:this.state.feedbacks.filter((feedback)=>{
+            var current = new Date(feedback.feedback_arrival_time).getTime(); 
+            return  current <= end && current >= start
+          })
+        }, () => {
+          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pagesVal = _.range(1, pageCountVal + 1);
+  
+          this.setState({
+            pageCount : pageCountVal,
+            pages : pagesVal 
+          }, () => {
+            this.paginationFeedbacks(1);
+          })
+        });
+
+          
       }
     
     
@@ -466,7 +564,7 @@ class NTTNFeedbacks extends React.Component {
         }, () => {
           const startIndex = (pageNo - 1) * pageSize;
           
-          const newPaginatedData = this.state.feedbacks.length === 0 ? [] :  _(this.state.feedbacks).slice(startIndex).take(pageSize).value();
+          const newPaginatedData = this.state.filteredFeedbacks.length === 0 ? [] :  _(this.state.filteredFeedbacks).slice(startIndex).take(pageSize).value();
           //console.log ("Paginated :" ,newPaginatedData);
           this.setState({
             paginatedData : newPaginatedData
@@ -522,16 +620,19 @@ class NTTNFeedbacks extends React.Component {
     render() {
         return(
             <div className="container">
-                <center><h3>Feedbacks from Users</h3><br></br></center>
+                <center><h3 style={{"margin":20}}>Feedbacks from Users</h3><br></br></center>
                 <div className = "row">
                 <div className="col">
-                <Button variant="primary" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":20,"width" : 280}} >{this.state.showAreaSearch ? "Hide Search By Location" : "Search by Location"}</Button>
+                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 200}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="primary" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":20, "width" : 280}} >{this.state.showSortRatingOrder ? "Hide Sort By Rating And Time" : "Sort By Rating And Time"}</Button>
+                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Feedbacks"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="primary" onClick={this.showAllData} style={{"marginBottom":20, "marginRight":20, "width" : 280}} >Show All Feedbacks</Button>       
+                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                </div>
+                <div className="col">
+                <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><BsIcons.BsCardChecklist size={30}/> Show All Feedbacks</Button>       
                 </div>
                 <div className="col">
                 <input type="text" className="form-control" style={{"marginBottom":20, "width" : 300}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Enter your search"/>
@@ -539,7 +640,7 @@ class NTTNFeedbacks extends React.Component {
                   
                   
                  </div>
-                <div hidden={!(this.state.showAreaSearch)} style={{"backgroundColor":"#343a40", "color": "white", "padding":10, "borderRadius":5, "marginBottom":20}}>
+                <div hidden={!(this.state.showAreaSearch)} style={{"backgroundColor":"#e6e6e6", "padding":10, "borderRadius":5, "marginBottom":20}}>
                   <Form>
                       <Form.Row>
                       <Col>
@@ -611,7 +712,7 @@ class NTTNFeedbacks extends React.Component {
                       <Form.Group>
                       
                         <Button variant="warning" type="submit" onClick={this.loadnewData} style={{"marginTop":30, "marginLeft":100, "width":200,"marginRight":20}}>
-                            Search
+                            <BsIcons.BsSearch size={30}/>  Search
                           </Button>
                       </Form.Group>
                       
@@ -624,7 +725,7 @@ class NTTNFeedbacks extends React.Component {
                 </div>
                 
 
-                <div hidden={!this.state.showSortRatingOrder} style={{"backgroundColor":"#343a40", "color": "white", "padding":10, "borderRadius":5,"marginBottom":20}}>
+                <div hidden={!this.state.showSortRatingOrder} style={{"backgroundColor":"#e6e6e6", "padding":10, "borderRadius":5,"marginBottom":20}}>
                   <Form style={{"padding" : 10}}>
                       <Form.Row>
 
@@ -677,7 +778,43 @@ class NTTNFeedbacks extends React.Component {
                     </Form>
                 </div>
 
-               
+               <div hidden={!this.state.showDate} style={{"backgroundColor":"#e6e6e6", "padding":10, "borderRadius":5,"marginBottom":20, "width": 500}}>
+                <div className="row">
+                  <div className="col"  style={{"margin":10, "width" : 250}}>
+                  <label htmlFor="startDate">Select Start Date </label>
+                  <DatePicker className="form-control" id="startDate"
+                      selected={this.state.selectedStartDate}
+                      onChange={(date)=>this.handleStartDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      isClearable
+                      showYearDropdown
+                      scrollableMonthYearDropdown
+                      maxDate={new Date()}
+                      />
+                  </div>
+
+                  <div className="col"  style={{"margin":10, "width" : 250}}>
+                  <label htmlFor="endDate">Select End Date </label>
+                  <DatePicker className="form-control" id="endDate"
+                      selected={this.state.selectedEndDate}
+                      onChange={(date)=>this.handleEndDate(date)}
+                      dateFormat="dd/MM/yyyy"
+                      isClearable
+                      maxDate={new Date()}
+                      showYearDropdown
+                      scrollableMonthYearDropdown
+                      />
+                  </div>
+
+                  <div className="col">
+                    <center>
+                  <Button variant="warning" type="submit" onClick={this.handleChangeDate} style={{"margin":10, "width":300}}>
+                  <BsIcons.BsSearch size={30}/>  Search
+                   </Button>
+                   </center>
+                  </div>
+                </div>
+               </div>
                 
                 
                 <table className="table table-bordered table-striped">
@@ -738,7 +875,7 @@ class NTTNFeedbacks extends React.Component {
                     
                     </ul>
                 </nav>
-                {this.state.feedbacks.length === 0 && <h4>"No feedbacks found"</h4>}
+                {this.state.filteredFeedbacks.length === 0 && <h4>"No feedbacks found"</h4>}
             </div>
         );
     }
