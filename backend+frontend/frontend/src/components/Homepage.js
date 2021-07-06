@@ -1,9 +1,15 @@
 import React from 'react'
 import bgimage from './../img/placeholder.png'
+import Header from './Header';
 
 function Homepage() {
     return (
-    <div className="shadow-lg p-3 mb-5 bg-white rounded" style={{margin : 50}}>
+        <div>
+            <Header />
+            <br></br>
+            <br></br>
+            <br></br>
+            <div className="shadow-lg p-3 mb-5 bg-white rounded" style={{margin : 50}}>
 
         <div className="row">
             <div className="col s12 m6" style={{paddingTop : "10%", paddingLeft : "10%"}}>
@@ -18,6 +24,8 @@ function Homepage() {
         </div>
        
     </div>
+        </div>
+    
 
    
     )

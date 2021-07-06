@@ -13,6 +13,8 @@ const handleReportFetchingUnsolved = async (request, response) => {
                 data : []
             })
         }
+        reports = reports.filter((report) => report.request_type === 0);
+
         return response.status(200).send({
             message : "Reports Found",
             data : reports
@@ -38,6 +40,7 @@ const handleReportFetchingSolved = async (request, response) => {
                 data : []
             })
         }
+        reports = reports.filter((report) => report.request_type === 0);
         return response.status(200).send({
             message : "Reports Found",
             data : reports
@@ -61,6 +64,7 @@ const handleReportFetching = async (request, response) => {
                 data : []
             })
         }
+        reports = reports.filter((report) => report.request_type === 0);
         return response.status(200).send({
             message : "Reports Found",
             data : reports
@@ -151,6 +155,8 @@ const handleReportFetchingSorted = async (request, response) => {
         if(problem_category){
             reports = reports.filter((report)=> report.category === problem_category);
         }
+
+        reports = reports.filter((report) => report.request_type === 0);
         
         
 

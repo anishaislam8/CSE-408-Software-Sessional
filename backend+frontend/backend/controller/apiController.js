@@ -7,6 +7,9 @@ const { ISP } = require('./../models/ISP');
 const { User } = require('./../models/User');
 const { Package } = require('./../models/Package');
 const { Contract } = require('../models/Contract');
+const { request, response } = require('express');
+
+
 
 
 const findAreaFromUnion = async(union) => {
@@ -270,7 +273,7 @@ const getUser = async (request, response) => {
     try{
         let user = await User.find();
         if(!user){
-            return response.status(404).send({
+            return response.send({
                 message : "Not found",
                 data : []
             })
@@ -280,12 +283,86 @@ const getUser = async (request, response) => {
             data : user
         })
     } catch (e) {
-        return response.status(500).send({
+        return response.send({
             message : "EXCEPTION",
             data : []
         })
     }
    
+}
+
+const getUnionOfISP = async (request, response) => {
+
+    let isp_id = request.body.isp_id;
+
+    if(!isp_id){
+        return response.send({
+            message : "Not found",
+            data : []
+        })
+    }
+    try{
+        isp_id = ObjectID(request.body.isp_id);
+  
+        let contracts = await Contract.find({
+            isp_id,
+            user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        //console.log(contracts);
+        let allUnions = await Union.find();
+        let unions = allUnions.filter((allUnion) => contracts.map((contract) => contract.union_id).includes(allUnion.union_id) );
+        
+        //console.log("Unions ",unions);
+        return response.send({
+            message : "Found",
+            data : unions
+        })
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
+const getContracts = async (request, response) => {
+    
+    try{
+       
+  
+        let contracts = await Contract.find({
+            user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : contracts
+        })
+
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
 }
 
 
@@ -489,5 +566,7 @@ module.exports = {
     getUser,
     getDistrict,
     getDivision,
-    getSubDistrict
+    getSubDistrict,
+    getUnionOfISP,
+    getContracts
 }

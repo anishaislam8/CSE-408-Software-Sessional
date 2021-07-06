@@ -11,6 +11,7 @@ import * as FcIcons from 'react-icons/fc';
 import * as BsIcons from 'react-icons/bs';
 import * as AiIcons from 'react-icons/ai';
 import * as VscIcons from 'react-icons/vsc';
+import Header from './Header';
 
 
 const pageSize = 5;
@@ -624,7 +625,12 @@ class ISPList extends React.Component {
     
     render() {
         return(
-            <div className="container">
+          <div>
+            <Header />
+            <br></br>
+            <br></br>
+            <br></br>
+               <div className="container">
                 <center><h3 style={{"margin":20}}>ISP List</h3><br></br></center>
                 <center>
                   <div className="row">
@@ -902,6 +908,8 @@ class ISPList extends React.Component {
                 </nav>
                 {this.state.filteredISPs.length === 0 && <h4>"No isps found"</h4>}
             </div>
+          </div>
+           
         );
     }
 }

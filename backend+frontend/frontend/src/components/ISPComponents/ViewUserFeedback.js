@@ -9,8 +9,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import * as FaIcons from 'react-icons/fa';
 import * as FcIcons from 'react-icons/fc';
 import * as BsIcons from 'react-icons/bs';
-import * as AiIcons from 'react-icons/ai';
-import Header from './Header';
+import * as GoIcons from 'react-icons/go';
+import ISPHeader from './Header';
 
 
 
@@ -28,28 +28,29 @@ const Feedback = (props) => {
             <td>{props.rating}</td>
             <td>{props.details}</td>
             <td>{new Date(props.feedback_arrival_time).toString()}</td>
-            <td><Link type="button" className="btn btn-danger" to={{
-                pathname : "",
-                state : {
-                    feedback_id : props.feedback_id
-                }}}><AiIcons.AiFillNotification/>  Warn ISP</Link></td>
+            
         </tr>
               
     );
     
 }
 
-class NTTNFeedbacks extends React.Component {
 
+class ViewUserFeedback extends React.Component{
     constructor(props){
         super(props);
-
-        this.state = {
+        this.state={
+            isp_id : "",
+            name : "",
             feedbacks : [],
+            users :[],
             filteredFeedbacks : [],
             isps : [],
-            users :[],
-            unions : [],
+            unions:[],
+            isEligible:false,
+            isp_unions:[],
+            isp : "",
+            contracts:[],
             areas : [],
             paginatedData : [],
             currentPage : 1,
@@ -67,15 +68,19 @@ class NTTNFeedbacks extends React.Component {
             searchdistricts : [],
             searchdivisions : [],
             searchupazillas : [],
-            searchISPs:[],
             showAreaSearch : false,
             showSortRatingOrder:false,
             showDate : false,
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",
             searchText:"",
             selectedStartDate:new Date(),selectedEndDate:new Date()
-           
+         
+
         }
+
+        this.getISP = this.getISP.bind(this);
+        this.getIspName = this.getIspName.bind(this);
+        this.getUnion= this.getUnion.bind(this);
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
         this.handleChangeArrivalTimeOrder = this.handleChangeArrivalTimeOrder.bind(this);
         this.handleChangeRatingOrderAll = this.handleChangeRatingOrderAll.bind(this);
@@ -86,9 +91,7 @@ class NTTNFeedbacks extends React.Component {
         this.handleChangeUpazilla = this.handleChangeUpazilla.bind(this);
         this.handleChangeUnion = this.handleChangeUnion.bind(this);
         this.handleChangeArea = this.handleChangeArea.bind(this);
-        this.handleChangeISP = this.handleChangeISP.bind(this);
         this.loadnewData = this.loadnewData.bind(this);
-        this.getIspName = this.getIspName.bind(this);
         this.getUnionName = this.getUnionName.bind(this);
         this.getUserName = this.getUserName.bind(this);
         this.getAreaName = this.getAreaName.bind(this);
@@ -103,16 +106,69 @@ class NTTNFeedbacks extends React.Component {
         this.showDatePicker = this.showDatePicker.bind(this);
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate = this.handleEndDate.bind(this);
-        
 
     }
 
-    
+    componentDidMount(){
 
-    componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/feedbacks";
-
+        let apiUrl = "http://localhost:7000/api/union";
         axios.get(apiUrl)
+        .then(response => {
+            this.setState({ unions: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+
+
+        
+
+         apiUrl = "http://localhost:7000/api/isp";
+        axios.get(apiUrl)
+        .then(response => {
+           
+            this.setState({ isps: response.data.data , name : this.props.location.state.data})
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+       
+
+
+        apiUrl = "http://localhost:7000/api/ispContracts";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ contracts: response.data.data, isp_id : this.props.location.state.id }, () => {
+            
+                let newcontracts = this.state.contracts.filter((contract) => contract.isp_id.toString() === this.state.isp_id);
+      
+                let isp = this.getISP(this.state.isp_id);
+             
+                this.setState({
+                    isp,
+                    isp_unions : [... new Set(newcontracts.map((contract) => contract.union_id))]
+                });
+                
+    
+                if(isp.connection_establishment_time){
+                    this.setState({
+                        isEligible : true
+                    })
+                }
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+
+        apiUrl = "http://localhost:7000/isp/feedbacks";
+        const object = {
+            isp_id : this.state.isp_id || this.props.location.state.id
+        }
+        axios.post(apiUrl, object)
         .then(response => {
           this.setState({ feedbacks: response.data.data, filteredFeedbacks : response.data.data }, () => {
             let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
@@ -128,25 +184,8 @@ class NTTNFeedbacks extends React.Component {
         .catch((error) => {
           console.log(error);
         })
-        
 
-        apiUrl = "http://localhost:7000/api/isp";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ isps: response.data.data, searchISPs : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
 
-        apiUrl = "http://localhost:7000/api/union";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ unions: response.data.data, searchUnions : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
 
         apiUrl = "http://localhost:7000/api/area";
         axios.get(apiUrl)
@@ -193,271 +232,266 @@ class NTTNFeedbacks extends React.Component {
           console.log(error);
         })
         
+
+        
     }
+
 
     loadnewData(e){
-      e.preventDefault();
-      let apiUrl = "http://localhost:7000/nttn/feedbacks/sortBy";
-      const object = {
-        district_id : this.state.selectedDistrict,
-        division_id :  this.state.selectedDivision,
-        union_id :  this.state.selectedUnion,
-        area_id:  this.state.selectedArea,
-        upazilla_id :  this.state.selectedUpazilla
-      }
-      //console.log(object);
-
-      axios.post(apiUrl, object)
-      .then(response => {
-       
-        this.setState({filteredFeedbacks:response.data.data }, () => {
-          
-          //console.log("here");
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
+        e.preventDefault();
+        let apiUrl = "http://localhost:7000/isp/feedbacks/sortBy";
+        const object = {
+          district_id : this.state.selectedDistrict,
+          division_id :  this.state.selectedDivision,
+          union_id :  this.state.selectedUnion,
+          area_id:  this.state.selectedArea,
+          upazilla_id :  this.state.selectedUpazilla,
+          isp_id : this.state.isp_id
+        }
+        //console.log(object);
   
-          this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal 
-          }, () => {
-            this.paginationFeedbacks(1);
-          })
-        
-        });
-        
-        
-      })
-      .catch((error) => {
-        console.log(error);
-        //this.setState({ feedbacks: [] });
-      })
-    }
-
-    showAllData(){
-
-      let apiUrl = "http://localhost:7000/nttn/feedbacks";
+        axios.post(apiUrl, object)
+        .then(response => {
+         
+          this.setState({filteredFeedbacks:response.data.data }, () => {
+            
+            //console.log("here");
+            let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
     
-
-      axios.get(apiUrl)
-      .then(response => {
-       
-        this.setState({
-          filteredFeedbacks:response.data.data, 
-          searchdistricts:this.state.districts, 
-          searchupazillas : this.state.upazillas, 
-          searchUnions : this.state.unions, 
-          searchAreas:this.state.areas 
-        }, () => {
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal 
+            }, () => {
+              this.paginationFeedbacks(1);
+            })
           
-          //console.log("here");
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
-  
-          this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal,
-            searchText:"",
-            showAreaSearch : false,
-            showSortRatingOrder:false,
-            showDate : false,
-            rating : "",
-            ratingAll : "",
-            timeAll:"",
-            time : "",
-            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
-            selectedStartDate:new Date(), selectedEndDate:new Date()
-
-          }, () => {
-            this.paginationFeedbacks(1);
-          })
-        
-        });
-        
-        
-      })
-      .catch((error) => {
-        console.log(error);
-        //this.setState({ feedbacks: [] });
-      })
-    }
-
-
-    handleChangeSearchText(e){
-      if(e.target.value===""){
-        this.setState({
-          searchText:""
+          });
+          
+          
         })
-        this.showAllData();
-      } else {
-        this.setState({
-          searchText : e.target.value,
-          filteredFeedbacks : this.state.feedbacks.filter((feedback) => {
-            return this.getIspName(feedback.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
-            this.getUserName(feedback.user_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            feedback.rating.toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
-            this.getAreaName(feedback.area_id).toLowerCase().includes((e.target.value).toLowerCase())||
-            feedback.details.toLowerCase().includes((e.target.value).toLowerCase())
-          })
-        }, () => {
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
+        .catch((error) => {
+          console.log(error);
+          //this.setState({ feedbacks: [] });
+        })
+      }
   
+      showAllData(){
+  
+        let apiUrl = "http://localhost:7000/isp/feedbacks";
+        const object = {
+            isp_id : this.state.isp_id || this.props.location.state.id
+        }
+  
+        axios.post(apiUrl, object)
+        .then(response => {
+         
           this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal 
+            filteredFeedbacks:response.data.data, 
+            searchdistricts:this.state.districts, 
+            searchupazillas : this.state.upazillas, 
+            searchUnions : this.state.unions, 
+            searchAreas:this.state.areas 
           }, () => {
-            this.paginationFeedbacks(1);
-          })
-          
-        });
-      }
-    }
-
-    handleStartDate(date){
-        
-        
-      if(!date){
-        date = new Date()
-      } 
-       
-      this.setState({selectedStartDate : date})
-      
-    }
-
-    handleEndDate(date){
-      
-      if(!date){
-        date = new Date()
-      }
-       
-      this.setState({selectedEndDate : date})
-    }
-
-
-    handleChangeArea(e){
-      this.setState({
-        selectedArea : e.target.value
-      })
-
-
-    }
-
-    findFromDivision(division){
-      let districts = this.state.districts.filter((district) => district.division_id === division);
-      let upazillas = this.state.upazillas.filter((upazilla) => districts.map((district) => district.district_id).includes(upazilla.district_id));
-      let unions = this.state.unions.filter((union) =>  upazillas.map((upazilla) => upazilla.upazilla_id).includes(union.upazilla_id));
-      let areas = this.state.areas.filter((area) => unions.map((union) => union.union_id).includes(area.union_id));
-      return [upazillas, unions, areas];
-    }
-
-    findFromDistrict(district){
-     
-      let upazillas = this.state.upazillas.filter((upazilla) => upazilla.district_id === district);
-      let unions = this.state.unions.filter((union) =>  upazillas.map(upazilla => upazilla.upazilla_id).includes(union.upazilla_id));
-      let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
-
-      return [unions, areas];
-    }
-
-    findFromUpazilla(upazilla){
-      let unions = this.state.unions.filter((union) =>  union.upazilla_id === upazilla);
-      let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
-
-      return [areas];
-
-    }
-   
-
-    handleChangeDivision(e){
-      let ans = this.findFromDivision(e.target.value);
-      //console.log(ans);
-      this.setState({
-        selectedDivision : e.target.value,
-        searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
-        searchupazillas: ans[0],
-        searchUnions : ans[1],
-        searchAreas : ans[2],
-        selectedDistrict:"", selectedUpazilla:"",selectedUnion:"", selectedArea:"",
-        
-      })
-        
-      
-    }
-
+            
+            //console.log("here");
+            let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
     
-
-    handleChangeDistrict(e){
-      let ans = this.findFromDistrict(e.target.value);
-      this.setState({
-        selectedDistrict : e.target.value,
-        searchupazillas :  this.state.upazillas.filter((upazilla) => upazilla.district_id === e.target.value),
-        searchUnions : ans[0],
-        searchAreas : ans[1],
-        selectedUpazilla:"",selectedUnion:"", selectedArea:""
-        
-      })
-
-    }
-
-    handleChangeUpazilla(e){
-      this.setState({
-        selectedUpazilla : e.target.value,
-        searchUnions :  this.state.unions.filter((union) => union.upazilla_id === e.target.value),
-        searchAreas : this.findFromUpazilla(e.target.value)[0],
-        selectedUnion:"", selectedArea:""
-        
-      })
-    }
-
-    handleChangeUnion(e){
-      this.setState({
-        selectedUnion : e.target.value,
-        searchAreas :  this.state.areas.filter((area) => area.union_id === e.target.value),
-        selectedArea:""
-        
-      })
-    }
-
-    showAreaSearchDiv = () => {
-      if(this.state.showAreaSearch){
-        this.setState({ showAreaSearch: false });
-      } else {
-        this.setState({showAreaSearch : true});
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal,
+              searchText:"",
+              showAreaSearch : false,
+              showSortRatingOrder:false,
+              showDate : false,
+              rating : "",
+              ratingAll : "",
+              timeAll:"",
+              time : "",
+              selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
+              selectedStartDate:new Date(), selectedEndDate:new Date()
+  
+            }, () => {
+              this.paginationFeedbacks(1);
+            })
+          
+          });
+          
+          
+        })
+        .catch((error) => {
+          console.log(error);
+          //this.setState({ feedbacks: [] });
+        })
       }
 
-      
-    };
-
-    showSortDiv = () => {
-      if(this.state.showSortRatingOrder){
-        this.setState({ showSortRatingOrder: false });
-      } else {
-        this.setState({showSortRatingOrder : true});
+      handleChangeSearchText(e){
+        if(e.target.value===""){
+          this.setState({
+            searchText:""
+          })
+          this.showAllData();
+        } else {
+          this.setState({
+            searchText : e.target.value,
+            filteredFeedbacks : this.state.feedbacks.filter((feedback) => {
+              return this.getIspName(this.state.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
+              this.getUserName(feedback.user_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+              feedback.rating.toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
+              this.getAreaName(feedback.area_id).toLowerCase().includes((e.target.value).toLowerCase())||
+              feedback.details.toLowerCase().includes((e.target.value).toLowerCase())
+            })
+          }, () => {
+            let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
+    
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal 
+            }, () => {
+              this.paginationFeedbacks(1);
+            })
+            
+          });
+        }
       }
-
-      
-    };
-
-    showDatePicker = () => {
-      if(this.state.showDate){
-        this.setState({ showDate: false });
-      } else {
-        this.setState({showDate : true});
+  
+      handleStartDate(date){
+          
+          
+        if(!date){
+          date = new Date()
+        } 
+         
+        this.setState({selectedStartDate : date})
+        
       }
-
+  
+      handleEndDate(date){
+        
+        if(!date){
+          date = new Date()
+        }
+         
+        this.setState({selectedEndDate : date})
+      }
+  
+  
+      handleChangeArea(e){
+        this.setState({
+          selectedArea : e.target.value
+        })
+  
+  
+      }
+  
+      findFromDivision(division){
+        let districts = this.state.districts.filter((district) => district.division_id === division);
+        let upazillas = this.state.upazillas.filter((upazilla) => districts.map((district) => district.district_id).includes(upazilla.district_id));
+        let unions = this.state.unions.filter((union) =>  upazillas.map((upazilla) => upazilla.upazilla_id).includes(union.upazilla_id));
+        let areas = this.state.areas.filter((area) => unions.map((union) => union.union_id).includes(area.union_id));
+        return [upazillas, unions, areas];
+      }
+  
+      findFromDistrict(district){
+       
+        let upazillas = this.state.upazillas.filter((upazilla) => upazilla.district_id === district);
+        let unions = this.state.unions.filter((union) =>  upazillas.map(upazilla => upazilla.upazilla_id).includes(union.upazilla_id));
+        let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
+  
+        return [unions, areas];
+      }
+  
+      findFromUpazilla(upazilla){
+        let unions = this.state.unions.filter((union) =>  union.upazilla_id === upazilla);
+        let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
+  
+        return [areas];
+  
+      }
+     
+  
+      handleChangeDivision(e){
+        let ans = this.findFromDivision(e.target.value);
+        //console.log(ans);
+        this.setState({
+          selectedDivision : e.target.value,
+          searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
+          searchupazillas: ans[0],
+          searchUnions : ans[1],
+          searchAreas : ans[2],
+          selectedDistrict:"", selectedUpazilla:"",selectedUnion:"", selectedArea:"",
+          
+        })
+          
+        
+      }
+  
       
-    };
-   
-
-    handleChangeISP(e){
-      this.setState({
-        selectedISP : e.target.value,
-      }, () => {
-        this.loadnewData();
-      })
-    }
-
-    handleChangeRatingOrder(e){
+  
+      handleChangeDistrict(e){
+        let ans = this.findFromDistrict(e.target.value);
+        this.setState({
+          selectedDistrict : e.target.value,
+          searchupazillas :  this.state.upazillas.filter((upazilla) => upazilla.district_id === e.target.value),
+          searchUnions : ans[0],
+          searchAreas : ans[1],
+          selectedUpazilla:"",selectedUnion:"", selectedArea:""
+          
+        })
+  
+      }
+  
+      handleChangeUpazilla(e){
+        this.setState({
+          selectedUpazilla : e.target.value,
+          searchUnions :  this.state.unions.filter((union) => union.upazilla_id === e.target.value),
+          searchAreas : this.findFromUpazilla(e.target.value)[0],
+          selectedUnion:"", selectedArea:""
+          
+        })
+      }
+  
+      handleChangeUnion(e){
+        this.setState({
+          selectedUnion : e.target.value,
+          searchAreas :  this.state.areas.filter((area) => area.union_id === e.target.value),
+          selectedArea:""
+          
+        })
+      }
+  
+      showAreaSearchDiv = () => {
+        if(this.state.showAreaSearch){
+          this.setState({ showAreaSearch: false });
+        } else {
+          this.setState({showAreaSearch : true});
+        }
+  
+        
+      };
+  
+      showSortDiv = () => {
+        if(this.state.showSortRatingOrder){
+          this.setState({ showSortRatingOrder: false });
+        } else {
+          this.setState({showSortRatingOrder : true});
+        }
+  
+        
+      };
+  
+      showDatePicker = () => {
+        if(this.state.showDate){
+          this.setState({ showDate: false });
+        } else {
+          this.setState({showDate : true});
+        }
+  
+        
+      };
+      handleChangeRatingOrder(e){
         this.setState({
           rating : e.target.value,
           ratingAll: "", time : "", timeAll : ""
@@ -575,17 +609,39 @@ class NTTNFeedbacks extends React.Component {
         
       }
 
-      
+     
+  
+
     getIspName = (isp_id) => {
        
 
         for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id === isp_id){
+            if(this.state.isps[i]._id.toString() === isp_id){
+                
                 return this.state.isps[i].name
             }
         }
     }
 
+    getISP(isp_id){
+        for(let i = 0; i < this.state.isps.length; i++){
+            if(this.state.isps[i]._id.toString() === isp_id){
+                //console.log("hit");
+                return this.state.isps[i]
+            }
+        }
+    }
+
+    getUnion(union_id){
+        //console.log(this.state.unions.length);
+        for(let i = 0; i < this.state.unions.length; i++){
+            if(this.state.unions[i].union_id === union_id){
+                //console.log("Here ",this.state.unions[i]);           
+                return this.state.unions[i].name
+            
+            }
+        }
+    }
 
     getUserName = (user_id) => {
        
@@ -617,18 +673,24 @@ class NTTNFeedbacks extends React.Component {
         }
       }
 
-   
     
-    render() {
+
+   
+
+    render(){
         return(
-          <div>
-               <Header />
-            <br></br>
-            <br></br>
-            <br></br>
-            <div className="container">
-                <center><h3 style={{"margin":20}}>Feedbacks from Users</h3><br></br></center>
-                <div className = "row">
+            <div>
+               <ISPHeader data={this.state.name} id={this.state.isp_id} />
+                
+               <br></br>
+               <br></br>
+               <br></br>
+               <div className="container">
+               {this.state.isEligible === false && <center><h1>Sorry! You are not connected yet!!</h1></center>}
+            
+               <div className="container" hidden={!this.state.isEligible} >
+                    <center><h2 style={{"margin":20}}>User Feedbacks</h2></center>
+                    <div className = "row">
                 <div className="col">
                 <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 200}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
@@ -834,7 +896,7 @@ class NTTNFeedbacks extends React.Component {
                         <th>Rating By User</th>
                         <th>Feedback</th>
                         <th>Feedback Arrival Time</th>
-                        <th>Warn ISP</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
@@ -843,7 +905,7 @@ class NTTNFeedbacks extends React.Component {
                            
                             return <Feedback 
                                 key={feedback._id} 
-                                isp_name={this.getIspName(feedback.isp_id)} 
+                                isp_name={this.getIspName(this.state.isp_id)} 
                                 user_name = {this.getUserName(feedback.user_id)} 
                                 rating = {feedback.rating} 
                                 area_name = {this.getAreaName(feedback.area_id)}
@@ -883,11 +945,15 @@ class NTTNFeedbacks extends React.Component {
                     </ul>
                 </nav>
                 {this.state.filteredFeedbacks.length === 0 && <h4>"No feedbacks found"</h4>}
+
+         
+                
+               </div>
+                
+                </div>
             </div>
-          </div>
-           
         );
     }
 }
 
-export default NTTNFeedbacks;
+export default ViewUserFeedback

@@ -28,5 +28,11 @@ router.get('/package', apiController.getPackage);
 // get all users
 router.get('/user', apiController.getUser);
 
+//get unions of ISP
+router.post('/isp/unions', apiController.getUnionOfISP);
+
+//get all contracts
+router.get('/ispContracts', apiController.getContracts);
+
 
 module.exports = router;

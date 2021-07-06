@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const ispReportController = require('../controller/ispReportController');
-
+const ispFeedbackController = require('./../controller/ispFeedbackController');
 
 // manage routes
 
@@ -21,9 +21,24 @@ router.post('/reports/solved', ispController.handleSolvedReport);
 
 */
 
+// view the feedbacks of users
+router.post('/feedbacks', ispFeedbackController.handleFeedbacks);
+
+// sort the feedbacks based on district, division, subdistrict, union, area, isp
+router.post('/feedbacks/sortBy', ispFeedbackController.handleFeedbackSorted);
+
+
+
+
 // isp-superuser
 
 // report to the superuser
 router.post('/reports', ispReportController.handleReporting);
+
+// report to the superuser sorted
+router.post('/reports/sortBy', ispReportController.handleReportFetchingSorted);
+
+// view own reports
+router.post('/reports/view', ispReportController.viewOwnReports);
 
 module.exports = router;

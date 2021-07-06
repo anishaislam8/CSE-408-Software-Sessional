@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import Header from './Header';
 
 const Renewal = (props) => {
 
@@ -90,7 +91,12 @@ class Renewals extends React.Component {
     
     render() {
         return(
-            <div className="container" >
+            <div>
+                <Header />
+                <br></br>
+                <br></br>
+                <br></br>
+                 <div className="container" >
                 <center><h3>Renewal Requests From ISP</h3><br></br></center>
                 
                 <table className="table table-bordered table-striped">
@@ -119,6 +125,8 @@ class Renewals extends React.Component {
                     </tbody>
                 </table>
             </div>
+            </div>
+           
         );
     }
 }
