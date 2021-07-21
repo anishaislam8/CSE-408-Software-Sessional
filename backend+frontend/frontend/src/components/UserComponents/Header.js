@@ -12,14 +12,14 @@ import {NavDropdown} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 
 
-function ISPHeader(props) {
+function UserHeader(props) {
 
     
     return (
         <div>
         <nav className="navbar navbar-expand-lg  bg-dark fixed-top" style={{ "color": "white"}}>
         <div className="container-fluid">
-          <NavLink className="navbar-brand" to={`/isp/${props.id}`} style={{"paddingLeft":20, "color" : "white"}}>{props.data}</NavLink>
+          <NavLink className="navbar-brand" to={`/user/${props.id}`} style={{"paddingLeft":20, "color" : "white"}}>{props.data}</NavLink>
          
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav nav-pills ms-auto">
@@ -39,59 +39,38 @@ function ISPHeader(props) {
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/isplist"><FaIcons.FaList size={20}/>  ISP List</NavLink>
               </li>*/}
-              <li className="nav-item" style={{"paddingRight":20}}>
-                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
-                   pathname: `/isp/${props.id}/pendings`,
-                   state: {
-                       data : props.data,
-                       id : props.id
-                   }
-                }}><FaIcons.FaList size={20}/>  Pending Requests</NavLink>
-              </li>
-              <li className="nav-item" style={{"paddingRight":20}}>
-                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
-                   pathname: `/isp/${props.id}/userReports`,
-                   state: {
-                       data : props.data,
-                       id : props.id
-                   }
-                }}><GoIcons.GoAlert size={20}/>  Reports</NavLink>
-              </li>
-              <li className="nav-item" style={{"paddingRight":20}}>
-                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
-                   pathname: `/isp/${props.id}/feedbacks`,
-                   state: {
-                       data : props.data,
-                       id : props.id
-                   }
-                }}><VscIcons.VscFeedback size={20}/> Feedbacks</NavLink>
-              </li> 
+             
               {/* <li className="nav-item" style={{"paddingRight":20}}>
              <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}}  to="/nttn/settings"><IoIcons.IoMdSettings size={20}/> Settings</NavLink>
               </li>*/}
               <li className="nav-item dropdown"  style={{ "color" : 'white'}}> 
             
-             
-
                 <div className="dropdown">
                     <button className="btn dark dropdown-toggle" type="button" id="dropdownMenuButton" style={{"color": "white"}} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <IoIcons.IoMdSettings size={20}/>
                     </button>
                     <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                     <Link className="dropdown-item" to={{
-                            pathname: `/isp/${props.id}`,
-                            state: {
-                                data : props.data,
-                                id : props.id
+                           pathname: `/user/${props.id}`,
+                           state: {
+                               data : props.data,
+                               id : props.id
                             }
                             }}>Edit Profile</Link>
-                        <Link className="dropdown-item" to={{
-                            pathname: `/isp/${props.id}/createReport`,
+                    <Link className="dropdown-item" to={{
+                        pathname: `/user/${props.id}/createReport`,
+                        state: {
+                            data : props.data,
+                            id : props.id
+                        }
+                        }}>Report a Problem</Link>
+                    <Link className="dropdown-item" to={{
+                            pathname: `/user/${props.id}/createFeedback`,
                             state: {
                                 data : props.data,
                                 id : props.id
                             }
-                            }}>Report a Problem</Link>
+                            }}>Give Us Feedback</Link>
                         
                     </div>
                 </div>
@@ -106,6 +85,6 @@ function ISPHeader(props) {
     )
 }
 
-export default ISPHeader
+export default UserHeader
 
 

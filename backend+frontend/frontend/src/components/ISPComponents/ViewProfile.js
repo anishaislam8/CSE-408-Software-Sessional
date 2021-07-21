@@ -165,7 +165,7 @@ class ViewProfile extends React.Component{
                                 <tr>
                                     <td>View User Reports</td>
                                     <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
-                                        pathname: `/isp/${this.state.isp_id}`,
+                                        pathname: `/isp/${this.state.isp_id}/userReports`,
                                         state: {
                                             data : this.state.name,
                                             id : this.state.isp_id

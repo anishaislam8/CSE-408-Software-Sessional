@@ -2,6 +2,7 @@ const router = require('express').Router();
 const nttnReportController = require('../controller/nttnReportController');
 const nttnFeedbackController = require('../controller/nttnFeedbackController');
 const nttnRequestController = require('../controller/nttnRequestController');
+const nttnAfterPaymentController = require('../controller/nttnAfterPaymentController');
 
 
 // manage routes
@@ -39,6 +40,10 @@ router.get('/pending', nttnRequestController.handlePending);
 //post pending requests
 router.post('/pending', nttnRequestController.insertPending);
 
+
+router.post('/pendings/sortBy', nttnRequestController.handlePendingFetchingSorted);
+
+router.post('/renewals/sortBy', nttnRequestController.handleRenewalFetchingSorted);
 // pending/notify
 // router.post('/pending/notify', nttnRequestController.handlePendningNotification);
 
@@ -47,6 +52,13 @@ router.get('/renewal', nttnRequestController.handleRenewal);
 
 // renewal/notify
 // router.post('/renewal/notify', nttnrequestController.handleRenewalNotification);
+
+
+// fetch all the new payments
+router.get("/payments", nttnAfterPaymentController.findNewPayment);
+
+// set payment status to solved and solving time to current time
+router.post("/payments/resolve", nttnAfterPaymentController.handlePaymentDone);
 
 
 module.exports = router;

@@ -20,7 +20,8 @@ var UserSchema  = new mongoose.Schema({
     },
     nid : {
         type : String,
-        minlength : 6,
+        minlength : 10,
+        maxlength : 10,
         required : true,
         trim : true
     },

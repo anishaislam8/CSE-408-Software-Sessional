@@ -7,6 +7,7 @@ const { ISP } = require('./../models/ISP');
 const { User } = require('./../models/User');
 const { Package } = require('./../models/Package');
 const { Contract } = require('../models/Contract');
+const { NTTN} = require('../models/NTTN');
 const { request, response } = require('express');
 
 
@@ -103,6 +104,28 @@ const findUnionFromDivision = async (division) => {
     });
 
     return unions;
+}
+
+const getUnionFromArea = async (areaId) => {
+    let areas = await Area.find();
+   //console.log(areas);
+    for(let i = 0; i < areas.length; i++){
+        if(areas[i]._id.toString() === areaId.toString()){
+            //console.log(areas[i].union_id);
+            return areas[i].union_id;
+        }
+    }
+}
+
+const getRatingFromISP = async (ispId) =>{
+    let isps = await ISP.find();
+
+    for(let i = 0; i < isps.length; i++){
+        if(isps[i]._id.toString() === ispId.toString()){
+            return isps[i].average_rating
+        }
+    }
+
 }
 
 const getISP = async (request, response) => {
@@ -245,10 +268,37 @@ const getSubDistrict = async (request, response) => {
 
 
 
-const getPackage = async (request, response) => {
+const getIspPackage = async (request, response) => {
    
     try{
-        let package = await Package.find();
+        let package = await Package.find({
+            package_type : 0
+        });
+        if(!package){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : package
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
+const getUserPackage = async (request, response) => {
+   
+    try{
+        let package = await Package.find({
+            package_type : 1
+        });
         if(!package){
             return response.status(404).send({
                 message : "Not found",
@@ -281,6 +331,60 @@ const getUser = async (request, response) => {
         response.status(200).send({
             message : "Found",
             data : user
+        })
+    } catch (e) {
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
+
+const getNTTN = async (request, response) => {
+   
+    try{
+        let nttn = await NTTN.find();
+        if(!nttn){
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : nttn
+        })
+    } catch (e) {
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+   
+}
+
+const postNTTN = async (request, response) => {
+   const username = request.body.username;
+   const password = request.body.password;
+    try{
+        let newNTTN = new NTTN ({
+            username, password
+        })
+    
+        let data = await newNTTN.save();
+    
+        if(data.nInserted === 0){
+            return response.send({
+                message : "Insertion Failed",
+                data : []
+            })
+        }
+    
+        return response.send({
+            message : "Insertion Successful",
+            data
         })
     } catch (e) {
         return response.send({
@@ -342,6 +446,38 @@ const getContracts = async (request, response) => {
   
         let contracts = await Contract.find({
             user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : contracts
+        })
+
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
+
+
+const getUserContracts = async (request, response) => {
+    
+    try{
+       
+  
+        let contracts = await Contract.find({
+            user_type : 1
         });
 
        
@@ -562,11 +698,16 @@ module.exports = {
     getISPSorted,
     getArea,
     getUnion,
-    getPackage,
+    getIspPackage,
+    getUserPackage,
     getUser,
     getDistrict,
     getDivision,
     getSubDistrict,
     getUnionOfISP,
-    getContracts
+    getContracts,
+    getUserContracts,
+    getUnionFromArea,
+    getRatingFromISP,
+    getNTTN, postNTTN
 }

@@ -5,28 +5,32 @@ import { Link , NavLink } from 'react-router-dom';
 import { Form, Button, Modal } from 'react-bootstrap';
 import * as AiIcons from 'react-icons/ai';
 import * as GoIcons from 'react-icons/go';
-import ISPHeader from './Header';
+import UserHeader from './Header';
 
 
 
 
-class ISPCreateReport extends React.Component{
+class UserCreateReport extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            isp_id : "",
+            user_id : "",
             name : "",
-            isps : [],
+            users : [],
             unions:[],
-            isp:"",
-            isEligible:false,
-            category:"",
-            union_id:"",
-            isp_unions:[],
-            problemCategoryError:"",
-            provideDetailsError:"",
-            unionError:"",
-            details:"",
+            areas:[],
+            user:"",
+            user_areas:[],
+            user_isps:[],
+            category:"", //option
+            area_id:"", //option
+            isp_id:"", //option
+            isps:[],
+            problemCategoryError:"", //error
+            provideDetailsError:"", // error
+            areaError:"", // error
+            ispError:"", // error
+            details:"",//option
             modalTitle : "",
             modalBody:"",
             contracts:[],
@@ -35,12 +39,15 @@ class ISPCreateReport extends React.Component{
         }
 
         this.handleChangeProblemCategory =this.handleChangeProblemCategory.bind(this);
-        this.handleChangeUnion = this.handleChangeUnion.bind(this);
+        this.handleChangeArea = this.handleChangeArea.bind(this);
+        this.handleChangeISP = this.handleChangeISP.bind(this);
         this.handleChangeDetails = this.handleChangeDetails.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.getISP = this.getISP.bind(this);
-        this.getIspName = this.getIspName.bind(this);
-        this.getUnion= this.getUnion.bind(this);
+        this.getUser = this.getUser.bind(this);
+        this.getUserName = this.getUserName.bind(this);
+        this.getISP = this.getISP.bind(this); //gives name
+        this.getUnion= this.getUnion.bind(this); //gives name
+        this.getArea= this.getArea.bind(this); //gives name
         this.handleClose = this.handleClose.bind(this);
 
     }
@@ -56,15 +63,30 @@ class ISPCreateReport extends React.Component{
           console.log(error);
         })
 
+        apiUrl = "http://localhost:7000/api/area";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ areas: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
-
+        apiUrl = "http://localhost:7000/api/isp";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ isps: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
         
 
-         apiUrl = "http://localhost:7000/api/isp";
+         apiUrl = "http://localhost:7000/api/user";
         axios.get(apiUrl)
         .then(response => {
            
-            this.setState({ isps: response.data.data , name : this.props.location.state.data})
+            this.setState({ users: response.data.data , name : this.props.location.state.data})
         })
         .catch((error) => {
           console.log(error);
@@ -73,26 +95,21 @@ class ISPCreateReport extends React.Component{
        
 
 
-        apiUrl = "http://localhost:7000/api/ispContracts";
+        apiUrl = "http://localhost:7000/api/userContracts";
         axios.get(apiUrl)
         .then(response => {
-            this.setState({ contracts: response.data.data, isp_id : this.props.location.state.id }, () => {
+            this.setState({ contracts: response.data.data, user_id : this.props.location.state.id }, () => {
             
-                let newcontracts = this.state.contracts.filter((contract) => contract.isp_id.toString() === this.state.isp_id);
+                let newcontracts = this.state.contracts.filter((contract) => contract.user_id.toString() === this.state.user_id);
       
-                let isp = this.getISP(this.state.isp_id);
+                let user = this.getUser(this.state.user_id);
              
                 this.setState({
-                    isp,
-                    isp_unions : [... new Set(newcontracts.map((contract) => contract.union_id))]
+                    user,
+                    user_areas : [... new Set(newcontracts.map((contract) => contract.area_id))],
+                    user_isps : [... new Set(newcontracts.map((contract) => contract.isp_id))],
                 });
                 
-    
-                if(isp.connection_establishment_time){
-                    this.setState({
-                        isEligible : true
-                    })
-                }
             })
         })
         .catch((error) => {
@@ -102,22 +119,31 @@ class ISPCreateReport extends React.Component{
         
     }
 
-    getIspName = (isp_id) => {
+    getUserName = (user_id) => {
        
 
-        for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id.toString() === isp_id){
+        for(let i = 0; i < this.state.users.length; i++){
+            if(this.state.users[i]._id.toString() === user_id){
                 
-                return this.state.isps[i].name
+                return this.state.users[i].name
+            }
+        }
+    }
+
+    getUser(user_id){
+        for(let i = 0; i < this.state.users.length; i++){
+            if(this.state.users[i]._id.toString() === user_id){
+                //console.log("hit");
+                return this.state.users[i]
             }
         }
     }
 
     getISP(isp_id){
         for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id.toString() === isp_id){
+            if(this.state.isps[i]._id === isp_id){
                 //console.log("hit");
-                return this.state.isps[i]
+                return this.state.isps[i].name
             }
         }
     }
@@ -133,6 +159,18 @@ class ISPCreateReport extends React.Component{
         }
     }
 
+    getArea(area_id){ // no toString()
+        //console.log(this.state.areas.length);
+       
+        for(let i = 0; i < this.state.areas.length; i++){
+            if(this.state.areas[i]._id === area_id){
+                //console.log("Here ",this.state.areas[i]);           
+                return this.state.areas[i].name
+            
+            }
+        }
+    }
+
     
     handleSubmit(e){
         e.preventDefault();
@@ -141,9 +179,14 @@ class ISPCreateReport extends React.Component{
                 problemCategoryError:"Please select a problem category"
             })
         }
-        if(!this.state.union_id){
+        if(!this.state.isp_id){
             this.setState({
-                unionError : "Please provide a union name"
+                ispError:"Please select an ISP"
+            })
+        }
+        if(!this.state.area_id){
+            this.setState({
+                areaError : "Please provide an area name"
             })
         }
         if(!this.state.details.trim()){
@@ -151,12 +194,14 @@ class ISPCreateReport extends React.Component{
                 provideDetailsError : "Please provide details of the problem you are facing"
             })
         }
-        if(this.state.category && this.state.union_id && this.state.details.trim()){
+        if(this.state.category && this.state.isp_id && this.state.area_id && this.state.details.trim()){
 
-            let apiUrl = "http://localhost:7000/isp/reports";
+            let apiUrl = "http://localhost:7000/user/reports";
             let object = {
+                user_id : this.state.user_id,
+               
                 isp_id : this.state.isp_id,
-                union_id : this.state.union_id,
+                area_id : this.state.area_id,
                 category : this.state.category,
                 details : this.state.details
             }
@@ -177,12 +222,13 @@ class ISPCreateReport extends React.Component{
                     // clear all inputs and open modal
                     this.setState({
                         
-                        union_id : "",
+                        area_id : "",
                         category : "",
                         details : "",
-                        provideDetailsError:"",provideDetailsError:"",unionError:"",
+                        isp_id :"",
+                        problemCategoryError:"",ispError:"",provideDetailsError:"",areaError:"",
                         modalTitle:"Success",
-                        modalBody:"Your report has been sent to NTTN"
+                        modalBody:"Your report has been sent to ISP"
                     }, () => {
                         this.setState({
                             done:true
@@ -207,12 +253,22 @@ class ISPCreateReport extends React.Component{
         })
     }
 
-    handleChangeUnion(e){
+    handleChangeArea(e){
         this.setState({
-            union_id:e.target.value
+            area_id:e.target.value
         }, () => {
             this.setState({
-                unionError : ""
+                areaError : ""
+            })
+        })
+    }
+
+    handleChangeISP(e){
+        this.setState({
+            isp_id:e.target.value
+        }, () => {
+            this.setState({
+                ispError : ""
             })
         })
     }
@@ -238,15 +294,15 @@ class ISPCreateReport extends React.Component{
     render(){
         return(
             <div>
-               <ISPHeader data={this.state.name} id={this.state.isp_id} />
+               <UserHeader data={this.state.name} id={this.state.user_id} />
                 
                <br></br>
                <br></br>
                <br></br>
                <div className="container">
-               {this.state.isEligible === false && <center><h1>Sorry! You are not connected yet!!</h1></center>}
+             
             
-               <div className="container" hidden={!this.state.isEligible} >
+               <div className="container" >
                     <center><h2>Report a problem</h2></center>
                 
                 <Form onSubmit={this.handleSubmit}>
@@ -266,15 +322,28 @@ class ISPCreateReport extends React.Component{
                       </Form.Group>
                      
                     <Form.Group controlId="exampleForm.ControlSelect2" style={{"margin":30, "marginLeft":200, "marginRight" : 200}}>
-                        <Form.Label>Select Union</Form.Label>
-                        <Form.Control as="select" value={this.state.union_id} onChange={this.handleChangeUnion}>
-                          <option value="" disabled hidden>Select Union</option>
+                        <Form.Label>Select Area</Form.Label>
+                        <Form.Control as="select" value={this.state.area_id} onChange={this.handleChangeArea}>
+                          <option value="" disabled hidden>Select Area</option>
                           {
-                              this.state.isp_unions.map((union) => <option key={union} value={union}>{this.getUnion(union)}</option>)
+                              this.state.user_areas.map((area) => <option key={area} value={area}>{this.getArea(area)}</option>)
                           }
                           </Form.Control>
                           <Form.Text style={{"color":"red"}}>
-                          {this.state.unionError}
+                          {this.state.areaError}
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group controlId="exampleForm.ControlSelect3" style={{"margin":30, "marginLeft":200, "marginRight" : 200}}>
+                        <Form.Label>Select ISP</Form.Label>
+                        <Form.Control as="select" value={this.state.isp_id} onChange={this.handleChangeISP}>
+                          <option value="" disabled hidden>Select ISP</option>
+                          {
+                              this.state.user_isps.map((isp) => <option key={isp} value={isp}>{this.getISP(isp)}</option>)
+                          }
+                          </Form.Control>
+                          <Form.Text style={{"color":"red"}}>
+                          {this.state.ispError}
                         </Form.Text>
                     </Form.Group>
                     
@@ -305,18 +374,18 @@ class ISPCreateReport extends React.Component{
                         </Modal.Body>
                         <Modal.Footer>
                         <Link type="button" onClick={this.handleClose} className="btn btn-warning" to={{
-                            pathname: `/isp/${this.state.isp_id}`,
+                            pathname: `/user/${this.state.user_id}`,
                             state : {
                                 data : this.state.name,
-                                id : this.state.isp_id
+                                id : this.state.user_id
 
                             }}}><AiIcons.AiOutlineHome size={20}/>  Go to Home</Link>
 
                         <Link type="button" onClick={this.handleClose} className="btn btn-info" to={{
-                             pathname: `/isp/${this.state.isp_id}/viewReport`,
+                             pathname: `/user/${this.state.user_id}/viewReports`,
                              state: {
                                 data : this.state.name,
-                                id : this.state.isp_id
+                                id : this.state.user_id
                              }}}><GoIcons.GoReport size={20}/>  View Reports</Link>
                         </Modal.Footer> 
                     </Modal>
@@ -333,4 +402,4 @@ class ISPCreateReport extends React.Component{
     }
 }
 
-export default ISPCreateReport
+export default UserCreateReport

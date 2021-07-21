@@ -10,8 +10,9 @@ import * as FaIcons from 'react-icons/fa';
 import * as FcIcons from 'react-icons/fc';
 import * as BsIcons from 'react-icons/bs';
 import * as AiIcons from 'react-icons/ai';
+import * as GoIcons from 'react-icons/go';
 import * as VscIcons from 'react-icons/vsc';
-import Header from './Header';
+import ISPHeader from './Header';
 
 
 const pageSize = 5;
@@ -23,41 +24,49 @@ const Report = (props) => {
         <tr> 
             <td>{props.isp_name}</td>
             <td>{props.union_name}</td>
-            <td>{props.average_rating}</td>
+            <td>{props.user_name}</td>
+            <td>{props.area_name}</td>
+         
             <td>{props.problem_category}</td>
             <td>{props.details}</td>
+        
             <td>{new Date(props.report_arrival_time).toString()}</td>
             <td>{props.resolve_status}</td>
-            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={() => {props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString()}</td>
+                     
+            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={()=>{props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString()}</td>
+           
         </tr>
               
     );
     
 }
 
-class NTTNReports extends React.Component {
 
+class ViewUserReport extends React.Component{
     constructor(props){
         super(props);
-
-        this.state = {
+        this.state={
+            isp_id : this.props.location.state.id,
+            name : this.props.location.state.data,
+            isps : [],
+            users :[],
+            unions : [],
+            areas : [],
+            isEligible:false,
+            isp:"",
             reports : [],
             filteredReports : [],
-            isps : [],
-            unions : [],
-            done : false,
             paginatedData : [],
             currentPage : 1,
             pages : [],
             pageCount : 0,
-            rating : "",
-            ratingAll : "",
             timeAll:"",
             time : "",
             districts : [],
             divisions : [],
             upazillas : [],
             searchUnions : [],
+            searchAreas : [],
             resolve_status : "All",
             searchdistricts : [],
             searchdivisions : [],
@@ -68,17 +77,21 @@ class NTTNReports extends React.Component {
             showProblem:false,
             showDate : false,
             showReport : false,
-            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
+            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",selectedArea:"",
             searchText:"",
             problem_category:"",
             selectedStartDate:new Date(),selectedEndDate:new Date(),
-            modalTitle:"",
-            modalBody:""
-           
+            done:false,
+            modalBody:"",
+            modalTitle:""
+
         }
-        this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
+
+        
+        this.getISP = this.getISP.bind(this);
+        this.getIspName = this.getIspName.bind(this);
+        this.getUnion= this.getUnion.bind(this);
         this.handleChangeArrivalTimeOrder = this.handleChangeArrivalTimeOrder.bind(this);
-        this.handleChangeRatingOrderAll = this.handleChangeRatingOrderAll.bind(this);
         this.handleChangeArrivalTimeOrderAll = this.handleChangeArrivalTimeOrderAll.bind(this);
         this.handleChangeSearchText = this.handleChangeSearchText.bind(this);
         this.handleChangeDistrict = this.handleChangeDistrict.bind(this);
@@ -89,38 +102,81 @@ class NTTNReports extends React.Component {
         this.handleChangeProblemCategory = this.handleChangeProblemCategory.bind(this);
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate=  this.handleEndDate.bind(this);
-        this.handleSolveReport = this.handleSolveReport.bind(this);
+        this.handleChangeArea = this.handleChangeArea.bind(this);
         this.loadnewData = this.loadnewData.bind(this);
-        this.getIspName = this.getIspName.bind(this);
         this.getUnionName = this.getUnionName.bind(this);
-        this.getISPRating = this.getISPRating.bind(this);
-        this.handleClose = this.handleClose.bind(this);
         this.paginationReports= this.paginationReports.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
         this.findFromDivision = this.findFromDivision.bind(this);
         this.findFromDistrict = this.findFromDistrict.bind(this);
-      
+        this.getUserName = this.getUserName.bind(this);
+        this.getAreaName = this.getAreaName.bind(this);
         this.showAllData = this.showAllData.bind(this);
-        // this.showSolvedData = this.showSolvedData.bind(this);
-        // this.showUnsolvedData = this.showUnsolvedData.bind(this);
         this.handleChangeDate = this.handleChangeDate.bind(this);
         this.showDatePicker = this.showDatePicker.bind(this);
         this.showReportArea = this.showReportArea.bind(this);
         this.showReportProblemArea = this.showReportProblemArea.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleSolveReport = this.handleSolveReport.bind(this);
         
-
-    
-        
-
     }
 
-    
+    componentDidMount(){
 
-    componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/reports";
-
+        let apiUrl = "http://localhost:7000/api/union";
         axios.get(apiUrl)
+        .then(response => {
+            this.setState({ unions: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+
+
+        
+
+         apiUrl = "http://localhost:7000/api/isp";
+        axios.get(apiUrl)
+        .then(response => {
+           
+            this.setState({ isps: response.data.data , name : this.props.location.state.data})
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+       
+
+
+        apiUrl = "http://localhost:7000/api/ispContracts";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ contracts: response.data.data, isp_id : this.props.location.state.id }, () => {
+            
+                let newcontracts = this.state.contracts.filter((contract) => contract.isp_id.toString() === this.state.isp_id);
+      
+                let isp = this.getISP(this.state.isp_id || this.props.location.state.id   );
+             
+                this.setState({
+                    isp,
+                    isp_unions : [... new Set(newcontracts.map((contract) => contract.union_id))]
+                });
+                
+    
+               
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/isp/userReports";
+        const object = {
+            isp_id : this.state.isp_id || this.props.location.state.id
+        }
+        axios.post(apiUrl, object)
         .then(response => {
           this.setState({ reports: response.data.data, filteredReports : response.data.data }, () => {
             let pageCountVal = this.state.reports ? Math.ceil(this.state.reports.length / pageSize) : 0;
@@ -136,27 +192,7 @@ class NTTNReports extends React.Component {
         .catch((error) => {
           console.log(error);
         })
-        
 
-        apiUrl = "http://localhost:7000/api/isp";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ isps: response.data.data, searchISPs : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        apiUrl = "http://localhost:7000/api/union";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ unions: response.data.data, searchUnions : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        
         apiUrl = "http://localhost:7000/api/division";
         axios.get(apiUrl)
         .then(response => {
@@ -183,302 +219,346 @@ class NTTNReports extends React.Component {
         .catch((error) => {
           console.log(error);
         })
+        apiUrl = "http://localhost:7000/api/area";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ areas: response.data.data, searchAreas : response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
-       
+        apiUrl = "http://localhost:7000/api/user";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ users: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        
     }
 
-    loadnewData(e){
-      if(e){
-        e.preventDefault();
+    handleSolveReport(report_id){
+      console.log(report_id);
+      let apiUrl = "http://localhost:7000/isp/reports/solve";
+      let object = {
+        report_id
       }
-      
-      //console.log("called");
-      let apiUrl = "http://localhost:7000/nttn/reports/sortBy";
-      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
-      let problemCategory = this.state.problem_category === "" ? undefined : this.state.problem_category;
-      const object = {
-        district_id : this.state.selectedDistrict,
-        division_id :  this.state.selectedDivision,
-        union_id :  this.state.selectedUnion,
-        upazilla_id :  this.state.selectedUpazilla,
-        resolve_status : resolveStatus,
-        problem_category:problemCategory
-      }
-      //console.log(object);
-
       axios.post(apiUrl, object)
       .then(response => {
-        //console.log(response.data.data);
-        this.setState({filteredReports:response.data.data }, () => {
-          
-          //console.log("here");
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
-  
-          this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal 
-          }, () => {
-            this.paginationReports(1);
-          })
-        
-        });
-        
-        
+          if(response.data.data.length === 0){
+            //failed
+            this.setState({
+              modalBody:"Report handling failed, try again!",
+              modalTitle:"Error",
+              
+            }, () => {
+              this.setState({
+                done : true
+              })
+            })
+          } else {
+            this.setState({
+              modalBody:"Solved!!",
+              modalTitle:"Success",
+              
+            }, () => {
+              this.setState({
+                done : true
+              })
+            })
+          }
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ reports: [] });
       })
     }
 
+    handleClose(){
+      this.setState({
+        done:false,
+        modalTitle:"",
+        modalBody:""
+      }, () => {
+        this.loadnewData();
+      })
+    }
 
-    showAllData(){
+     
 
-      let apiUrl = "http://localhost:7000/nttn/reports";
+    loadnewData(e){
+        if(e){
+          e.preventDefault();
+        }
+        
+        //console.log("called");
+        let apiUrl = "http://localhost:7000/isp/userReports/sortBy";
+        let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
+        let problemCategory = this.state.problem_category === "" ? undefined : this.state.problem_category;
+        const object = {
+          district_id : this.state.selectedDistrict,
+          division_id :  this.state.selectedDivision,
+          union_id :  this.state.selectedUnion,
+          area_id: this.state.selectedArea,
+          upazilla_id :  this.state.selectedUpazilla,
+          resolve_status : resolveStatus,
+          problem_category:problemCategory,
+          isp_id : this.state.isp_id
+        }
+        //console.log(object);
+  
+        axios.post(apiUrl, object)
+        .then(response => {
+          //console.log(response.data.data);
+          this.setState({filteredReports:response.data.data }, () => {
+            
+            //console.log("here");
+            let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
     
-
-      axios.get(apiUrl)
-      .then(response => {
-       
-        this.setState({
-          filteredReports:response.data.data, 
-          searchdistricts:this.state.districts, 
-          searchupazillas : this.state.upazillas, 
-          searchUnions : this.state.unions, 
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal 
+            }, () => {
+              this.paginationReports(1);
+            })
+          
+          });
+          
+          
+        })
+        .catch((error) => {
+          console.log(error);
+          //this.setState({ reports: [] });
+        })
+      }
+  
+  
+      showAllData(){
+  
+        let apiUrl = "http://localhost:7000/isp/userReports";
+        const object = {
+            isp_id : this.state.isp_id || this.props.location.state.id
+        }
+  
+        axios.post(apiUrl, object)
+        .then(response => {
          
-        }, () => {
-          
-          //console.log("here");
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
-  
           this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal,
-            searchText:"",
-            showAreaSearch : false,
-            showSortRatingOrder:false,
-            showDate : false,
-            showProblem:false,
-            showReport : false,
-            rating : "",
-            ratingAll : "",
-            timeAll:"",
-            time : "",
-            problem_category:"",
-            resolve_status:"All",
-            selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
-            selectedStartDate:new Date(), selectedEndDate:new Date()
-
+            filteredReports:response.data.data, 
+            searchdistricts:this.state.districts, 
+            searchupazillas : this.state.upazillas, 
+            searchUnions : this.state.unions, 
+            searchAreas : this.state.areas
+           
           }, () => {
-            this.paginationReports(1);
-          })
-        
-        });
-        
-        
-      })
-      .catch((error) => {
-        console.log(error);
-        //this.setState({ reports: [] });
-      })
-    }
-
-
-    handleChangeSearchText(e){
-      if(e.target.value===""){
-        this.setState({
-          searchText:""
-        })
-        this.showAllData();
-      } else {
-        this.setState({
-          searchText : e.target.value,
-          filteredReports : this.state.reports.filter((report) => {
-            return this.getIspName(report.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
-            this.getUnionName(report.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            this.getISPRating(report.isp_id).toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
-            report.details.toLowerCase().includes((e.target.value).toLowerCase())
-          })
-        }, () => {
-          let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
-          let pagesVal = _.range(1, pageCountVal + 1);
+            
+            //console.log("here");
+            let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
+    
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal,
+              searchText:"",
+              
+              showAreaSearch : false,
+              showSortRatingOrder:false,
+              showDate : false,
+              showProblem:false,
+              showReport : false,
+           
+              timeAll:"",
+              time : "",
+              problem_category:"",
+              resolve_status:"All",
+              selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",
+              selectedStartDate:new Date(), selectedEndDate:new Date()
   
+            }, () => {
+              this.paginationReports(1);
+            })
+          
+          });
+          
+          
+        })
+        .catch((error) => {
+          console.log(error);
+          //this.setState({ reports: [] });
+        })
+      }
+
+      handleChangeSearchText(e){
+        if(e.target.value===""){
           this.setState({
-            pageCount : pageCountVal,
-            pages : pagesVal 
-          }, () => {
-            this.paginationReports(1);
+            searchText:""
           })
-          
-        });
-      }
-    }
-
-
-   
-
-    findFromDivision(division){
-      let districts = this.state.districts.filter((district) => district.division_id === division);
-      let upazillas = this.state.upazillas.filter((upazilla) => districts.map((district) => district.district_id).includes(upazilla.district_id));
-      let unions = this.state.unions.filter((union) =>  upazillas.map((upazilla) => upazilla.upazilla_id).includes(union.upazilla_id));
-     
-      return [upazillas, unions];
-    }
-
-    findFromDistrict(district){
-     
-      let upazillas = this.state.upazillas.filter((upazilla) => upazilla.district_id === district);
-      let unions = this.state.unions.filter((union) =>  upazillas.map(upazilla => upazilla.upazilla_id).includes(union.upazilla_id));
-     
-
-      return [unions];
-    }
-
+          this.showAllData();
+        } else {
+          this.setState({
+            searchText : e.target.value,
+            filteredReports : this.state.reports.filter((report) => {
+              return this.getIspName(this.state.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
+              this.getUnionName(report.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+              this.getUserName(report.user_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+              this.getAreaName(report.area_id).toLowerCase().includes((e.target.value).toLowerCase())||
+              report.details.toLowerCase().includes((e.target.value).toLowerCase())
+            })
+          }, () => {
+            let pageCountVal = this.state.filteredReports ? Math.ceil(this.state.filteredReports.length / pageSize) : 0;
+            let pagesVal = _.range(1, pageCountVal + 1);
     
-   
-
-    handleChangeDivision(e){
-      let ans = this.findFromDivision(e.target.value);
-      //console.log(ans);
-      this.setState({
-        selectedDivision : e.target.value,
-        searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
-        searchupazillas: ans[0],
-        searchUnions : ans[1],
-       
-        selectedDistrict:"", selectedUpazilla:"",selectedUnion:""
-        
-      })
-        
-      
-    }
-
-    
-
-    handleChangeDistrict(e){
-      let ans = this.findFromDistrict(e.target.value);
-      this.setState({
-        selectedDistrict : e.target.value,
-        searchupazillas :  this.state.upazillas.filter((upazilla) => upazilla.district_id === e.target.value),
-        searchUnions : ans[0],
-     
-        selectedUpazilla:"",selectedUnion:""
-        
-      })
-
-    }
-
-    handleChangeUpazilla(e){
-      this.setState({
-        selectedUpazilla : e.target.value,
-        searchUnions :  this.state.unions.filter((union) => union.upazilla_id === e.target.value),
-       
-        selectedUnion:""
-        
-      })
-    }
-
-    handleChangeUnion(e){
-      this.setState({
-        selectedUnion : e.target.value
-        
-      })
-    }
-
-    showAreaSearchDiv = () => {
-      if(this.state.showAreaSearch){
-        this.setState({ showAreaSearch: false });
-      } else {
-        this.setState({showAreaSearch : true});
+            this.setState({
+              pageCount : pageCountVal,
+              pages : pagesVal 
+            }, () => {
+              this.paginationReports(1);
+            })
+            
+          });
+        }
       }
 
-      
-    };
-
-    showSortDiv = () => {
-      if(this.state.showSortRatingOrder){
-        this.setState({ showSortRatingOrder: false });
-      } else {
-        this.setState({showSortRatingOrder : true});
-      }
-
-      
-    };
-
-    showDatePicker = () => {
-      if(this.state.showDate){
-        this.setState({ showDate: false });
-      } else {
-        this.setState({showDate : true});
-      }
-
-      
-    };
-
-    showReportArea = () => {
-      if(this.state.showReport){
-        this.setState({ showReport: false });
-      } else {
-        this.setState({showReport : true});
-      }
-
-      
-    };
-
-    showReportProblemArea = () => {
-      if(this.state.showProblem){
-        this.setState({ showProblem: false });
-      } else {
-        this.setState({showProblem : true});
-      }
-
-      
-    };
-   
-
+      handleChangeArea(e){
+        this.setState({
+          selectedArea : e.target.value
+        })
   
-    handleChangeRatingOrder(e){
+  
+      }
+  
+      findFromDivision(division){
+        let districts = this.state.districts.filter((district) => district.division_id === division);
+        let upazillas = this.state.upazillas.filter((upazilla) => districts.map((district) => district.district_id).includes(upazilla.district_id));
+        let unions = this.state.unions.filter((union) =>  upazillas.map((upazilla) => upazilla.upazilla_id).includes(union.upazilla_id));
+        let areas = this.state.areas.filter((area) => unions.map((union) => union.union_id).includes(area.union_id));
+        return [upazillas, unions, areas];
+      }
+  
+      findFromDistrict(district){
+       
+        let upazillas = this.state.upazillas.filter((upazilla) => upazilla.district_id === district);
+        let unions = this.state.unions.filter((union) =>  upazillas.map(upazilla => upazilla.upazilla_id).includes(union.upazilla_id));
+        let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
+  
+        return [unions, areas];
+      }
+  
+      findFromUpazilla(upazilla){
+        let unions = this.state.unions.filter((union) =>  union.upazilla_id === upazilla);
+        let areas = this.state.areas.filter((area) => unions.map(union => union.union_id).includes(area.union_id));
+  
+        return [areas];
+  
+      }
+     
+  
+      handleChangeDivision(e){
+        let ans = this.findFromDivision(e.target.value);
+        //console.log(ans);
         this.setState({
-          rating : e.target.value,
-          ratingAll: "", time : "", timeAll : ""
-        }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
-          } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) =>this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
-          }
-    
-          //this.paginationReports(this.state.currentPage);
+          selectedDivision : e.target.value,
+          searchdistricts :  this.state.districts.filter((district) => district.division_id === e.target.value),
+          searchupazillas: ans[0],
+          searchUnions : ans[1],
+          searchAreas : ans[2],
+          selectedDistrict:"", selectedUpazilla:"",selectedUnion:"", selectedArea:"",
           
         })
-        
+          
         
       }
-
-      handleChangeRatingOrderAll(e){
+  
+      
+  
+      handleChangeDistrict(e){
+        let ans = this.findFromDistrict(e.target.value);
         this.setState({
-          ratingAll : e.target.value,
-          rating: "", time : "", timeAll : ""
-        }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => this.getISPRating(a.isp_id) - this.getISPRating(b.isp_id))}))
-          } else {
-            this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => this.getISPRating(b.isp_id) - this.getISPRating(a.isp_id))}))
-          }
-    
-          this.paginationReports(1);
+          selectedDistrict : e.target.value,
+          searchupazillas :  this.state.upazillas.filter((upazilla) => upazilla.district_id === e.target.value),
+          searchUnions : ans[0],
+          searchAreas : ans[1],
+          selectedUpazilla:"",selectedUnion:"", selectedArea:""
           
         })
-        
-        
+  
       }
-
+  
+      handleChangeUpazilla(e){
+        this.setState({
+          selectedUpazilla : e.target.value,
+          searchUnions :  this.state.unions.filter((union) => union.upazilla_id === e.target.value),
+          searchAreas : this.findFromUpazilla(e.target.value)[0],
+          selectedUnion:"", selectedArea:""
+          
+        })
+      }
+  
+      handleChangeUnion(e){
+        this.setState({
+          selectedUnion : e.target.value,
+          searchAreas :  this.state.areas.filter((area) => area.union_id === e.target.value),
+          selectedArea:""
+          
+        })
+      }
+      showAreaSearchDiv = () => {
+        if(this.state.showAreaSearch){
+          this.setState({ showAreaSearch: false });
+        } else {
+          this.setState({showAreaSearch : true});
+        }
+  
+        
+      };
+  
+      showSortDiv = () => {
+        if(this.state.showSortRatingOrder){
+          this.setState({ showSortRatingOrder: false });
+        } else {
+          this.setState({showSortRatingOrder : true});
+        }
+  
+        
+      };
+  
+      showDatePicker = () => {
+        if(this.state.showDate){
+          this.setState({ showDate: false });
+        } else {
+          this.setState({showDate : true});
+        }
+  
+        
+      };
+  
+      showReportArea = () => {
+        if(this.state.showReport){
+          this.setState({ showReport: false });
+        } else {
+          this.setState({showReport : true});
+        }
+  
+        
+      };
+  
+      showReportProblemArea = () => {
+        if(this.state.showProblem){
+          this.setState({ showProblem: false });
+        } else {
+          this.setState({showProblem : true});
+        }
+  
+        
+      };
+     
       handleChangeArrivalTimeOrder(e){
         this.setState({
           time : e.target.value,
-          rating: "", ratingAll : "", timeAll : ""
+           timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
             this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
@@ -496,7 +576,7 @@ class NTTNReports extends React.Component {
       handleChangeArrivalTimeOrderAll(e){
         this.setState({
           timeAll : e.target.value,
-          rating: "", ratingAll : "", time : ""
+           time : ""
         }, () =>{
           if(e.target.value === "1"){
             this.setState((prevstate) => ({filteredReports : prevstate.filteredReports.sort((a,b) => a.report_arrival_time.localeCompare(b.report_arrival_time))}))
@@ -547,21 +627,21 @@ class NTTNReports extends React.Component {
         if(e.target.value === "All"){
            this.setState({
              resolve_status:"All",
-             rating :"", ratingAll:"", time:"", timeAll:""
+             time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
         } else if(e.target.value === "Solved"){
            this.setState({
              resolve_status:"Solved",
-             rating :"", ratingAll:"", time:"", timeAll:""
+              time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
         } else if(e.target.value === "Unsolved"){
            this.setState({
              resolve_status:"Unsolved",
-             rating :"", ratingAll:"", time:"", timeAll:""
+             time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
@@ -574,7 +654,7 @@ class NTTNReports extends React.Component {
       handleChangeProblemCategory(e){
         this.setState({
           problem_category:e.target.value,
-          rating :"", ratingAll:"", time:"", timeAll:""
+           time:"", timeAll:""
         }, () => {
           this.loadnewData();
         })
@@ -599,71 +679,38 @@ class NTTNReports extends React.Component {
         
       }
 
-    handleSolveReport(report_id){
-      let apiUrl = "http://localhost:7000/nttn/reports/solve";
-      let object = {
-        report_id
-      }
-      axios.post(apiUrl, object)
-      .then(response => {
-          if(response.data.data.length === 0){
-            //failed
-            this.setState({
-              modalBody:"Report handling failed, try again!",
-              modalTitle:"Error",
-              
-            }, () => {
-              this.setState({
-                done : true
-              })
-            })
-          } else {
-            this.setState({
-              modalBody:"Solved!!",
-              modalTitle:"Success",
-              
-            }, () => {
-              this.setState({
-                done : true
-              })
-            })
-          }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-    }
-
-    handleClose(){
-      this.setState({
-        done:false,
-        modalTitle:"",
-        modalBody:""
-      }, () => {
-        this.loadnewData();
-      })
-    }
-
       
+   
     getIspName = (isp_id) => {
        
 
         for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id === isp_id){
+            if(this.state.isps[i]._id.toString() === isp_id){
+                
                 return this.state.isps[i].name
             }
         }
     }
 
-
-    getISPRating(isp_id){
+    getISP(isp_id){
         for(let i = 0; i < this.state.isps.length; i++){
-            if(this.state.isps[i]._id === isp_id){
-                return this.state.isps[i].average_rating
+            if(this.state.isps[i]._id.toString() === isp_id){
+                //console.log("hit");
+                return this.state.isps[i]
             }
         }
-      }
-   
+    }
+
+    getUnion(union_id){
+        //console.log(this.state.unions.length);
+        for(let i = 0; i < this.state.unions.length; i++){
+            if(this.state.unions[i].union_id === union_id){
+                //console.log("Here ",this.state.unions[i]);           
+                return this.state.unions[i].name
+            
+            }
+        }
+    }
 
     getUnionName(union_id) {
    
@@ -695,20 +742,41 @@ class NTTNReports extends React.Component {
         this.setState({selectedEndDate : date})
       }
 
-   
+      getUserName = (user_id) => {
+       
+
+        for(let i = 0; i < this.state.users.length; i++){
+            if(this.state.users[i]._id === user_id){
+                return this.state.users[i].name
+            }
+        }
+    }
+
+    getAreaName = (area_id) => {
+       
+
+        for(let i = 0; i < this.state.areas.length; i++){
+            if(this.state.areas[i]._id === area_id){
+                return this.state.areas[i].name
+            }
+        }
+    }
+
     
-    render() {
-      
+   
+    render(){
         return(
-          <div>
-            <Header />
-            <br></br>
-            <br></br>
-            <br></br>
-             <div className="container">
-             <center><h3 style={{"margin":20}}>Reports from ISPs</h3><br></br></center>
-                {/* <center> */}
-                  <div className="row">
+            <div>
+               <ISPHeader data={this.state.name} id={this.state.isp_id} />
+                
+               <br></br>
+               <br></br>
+               <br></br>
+               <div className="container">
+             
+               <div className="container">
+                    <center><h2 style={{"margin" : 30}}>User Reports</h2></center>
+                    <div className="row">
                     <div className="col">
                     <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Reports"/>
                     </div>
@@ -719,19 +787,19 @@ class NTTNReports extends React.Component {
                  {/* </center> */}
                 <div className = "row">
                 <div className="col">
-                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20,"width" : 240}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
+                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20,"width" : 230}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20,  "width" : 240}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Reports"}</Button>
+                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20,  "width" : 230}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Reports"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 230}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 240}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Show Report" : "  Show Reports"}</Button>       
+                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 230}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Show Report" : "  Show Reports"}</Button>       
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showReportProblemArea} style={{"marginBottom":20,  "width" : 240}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showProblem ? "  Hide Problem Type" : "  Problem Category"}</Button>       
+                <Button variant="warning" onClick={this.showReportProblemArea} style={{"marginBottom":20,  "width" : 230}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showProblem ? "  Hide Problem Type" : "  Problem Category"}</Button>       
                 </div>
                   
                   
@@ -789,6 +857,22 @@ class NTTNReports extends React.Component {
                       </Form.Group>
                       </Col>
 
+                      <Col>
+                      <Form.Group>
+                          <Form.Label>Area</Form.Label>
+                          <Form.Control as="select" value={this.state.selectedArea} onChange={this.handleChangeArea} >
+                          <option value="" disabled hidden>Select Area</option>
+                          {this.state.searchAreas.length === 0 && <option value="" disabled>No Areas found</option>}
+                          {
+                            
+                          
+                            this.state.searchAreas.map((area) =><option key={area._id} value={area._id}>{area.name}</option>)
+                          }
+                          </Form.Control>
+                      </Form.Group>
+
+                      </Col>
+
                      
                       <Col>
                       <Form.Group>
@@ -811,17 +895,7 @@ class NTTNReports extends React.Component {
                   <Form style={{"padding" : 10}}>
                       <Form.Row>
 
-                      <Col>
-                      <Form.Group style={{"marginRight" : 40}}>
-                          <Form.Label>Sort This Page By Rating</Form.Label>
-                          <Form.Control as="select" value={this.state.rating} onChange={this.handleChangeRatingOrder}>
-                          <option value=""  disabled hidden>Select Rating Order</option>
-                          <option value="1">Ascending</option>
-                          <option value="-1">Descending</option>
-                          </Form.Control>
-                      </Form.Group>
-                      </Col>
-
+                     
 
                       <Col >
                     <Form.Group style={{ "marginRight" : 40}}>
@@ -835,17 +909,7 @@ class NTTNReports extends React.Component {
                     </Col>
 
 
-                    <Col >
-                    <Form.Group style={{"marginRight" : 40}}>
-                        <Form.Label>Sort All Data By Rating</Form.Label>
-                        <Form.Control as="select" value={this.state.ratingAll} onChange={this.handleChangeRatingOrderAll}>
-                        <option value="" disabled hidden>Select Rating Order</option>
-                        <option value="-1">Descending</option>
-                        <option value="1">Ascending</option>
-                        </Form.Control>
-                    </Form.Group>
-                    </Col>
-
+                  
                     <Col >
                     <Form.Group>
                         <Form.Label>Sort All Data By Time</Form.Label>
@@ -949,7 +1013,8 @@ class NTTNReports extends React.Component {
                         
                             <th>ISP Name</th>
                             <th>Union Name</th>
-                            <th>Rating</th>
+                            <th>User Name</th>
+                            <th>User Area</th>
                             <th>Problem Category</th>
                             <th>Details</th>
                             <th>Report Arrival Time</th>
@@ -964,17 +1029,18 @@ class NTTNReports extends React.Component {
                            
                              return <Report 
                                 key={report._id} 
-                                isp_name={this.getIspName(report.isp_id)} 
+                                isp_name={this.getIspName(this.state.isp_id)} 
                                 union_name = {this.getUnionName(report.union_id)} 
                                 problem_category = {(report.category === "0") ? "Low Bandwidth" : (report.category === "1" ? "Physical Connection Problem" : (report.category === "2" ? "Platform Related Problem" : "Others")) } 
                                 report_arrival_time = {report.report_arrival_time} 
                                 count={index + 1}
                                 report_id={report._id}
                                 details = {report.details}
-                                average_rating={this.getISPRating(report.isp_id)}
+                                user_name = {this.getUserName(report.user_id)} 
+                                area_name = {this.getAreaName(report.area_id)}
                                 resolve_status={report.resolve_status===false ? "False" : "True"}
                                 resolve_time={report.report_resolve_time}
-                                handleSolveReport={this.handleSolveReport}
+                                handleSolveReport= {this.handleSolveReport}
                             />})
                         }
                     </tbody>
@@ -1007,9 +1073,11 @@ class NTTNReports extends React.Component {
                     </ul>
                 </nav>
                 {this.state.filteredReports.length === 0 && <h4>"No reports found"</h4>}
-            </div>
+                
+                    
+                </div>
 
-            <Modal show={this.state.done} onHide={this.handleClose} animation={false}>
+                <Modal show={this.state.done} onHide={this.handleClose} animation={false}>
                         <Modal.Header closeButton>
                         <Modal.Title>{this.state.modalTitle}</Modal.Title>
                         </Modal.Header>
@@ -1018,11 +1086,13 @@ class NTTNReports extends React.Component {
                         </Modal.Body>
                        
                     </Modal>
-          </div>
-
-           
+         
+                
+               </div>
+                
+            </div>
         );
     }
 }
 
-export default NTTNReports;
+export default ViewUserReport

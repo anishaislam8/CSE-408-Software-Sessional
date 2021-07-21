@@ -19,8 +19,9 @@ class ISPHome extends React.Component {
         super(props);
         this.state = {
             isps : [],
-            isp_id : this.props.match.params.id,
+            isp_id : "",
             isp_name : "",
+            isp:""
         }
     }
     componentDidMount(){
@@ -29,7 +30,12 @@ class ISPHome extends React.Component {
         .then(response => {
             this.setState({
                 isps:response.data.data,
-                isp_name : response.data.data.filter((isp) => isp._id.toString() === this.state.isp_id)[0].name
+                isp_id : this.props.match.params.id
+            }, () => {
+                this.setState({
+                    isp : response.data.data.filter((isp) => isp._id.toString() === this.state.isp_id)[0], 
+                    isp_name : response.data.data.filter((isp) => isp._id.toString() === this.state.isp_id)[0].name
+                })
             })
         })
         .catch((error) => {
@@ -47,19 +53,78 @@ class ISPHome extends React.Component {
                 <br></br>
                 <br></br>
                 <br></br>
-                <div className="shadow-lg p-3 mb-5 bg-white rounded" style={{margin : 50}}>
-                    
-                    <div className="row">
-                        <div className="col s12 m6" style={{paddingTop : "10%", paddingLeft : "10%"}}>
-                            <h1>Welcome to {this.state.isp_name}</h1>
+                <div className="container">
+                        <center> <h2 style={{"margin" : 20}}> {this.state.isp.name}</h2></center>
+                        <table className="table table-bordered table-striped">
                             
-                        </div>
-                        <div className="col s12 m6" style = {{paddingRight : "5%"}} >
-                            <img src={bgimage} alt="Logo" height="100%" width="90%" />
-                        </div>
+                            <tbody>
+                                <tr>
+                                    <td><b>ISP Name</b></td>
+                                    <td>{this.state.isp.name}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>License ID</b></td>
+                                    <td>{this.state.isp.license_id}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>Physical Connection Established</b></td>
+                                    <td>{new Date(this.state.isp.physical_connection_establishment_time).toString()}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><b>Current Connection Establishment Time</b></td>
+                                    <td>{new Date(this.state.isp.connection_establishment_time).toString()}</td>
+                                </tr>
+
+                                
+
+                                <tr>
+                                    <td>View Status Of Current Connections</td>
+                                    <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
+                                        pathname: `/isp/${this.state.isp_id}`,
+                                        state: {
+                                            data : this.state.isp_name,
+                                            id : this.state.isp_id
+                                        }}}><AiIcons.AiOutlineEye size={20}/>  View Connection Details</Link></td>
+                                </tr>
+
+                                <tr>
+                                    <td>View User Feedbacks</td>
+                                    <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
+                                        pathname: `/isp/${this.state.isp_id}/feedbacks`,
+                                        state: {
+                                            data : this.state.isp_name,
+                                            id : this.state.isp_id
+                                        }}}><BsIcons.BsCardChecklist size={20}/>   View User Feedbacks</Link></td>
+                                </tr>
+
+                                <tr>
+                                    <td>View User Reports</td>
+                                    <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
+                                        pathname: `/isp/${this.state.isp_id}/userReports`,
+                                        state: {
+                                            data : this.state.isp_name,
+                                            id : this.state.isp_id
+                                        }}}><FaIcons.FaClipboardList size={20}/>  View User Reports</Link></td>
+                                </tr>
+
+                                <tr>
+                                    <td>View Reports to NTTN</td>
+                                    <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
+                                        pathname: `/isp/${this.state.isp_id}/viewReport`,
+                                        state: {
+                                            data : this.state.isp_name,
+                                            id : this.state.isp_id
+                                        }}}><BsIcons.BsCardList size={20}/>  View Own Reports</Link></td>
+                                </tr>
+
+                               
+
+                            </tbody>
+                        </table>
                     </div>
-                
-                </div>
             </div>
             
         

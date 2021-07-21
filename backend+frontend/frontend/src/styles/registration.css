@@ -1,0 +1,134 @@
+.registration1Form {
+    min-height: 100vh;
+    display: flex;
+    font-weight: 400;
+    font-family: sans-serif;
+    /* background: #12c2e9; 
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); */
+    
+  }
+  
+
+  
+  .registration1inner {
+    width: 550px;
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #4776E6 0%, #8E54E9  51%, #4776E6  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+  .registration2Form {
+    min-height: 100vh;
+    display: flex;
+    font-weight: 400;
+    font-family: sans-serif;
+    /* background: #12c2e9; 
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); */
+    
+  }
+  
+
+  
+  .registration2inner {
+    width: 700px;
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #c2e59c 0%, #64b3f4  51%, #c2e59c  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+
+  .registration3Form {
+    min-height: 100vh;
+    display: flex;
+    font-weight: 400;
+    font-family: sans-serif;
+    /* background: #12c2e9; 
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); */
+    
+  }
+  
+
+  
+  .registration3inner {
+    width: 650px;
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #EECDA3 0%, #EF629F  51%, #EECDA3  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+
+  .registration4Form {
+    min-height: 100vh;
+    display: flex;
+    font-weight: 400;
+    font-family: sans-serif;
+    /* background: #12c2e9; 
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); */
+    
+  }
+  
+
+  
+  .registration4inner {
+    width: 650px;
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background:  linear-gradient(to right, #fceabb 0%, #f8b500  51%, #fceabb  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+
+  .registration5Form {
+    min-height: 100vh;
+    display: flex;
+    font-weight: 400;
+    font-family: sans-serif;
+    /* background: #12c2e9; 
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); */
+    
+  }
+  
+
+  
+  .registration5inner {
+    width: 650px;
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background:  linear-gradient(to right, #56ab2f 0%, #a8e063  51%, #56ab2f  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+
+
+
+  
+  
+  

@@ -13,6 +13,10 @@ var LicenseSchema = new mongoose.Schema({
         minlength : 6,
         required : true
     },
+    issue_date : {
+        type : Date,
+        required : true
+    },
     valid_until : {
         type : Date,
         required : true
