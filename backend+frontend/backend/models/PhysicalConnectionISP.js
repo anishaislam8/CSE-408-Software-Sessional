@@ -133,6 +133,10 @@ var PhysicalConnectionISPSchema = new mongoose.Schema({
     request_resolve_time : {
         type : Date,
         default : null
+    },
+    rejected : {
+        type : Boolean,
+        default : false
     }
 
 

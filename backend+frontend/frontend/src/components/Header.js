@@ -23,7 +23,7 @@ function Header() {
             <li className="nav-item dropdown"  style={{"paddingRight":20, "color" : 'white'}}>
             
             <NavDropdown title= "Connection" id="basic-nav-dropdown" style={{"color":"white"}}>
-              <NavDropdown.Item href="/nttn/connections">Confirm Connection</NavDropdown.Item>
+              <NavDropdown.Item href="/nttn/connections">Connection Requests</NavDropdown.Item>
               <NavDropdown.Item href="/nttn/pendings">Pending Requests</NavDropdown.Item>
               {/* <NavDropdown.Item href="/nttn/confirmConnection">Confirm Connection</NavDropdown.Item> */}
               
@@ -38,9 +38,9 @@ function Header() {
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/reports"><GoIcons.GoAlert size={20}/>  Reports</NavLink>
               </li>
-              <li className="nav-item" style={{"paddingRight":20}}>
+              {/* <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/feedbacks"><VscIcons.VscFeedback size={20}/> Feedbacks</NavLink>
-              </li>
+              </li> */}
               <li className="nav-item dropdown"  style={{ "color" : 'white'}}> 
             
              

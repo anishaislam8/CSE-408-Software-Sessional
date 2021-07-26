@@ -1,6 +1,7 @@
 const { PhysicalConnectionISP } = require('./../models/PhysicalConnectionISP');
 const { UserConnection } = require('./../models/UserConnection');
 const { request, response } = require('express');
+const { Employee } = require('../models/Employee');
 
 
 
@@ -71,6 +72,48 @@ const registerISP = async (request, response) => {
     }
 }
 
+const addEmployee = async (request, response) => {
+    let employee_type = request.body.employee_type;
+    let name = request.body.name;
+    let address = request.body.address;
+    let nid = request.body.nid;
+    let phone_number = request.body.phone_number;
+    let joining_date = request.body.joining_date;
+    let isp_id = request.body.isp_id || null;
+	
+
+    try{
+        let newEmployee = new Employee({
+            employee_type,
+            name,
+            address,
+            nid,
+            phone_number,
+            joining_date,
+            isp_id
+        });
+
+        let addedEmployee = await newEmployee.save();
+
+        if(addedEmployee.nInserted === 0){
+            return response.send({
+                message : "Insertion Failed",
+                data : []
+            })
+        }
+        return response.status(200).send({
+            message : "Insertion Successful",
+            data : addedEmployee
+        })
+
+    }catch(e){
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
 const registerUser = async (request, response) => {
     const user_name = request.body.user_name;
     const nid_number = request.body.nid_number;
@@ -128,5 +171,6 @@ const registerUser = async (request, response) => {
 
 module.exports = {
     registerISP,
-    registerUser
+    registerUser,
+    addEmployee
 }

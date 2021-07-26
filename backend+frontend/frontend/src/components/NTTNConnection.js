@@ -12,6 +12,7 @@ import * as BsIcons from 'react-icons/bs';
 import * as AiIcons from 'react-icons/ai';
 import * as VscIcons from 'react-icons/vsc';
 import Header from './Header';
+import './../styles/connection.css';
 
 const pageSize = 5;
 
@@ -27,7 +28,7 @@ const Connection = (props) => {
             <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.request_status}</td>
             <td><Link type="button" className="btn btn-info" to={{
-                pathname : "/nttn/connections/isp/details",
+                pathname : "/nttn/connections/details",
                 state : {
                   key : props.connection_id,
                   connection_id : props.connection_id
@@ -711,7 +712,7 @@ class NTTNConnections extends React.Component {
               <br></br>
               <br></br>
               <br></br>
-                <center><h3 style={{"margin":20}}>Connection Requests from ISPs</h3><br></br></center>
+              <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Connection Requests from ISP</h3></center>
 
                 <div className="row">
                     <div className="col">
@@ -940,7 +941,7 @@ class NTTNConnections extends React.Component {
 
                
                 
-                
+                <div>
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
                         <tr>
@@ -970,6 +971,7 @@ class NTTNConnections extends React.Component {
                     </tbody>
                 </table>
 
+                </div>
                 <nav className="d-flex justify-content-center">
                     <ul className="pagination">
                     <li className={this.state.currentPage === 1 ? "page-item disabled": "page-item"}>
@@ -996,6 +998,8 @@ class NTTNConnections extends React.Component {
                     
                     </ul>
                 </nav>
+                
+                
                 {this.state.filteredConnections.length === 0 && <h4>"No connections found"</h4>}
             </div>
         );

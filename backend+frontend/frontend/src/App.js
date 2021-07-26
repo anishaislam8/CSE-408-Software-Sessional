@@ -24,6 +24,7 @@ import Login from "./components/LogInComponents/login";
 import ISPForm from "./components/Registration/ISPForm";
 import UserForm from "./components/RegistrationUser/UserForm";
 import IspConnections from "./components/ISPComponents/Connections";
+import ConnectionDetails from "./components/ConnectionDetails";
 
 
 
@@ -43,9 +44,9 @@ function App() {
       <Route path="/nttn/renewals" exact component={Renewals} />
       <Route path="/nttn/pendings" exact component={Pendings} />
       <Route path="/nttn/connections" exact component={NTTNConnections} />
-   
+      <Route path="/nttn/connections/details" exact component={ConnectionDetails} />
       <Route path="/nttn/pendings/isp/details" exact component={PendingDetails} />
-      <Route path="/nttn/connection" exact component={Pendings} />
+      
       
       <Route path="/nttn/settings" exact component={Pendings} />
       <Route path="/isp/:id" exact component={ISPHome} />

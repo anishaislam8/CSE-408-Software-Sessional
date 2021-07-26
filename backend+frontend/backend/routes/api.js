@@ -70,6 +70,9 @@ router.post('/registerISP', apiRegistrationController.registerISP);
 // register user
 router.post('/registerUser', apiRegistrationController.registerUser);
 
+// add employee
+router.post('/addEmployee', apiRegistrationController.addEmployee);
+
 
 
 

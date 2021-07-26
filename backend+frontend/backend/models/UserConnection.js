@@ -85,6 +85,10 @@ var UserConnectionSchema = new mongoose.Schema({
     isp_id : {
         type : ObjectID,
         required : true
+    },
+    rejected : {
+        type : Boolean,
+        default : false
     }
 
 
