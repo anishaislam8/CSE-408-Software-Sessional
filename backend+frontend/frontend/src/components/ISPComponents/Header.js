@@ -41,6 +41,15 @@ function ISPHeader(props) {
               </li>*/}
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
+                   pathname: `/isp/${props.id}/connections`,
+                   state: {
+                       data : props.data,
+                       id : props.id
+                   }
+                }}><FaIcons.FaConnectdevelop size={20}/>  Connection Requests</NavLink>
+              </li>
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
                    pathname: `/isp/${props.id}/pendings`,
                    state: {
                        data : props.data,

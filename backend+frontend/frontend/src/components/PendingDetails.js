@@ -16,7 +16,7 @@ import Header from './Header';
 
 
 
-class PendingDetails extends React.Component{
+export default class PendingDetails extends React.Component{
     constructor(props){
         super(props);
         this.state = {
@@ -34,15 +34,13 @@ class PendingDetails extends React.Component{
     }
 
      componentDidMount(){
-
+    
         let apiUrl = "http://localhost:7000/nttn/pending";
 
         axios.get(apiUrl)
         .then(response => {
-            console.log("Response", response.data.data);
-          this.setState({ pendings: response.data.data, pending_id : this.props.location.state.pending_id }, ()=>{
-              console.log("Balamar" ,this.state.pendings)
-          })
+            
+          this.setState({ pendings: response.data.data, pending_id : this.props.location.state.pending_id })
         })
         .catch((error) => {
           console.log(error);
@@ -77,14 +75,12 @@ class PendingDetails extends React.Component{
 
     }
 
-    getRequest() {
-        console.log("called");
-        console.log(this.state.pendings.length);
+    getRequest(pending_id) {
+       
 
         for(let i = 0; i < this.state.pendings.length; i++){
-            if(this.state.pendings[i]._id.toString() === this.state.pending_id.toString()){
-                console.log("hit");
-                
+            if(this.state.pendings[i]._id.toString() === pending_id.toString()){
+               
                 return this.state.pendings[i]
             }
         }
@@ -120,23 +116,25 @@ class PendingDetails extends React.Component{
       }
     render(){
         return(
-
+            
             <div>
                 <Header />
                 <br></br>
                 <br></br>
                 <br></br>
+                
                 <div className="container">
                 
                 <div className="row">
                 <center><h3 style={{"margin":20}}>Request Details</h3><br></br></center>
                     <div className="col">
                     <table className="table table-bordered table-striped">
-                   
+                    {this.state.pendings.length > 0 && 
                    <tbody>
+                       
                        <tr>
                            <td><b>ISP Name</b></td>
-                           <td>{this.getISP(this.getRequest().isp_id)}</td>
+                           <td>{this.getISP(this.getRequest(this.state.pending_id || this.props.location.state.pending_id).isp_id)}</td>
                        </tr> 
 
                        <tr>
@@ -178,8 +176,8 @@ class PendingDetails extends React.Component{
                            <td><b>Price</b></td>
                            <td>{this.getPackage(this.getRequest(this.state.pending_id || this.props.location.state.pending_id).package_id).price} BDT</td>
                        </tr>
-                      
-                   </tbody>
+                     
+                   </tbody> }
                </table>
                     </div>
                 </div>
@@ -191,4 +189,3 @@ class PendingDetails extends React.Component{
     }
 }
 
-export default PendingDetails;

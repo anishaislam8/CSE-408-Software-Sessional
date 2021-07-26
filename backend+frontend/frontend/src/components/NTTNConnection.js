@@ -10,43 +10,53 @@ import * as FaIcons from 'react-icons/fa';
 import * as FcIcons from 'react-icons/fc';
 import * as BsIcons from 'react-icons/bs';
 import * as AiIcons from 'react-icons/ai';
+import * as VscIcons from 'react-icons/vsc';
 import Header from './Header';
-
-
 
 const pageSize = 5;
 
-const Feedback = (props) => {
+const Connection = (props) => {
 
     return(
         
         <tr> 
-            
+            <td>{props.count}</td>
             <td>{props.isp_name}</td>
-            <td>{props.user_name}</td>
-            <td>{props.area_name}</td>
-            <td>{props.rating}</td>
-            <td>{props.details}</td>
-            <td>{new Date(props.feedback_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
+            <td>{props.union_name}</td>
+            
+            <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
+            <td>{props.request_status}</td>
+            <td><Link type="button" className="btn btn-info" to={{
+                pathname : "/nttn/connections/isp/details",
+                state : {
+                  key : props.connection_id,
+                  connection_id : props.connection_id
+                }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
+            {/* <td><Link type="button" className="btn btn-success" to={{
+                pathname : "",
+                state : {
+                    connection_id : props.connection_id,
+                    
+                }}}><AiIcons.AiFillNotification/>  Accept</Link></td>
             <td><Link type="button" className="btn btn-danger" to={{
                 pathname : "",
                 state : {
-                    feedback_id : props.feedback_id
-                }}}><AiIcons.AiFillNotification/>  Warn ISP</Link></td>
+                    connection_id : props.connection_id
+                }}}><AiIcons.AiFillNotification/>  Reject</Link></td> */}
         </tr>
               
     );
     
 }
 
-class NTTNFeedbacks extends React.Component {
+class NTTNConnections extends React.Component {
 
     constructor(props){
         super(props);
 
         this.state = {
-            feedbacks : [],
-            filteredFeedbacks : [],
+            connections : [],
+            filteredConnections : [],
             isps : [],
             users :[],
             unions : [],
@@ -71,9 +81,14 @@ class NTTNFeedbacks extends React.Component {
             showAreaSearch : false,
             showSortRatingOrder:false,
             showDate : false,
+            showReport:false,
+            showPackage:false,
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",
             searchText:"",
-            selectedStartDate:new Date(),selectedEndDate:new Date()
+            selectedStartDate:new Date(),selectedEndDate:new Date(),
+            selectedPackage:"",
+            packages:[],
+            resolve_status:"All",
            
         }
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
@@ -92,7 +107,7 @@ class NTTNFeedbacks extends React.Component {
         this.getUnionName = this.getUnionName.bind(this);
         this.getUserName = this.getUserName.bind(this);
         this.getAreaName = this.getAreaName.bind(this);
-        this.paginationFeedbacks= this.paginationFeedbacks.bind(this);
+        this.paginationconnections= this.paginationconnections.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
         this.findFromDivision = this.findFromDivision.bind(this);
@@ -103,6 +118,10 @@ class NTTNFeedbacks extends React.Component {
         this.showDatePicker = this.showDatePicker.bind(this);
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate = this.handleEndDate.bind(this);
+        this.handleChangePackage = this.handleChangePackage.bind(this);
+        this.showReportArea = this.showReportArea.bind(this);
+        this.showPackageArea = this.showPackageArea.bind(this);
+        this.handleChangeReportType = this.handleChangeReportType.bind(this);
         
 
     }
@@ -110,12 +129,12 @@ class NTTNFeedbacks extends React.Component {
     
 
     componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/feedbacks";
+        let apiUrl = "http://localhost:7000/nttn/connectionsISP";
 
         axios.get(apiUrl)
         .then(response => {
-          this.setState({ feedbacks: response.data.data, filteredFeedbacks : response.data.data }, () => {
-            let pageCountVal = this.state.feedbacks ? Math.ceil(this.state.feedbacks.length / pageSize) : 0;
+          this.setState({ connections: response.data.data, filteredConnections : response.data.data }, () => {
+            let pageCountVal = this.state.connections ? Math.ceil(this.state.connections.length / pageSize) : 0;
             let pagesVal = _.range(1, pageCountVal + 1);
     
             this.setState({
@@ -123,7 +142,7 @@ class NTTNFeedbacks extends React.Component {
               pages : pagesVal 
             })
           });
-          this.paginationFeedbacks(1);
+          this.paginationconnections(1);
         })
         .catch((error) => {
           console.log(error);
@@ -192,35 +211,44 @@ class NTTNFeedbacks extends React.Component {
         .catch((error) => {
           console.log(error);
         })
+
+      
         
     }
 
     loadnewData(e){
-      e.preventDefault();
-      let apiUrl = "http://localhost:7000/nttn/feedbacks/sortBy";
+      if(e){
+        e.preventDefault();
+      }
+     
+      let apiUrl = "http://localhost:7000/nttn/connections/sortBy";
+      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
+     
       const object = {
         district_id : this.state.selectedDistrict,
         division_id :  this.state.selectedDivision,
         union_id :  this.state.selectedUnion,
         area_id:  this.state.selectedArea,
-        upazilla_id :  this.state.selectedUpazilla
+        upazilla_id :  this.state.selectedUpazilla,
+       resolve_status : resolveStatus,
+       
       }
       //console.log(object);
 
       axios.post(apiUrl, object)
       .then(response => {
        
-        this.setState({filteredFeedbacks:response.data.data }, () => {
+        this.setState({filteredConnections:response.data.data }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationFeedbacks(1);
+            this.paginationconnections(1);
           })
         
         });
@@ -229,20 +257,20 @@ class NTTNFeedbacks extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ feedbacks: [] });
+        //this.setState({ connections: [] });
       })
     }
 
     showAllData(){
 
-      let apiUrl = "http://localhost:7000/nttn/feedbacks";
+      let apiUrl = "http://localhost:7000/nttn/connectionsISP";
     
 
       axios.get(apiUrl)
       .then(response => {
        
         this.setState({
-          filteredFeedbacks:response.data.data, 
+          filteredConnections:response.data.data, 
           searchdistricts:this.state.districts, 
           searchupazillas : this.state.upazillas, 
           searchUnions : this.state.unions, 
@@ -250,7 +278,7 @@ class NTTNFeedbacks extends React.Component {
         }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
@@ -264,11 +292,16 @@ class NTTNFeedbacks extends React.Component {
             ratingAll : "",
             timeAll:"",
             time : "",
+            selectedPackage:"",
+            showReport:"",
+            showPackage:"",
+            resolve_status:"All",
+           
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
             selectedStartDate:new Date(), selectedEndDate:new Date()
 
           }, () => {
-            this.paginationFeedbacks(1);
+            this.paginationconnections(1);
           })
         
         });
@@ -277,7 +310,7 @@ class NTTNFeedbacks extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ feedbacks: [] });
+        //this.setState({ connections: [] });
       })
     }
 
@@ -291,22 +324,27 @@ class NTTNFeedbacks extends React.Component {
       } else {
         this.setState({
           searchText : e.target.value,
-          filteredFeedbacks : this.state.feedbacks.filter((feedback) => {
-            return this.getIspName(feedback.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
-            this.getUserName(feedback.user_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            feedback.rating.toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
-            this.getAreaName(feedback.area_id).toLowerCase().includes((e.target.value).toLowerCase())||
-            feedback.details.toLowerCase().includes((e.target.value).toLowerCase())
+          filteredConnections : this.state.connections.filter((connection) => {
+            return connection.isp_name.toLowerCase().includes((e.target.value).toLowerCase()) || 
+            this.getUnionName(connection.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+            connection.license_number.includes(e.target.value) ||
+            connection.head_office_telephone.includes((e.target.value).toLowerCase()) ||
+            connection.head_office_mobile.includes((e.target.value).toLowerCase()) ||
+            connection.office_telephone.includes((e.target.value).toLowerCase()) ||
+            connection.office_mobile.includes((e.target.value).toLowerCase()) ||
+            connection.contact_person_telephone.includes((e.target.value).toLowerCase()) ||
+            connection.contact_person_mobile.includes((e.target.value).toLowerCase())
+
           })
         }, () => {
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationFeedbacks(1);
+            this.paginationconnections(1);
           })
           
         });
@@ -457,6 +495,14 @@ class NTTNFeedbacks extends React.Component {
       })
     }
 
+    handleChangePackage(e){
+      this.setState({
+        selectedPackage : e.target.value,
+      }, () => {
+        this.loadnewData();
+      })
+    }
+
     handleChangeRatingOrder(e){
         this.setState({
           rating : e.target.value,
@@ -468,7 +514,7 @@ class NTTNFeedbacks extends React.Component {
             this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.rating - a.rating)}))
           }
     
-          //this.paginationFeedbacks(this.state.currentPage);
+          //this.paginationconnections(this.state.currentPage);
           
         })
         
@@ -481,12 +527,12 @@ class NTTNFeedbacks extends React.Component {
           rating: "", time : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => a.rating - b.rating)}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => a.rating - b.rating)}))
           } else {
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => b.rating - a.rating)}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => b.rating - a.rating)}))
           }
     
-          this.paginationFeedbacks(1);
+          this.paginationconnections(1);
           
         })
         
@@ -499,12 +545,12 @@ class NTTNFeedbacks extends React.Component {
           rating: "", ratingAll : "", timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.request_arrival_time.localeCompare(b.request_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.request_arrival_time.localeCompare(a.request_arrival_time))}))
           }
     
-          //this.paginationFeedbacks(this.state.currentPage);
+          //this.paginationconnections(this.state.currentPage);
           
         })
         
@@ -517,12 +563,12 @@ class NTTNFeedbacks extends React.Component {
           rating: "", ratingAll : "", time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => a.feedback_arrival_time.localeCompare(b.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => a.request_arrival_time.localeCompare(b.request_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({filteredFeedbacks : prevstate.filteredFeedbacks.sort((a,b) => b.feedback_arrival_time.localeCompare(a.feedback_arrival_time))}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => b.request_arrival_time.localeCompare(a.request_arrival_time))}))
           }
     
-          this.paginationFeedbacks(1);
+          this.paginationconnections(1);
           
         })
         
@@ -538,35 +584,62 @@ class NTTNFeedbacks extends React.Component {
           [start, end] = [end, start];
         }
         this.setState({
-          filteredFeedbacks:this.state.filteredFeedbacks.filter((feedback)=>{
-            var current = new Date(feedback.feedback_arrival_time).getTime(); 
+          filteredConnections:this.state.filteredConnections.filter((connection)=>{
+            var current = new Date(connection.request_arrival_time).getTime(); 
             return  current <= end && current >= start
           })
         }, () => {
-          let pageCountVal = this.state.filteredFeedbacks ? Math.ceil(this.state.filteredFeedbacks.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationFeedbacks(1);
+            this.paginationconnections(1);
           })
         });
 
           
       }
     
+      handleChangeReportType(e){
+        if(e.target.value === "All"){
+           this.setState({
+             resolve_status:"All",
+              time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Solved"){
+           this.setState({
+             resolve_status:"Solved",
+             time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Unsolved"){
+           this.setState({
+             resolve_status:"Unsolved",
+            time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Unselect"){
+          this.showAllData();
+        }
+      }
+
     
     
 
-    paginationFeedbacks(pageNo) {
+    paginationconnections(pageNo) {
         this.setState({
           currentPage : pageNo
         }, () => {
           const startIndex = (pageNo - 1) * pageSize;
           
-          const newPaginatedData = this.state.filteredFeedbacks.length === 0 ? [] :  _(this.state.filteredFeedbacks).slice(startIndex).take(pageSize).value();
+          const newPaginatedData = this.state.filteredConnections.length === 0 ? [] :  _(this.state.filteredConnections).slice(startIndex).take(pageSize).value();
           //console.log ("Paginated :" ,newPaginatedData);
           this.setState({
             paginatedData : newPaginatedData
@@ -617,33 +690,54 @@ class NTTNFeedbacks extends React.Component {
         }
       }
 
+      showReportArea(){
+        this.setState({
+          showReport : !this.state.showReport
+        })
+      }
+
+      showPackageArea(){
+        this.setState({
+          showPackage : !this.state.showPackage
+        })
+      }
+
    
     
     render() {
         return(
-          <div>
-               <Header />
-            <br></br>
-            <br></br>
-            <br></br>
             <div className="container">
-                <center><h3 style={{"margin":20}}>Feedbacks from Users</h3><br></br></center>
+              <Header />
+              <br></br>
+              <br></br>
+              <br></br>
+                <center><h3 style={{"margin":20}}>Connection Requests from ISPs</h3><br></br></center>
+
+                <div className="row">
+                    <div className="col">
+                    <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Connection Requests"/>
+                    </div>
+                    <div className="col">
+                    <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20}} ><BsIcons.BsClipboardData size={20}/>  Show All Data</Button>
+                    </div>
+                  </div>
                 <div className = "row">
                 <div className="col">
-                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 200}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
+                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 230}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Feedbacks"}</Button>
+                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":10, "width" : 230}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Connections"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "marginRight":10, "width" : 230}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
                 </div>
+               
                 <div className="col">
-                <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><BsIcons.BsCardChecklist size={30}/> Show All Feedbacks</Button>       
+                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 230}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Request Type" : "  Show Request Type"}</Button>       
                 </div>
-                <div className="col">
-                <input type="text" className="form-control" style={{"marginBottom":20, "width" : 300}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Enter your search"/>
-                </div>
+                {/* <div className="col">
+                <Button variant="warning" onClick={this.showPackageArea} style={{"marginBottom":20,  "width" : 230}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showPackage? "  Hide Package Type" : "  Package Type"}</Button>       
+                </div> */}
                   
                   
                  </div>
@@ -700,7 +794,7 @@ class NTTNFeedbacks extends React.Component {
                       </Form.Group>
                       </Col>
 
-                      <Col>
+                      {/* <Col>
                       <Form.Group>
                           <Form.Label>Area</Form.Label>
                           <Form.Control as="select" value={this.state.selectedArea} onChange={this.handleChangeArea} >
@@ -714,7 +808,7 @@ class NTTNFeedbacks extends React.Component {
                           </Form.Control>
                       </Form.Group>
 
-                      </Col>
+                      </Col> */}
                       <Col>
                       <Form.Group>
                       
@@ -736,7 +830,7 @@ class NTTNFeedbacks extends React.Component {
                   <Form style={{"padding" : 10}}>
                       <Form.Row>
 
-                      <Col>
+                      {/* <Col>
                       <Form.Group style={{"marginRight" : 40}}>
                           <Form.Label>Sort This Page By Rating</Form.Label>
                           <Form.Control as="select" value={this.state.rating} onChange={this.handleChangeRatingOrder}>
@@ -745,7 +839,7 @@ class NTTNFeedbacks extends React.Component {
                           <option value="-1">Descending</option>
                           </Form.Control>
                       </Form.Group>
-                      </Col>
+                      </Col> */}
 
 
                       <Col >
@@ -760,7 +854,7 @@ class NTTNFeedbacks extends React.Component {
                     </Col>
 
 
-                    <Col >
+                    {/* <Col >
                     <Form.Group style={{"marginRight" : 40}}>
                         <Form.Label>Sort All Data By Rating</Form.Label>
                         <Form.Control as="select" value={this.state.ratingAll} onChange={this.handleChangeRatingOrderAll}>
@@ -769,7 +863,7 @@ class NTTNFeedbacks extends React.Component {
                         <option value="1">Ascending</option>
                         </Form.Control>
                     </Form.Group>
-                    </Col>
+                    </Col> */}
 
                     <Col >
                     <Form.Group>
@@ -822,35 +916,55 @@ class NTTNFeedbacks extends React.Component {
                   </div>
                 </div>
                </div>
+
+               <div hidden={!(this.state.showReport)} style={{"backgroundColor":"#e6e6e6", "padding":10, "width":300, "borderRadius":5, "marginBottom":20}}>
+                  <Form>
+                      <Form.Row>
+                      <Col>
+                      <Form.Group style={{"marginRight":20, "marginLeft":20}}>
+                          <Form.Label>Select Request type</Form.Label>
+                          <Form.Control as="select" value={this.state.resolve_status} onChange={this.handleChangeReportType}>
+                          {/* <option disabled hidden value="">Select Reports</option> */}
+                          <option value="All">All</option>
+                          <option value="Solved">Solved</option>
+                          <option value="Unsolved">Unsolved</option>
+                          {/* <option value="Unselect">Unselect</option> */}
+                          </Form.Control>
+                      </Form.Group>
+                      </Col>
+
+                     
+                    </Form.Row>
+                  </Form>
+                </div>
+
+               
                 
                 
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
                         <tr>
-                        
+                        <th>#</th>
                         <th>ISP Name</th>
-                        <th>User Name</th>
-                        <th>Area Name</th>
-                        <th>Rating By User</th>
-                        <th>Feedback</th>
-                        <th>Feedback Arrival Time</th>
-                        <th>Warn ISP</th>
+                        <th>Union Name</th>
+                        <th>Request Arrival Time</th>
+                        <th>Request Processing Status</th>
+                        <th>Take Action</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((feedback, index) => {
+                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((connection, index) => {
                            
-                            return <Feedback 
-                                key={feedback._id} 
-                                isp_name={this.getIspName(feedback.isp_id)} 
-                                user_name = {this.getUserName(feedback.user_id)} 
-                                rating = {feedback.rating} 
-                                area_name = {this.getAreaName(feedback.area_id)}
-                                details = {feedback.details}
-                                feedback_arrival_time = {feedback.feedback_arrival_time} 
+                            return <Connection 
+                                key={connection._id} 
+                                isp_name={connection.isp_name}   
+                                union_name = {this.getUnionName(connection.union_id)}
+                                request_arrival_time = {connection.request_arrival_time} 
                                 count={index + 1}
-                                feedback_id={feedback._id}
+                                request_status = {connection.resolve_status === true ? "True" : "False"}
+                                connection_id={connection._id}
                             />})
                         }
                     </tbody>
@@ -859,7 +973,7 @@ class NTTNFeedbacks extends React.Component {
                 <nav className="d-flex justify-content-center">
                     <ul className="pagination">
                     <li className={this.state.currentPage === 1 ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationFeedbacks(this.state.currentPage - 1)} aria-label="Previous">
+                    <p className="page-link"  onClick={()=>this.paginationconnections(this.state.currentPage - 1)} aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -868,13 +982,13 @@ class NTTNFeedbacks extends React.Component {
                         this.state.pages.map((page) => {
                             return <li key={page} className={
                                 page === this.state.currentPage ? "page-item active" : "page-item"
-                            }><p className="page-link" onClick={()=>this.paginationFeedbacks(page)}>{page}</p></li>
+                            }><p className="page-link" onClick={()=>this.paginationconnections(page)}>{page}</p></li>
                         })
 
                         
                     }
                     <li className={this.state.currentPage === this.state.pageCount ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationFeedbacks(this.state.currentPage + 1)} aria-label="Next">
+                    <p className="page-link"  onClick={()=>this.paginationconnections(this.state.currentPage + 1)} aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -882,12 +996,10 @@ class NTTNFeedbacks extends React.Component {
                     
                     </ul>
                 </nav>
-                {this.state.filteredFeedbacks.length === 0 && <h4>"No feedbacks found"</h4>}
+                {this.state.filteredConnections.length === 0 && <h4>"No connections found"</h4>}
             </div>
-          </div>
-           
         );
     }
 }
 
-export default NTTNFeedbacks;
+export default NTTNConnections;

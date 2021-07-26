@@ -24,7 +24,7 @@ const Renewal = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.union_name}</td>
             
-            <td>{new Date(props.request_arrival_time).toString()}</td>
+            <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td><Link type="button" className="btn btn-info" to={{
                 pathname : "",
                 state : {

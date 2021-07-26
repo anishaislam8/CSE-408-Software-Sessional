@@ -3,7 +3,66 @@ const { ObjectID } = require('mongodb');
 let { ISP } = require('../models/ISP');
 let { Pending } = require('../models/Pending');
 let apiController = require('./apiController');
+const { UserConnection } = require('../models/UserConnection');
 
+
+const getUserConnections = async (request, response) => {
+    try{
+        let connections = await UserConnection.find();
+        if(!connections || connections.length === 0){
+            return response.send({
+                message : "No data found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : connections
+        })
+    } catch(e){
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
+
+const handleConnection = async (request, response) => {
+    let isp_id = ObjectID(request.body.isp_id);
+    if(!isp_id){
+        return response.send({
+            message : "Nothing to show",
+            data : []
+        })
+    }
+    try{
+        let connections = await UserConnection.find({
+            isp_id
+        }).sort({request_arrival_time : 1});
+
+        if(!connections){
+            return response.send({
+                message : "Nothing to show",
+                data : []
+            })
+        }
+
+        
+        return response.status(200).send({
+            message : "Found",
+            data : connections
+        })
+
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+    
+    
+}
 const handlePending = async (request, response) => {
     let isp_id = ObjectID(request.body.isp_id);
     if(!isp_id){
@@ -152,7 +211,7 @@ const handlePendingFetchingSorted = async (request, response) => {
 
         }
         if(!requests){
-            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion){
+            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion || sortByArea){
                 //empty
               
                 return response.send({
@@ -226,9 +285,124 @@ const handlePendingFetchingSorted = async (request, response) => {
 
 
 
+const handleConnectionFetchingSorted = async (request, response) => {
+    let sortByDistrict = request.body.district_id;
+    let sortByDivision = request.body.division_id;
+    let sortBySubDistrict = request.body.upazilla_id;
+    let sortByArea = request.body.area_id;
+    let sortByUnion = request.body.union_id;
+    let resolve_status = request.body.resolve_status;
+    
+    let isp_id = ObjectID(request.body.isp_id)
+    
+    //console.log(resolve_status);
+
+    try{
+        let requests;
+
+        if(sortByArea){
+            requests = await UserConnection.find({
+                area_id : sortByArea, isp_id
+            }).sort({"request_arrival_time": 1});
+        }
+        else if(sortByUnion){
+            let areas = await apiController.findAreaFromUnion(sortByUnion);
+            requests = await UserConnection.find({
+                area_id : { "$in": areas.map(area => area._id) }
+                , isp_id
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortBySubDistrict){
+
+            let areas = await apiController.findAreaFromSubDistrict(sortBySubDistrict);
+            requests = await UserConnection.find({
+                area_id : { "$in": areas.map(area => area._id) }
+                , isp_id
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortByDistrict){
+
+            let areas = await apiController.findAreaFromDistrict(sortByDistrict);
+            requests = await UserConnection.find({
+                area_id : { "$in": areas.map(area => area._id) }
+                , isp_id
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortByDivision){
+
+            let areas = await apiController.findAreaFromDivision(sortByDivision);
+            requests = await UserConnection.find({
+                area_id : { "$in": areas.map(area => area._id) }
+                , isp_id
+            }).sort({"request_arrival_time": 1});
+
+
+        }
+        if(!requests){
+            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion || sortByArea){
+                //empty
+              
+                return response.send({
+                    message : "No Connections Found 1",
+                    data : []
+                })
+            } else {
+             
+                requests = await UserConnection.find({
+                    isp_id
+                }).sort({"request_arrival_time": 1});
+         
+            }
+        }
+
+
+        if(!requests || requests.length === 0){
+      
+            return response.send({
+                message : "No Connections Found 2",
+                data : []
+            })
+        }
+      
+       // console.log(resolve_status);
+
+        if(resolve_status !== undefined){
+            requests = requests.filter((Connection)=> Connection.resolve_status === resolve_status);
+        }
+
+       // console.log(requests);
+    
+        if(!requests || requests.length === 0){
+        
+            return response.send({
+                message : "No Connections Found 3",
+                data : []
+            })
+        }
+       
+        return response.status(200).send({
+            message : "Connections Found",
+            data : requests
+        })
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+
+    
+
+}
+
+
+
 module.exports = {
     handlePending,
     insertPending,
     handlePendingFetchingSorted,
-    handleEditProfile
+    handleConnectionFetchingSorted,
+    handleEditProfile,
+    getUserConnections,
+    handleConnection
 }

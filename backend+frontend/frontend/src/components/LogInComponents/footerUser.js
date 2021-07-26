@@ -7,7 +7,7 @@ function FooterUser() {
         <div className="row" style={{"marginTop":20}}>
             <div className="col">
             <p className="forgot-password text-left">
-                <b>Not Registered? <Link to="">Register Now!!</Link></b>
+                <b>Not Registered? <Link to="/userRegistration">Register Now!!</Link></b>
             </p>
             </div>
 

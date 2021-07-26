@@ -23,7 +23,7 @@ function Header() {
             <li className="nav-item dropdown"  style={{"paddingRight":20, "color" : 'white'}}>
             
             <NavDropdown title= "Connection" id="basic-nav-dropdown" style={{"color":"white"}}>
-              <NavDropdown.Item href="/nttn/confirmConnection">Confirm Connection</NavDropdown.Item>
+              <NavDropdown.Item href="/nttn/connections">Confirm Connection</NavDropdown.Item>
               <NavDropdown.Item href="/nttn/pendings">Pending Requests</NavDropdown.Item>
               {/* <NavDropdown.Item href="/nttn/confirmConnection">Confirm Connection</NavDropdown.Item> */}
               

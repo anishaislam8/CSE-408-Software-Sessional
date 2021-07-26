@@ -51,12 +51,14 @@ router.post('/reports/view', ispReportController.viewOwnReports);
 
 //get pending requests
 router.post('/pending', ispRequestController.handlePending);
-
-
 router.post('/pendings/sortBy', ispRequestController.handlePendingFetchingSorted);
 
 // give payment to nttn
 router.post("/payments", ispGivePayment.handlePaying);
+
+// get user connection requests
+router.post('/connections', ispRequestController.handleConnection);
+router.post('/connections/sortBy', ispRequestController.handleConnectionFetchingSorted);
 
 
 

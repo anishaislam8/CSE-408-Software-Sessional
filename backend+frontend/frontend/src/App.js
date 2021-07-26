@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Homepage from './components/Homepage';
 import NTTNReports from './components/NTTNReports';
 import NTTNFeedbacks from './components/NTTNFeedbacks';
+import NTTNConnections from "./components/NTTNConnection";
 import Pendings from './components/Pendings';
 import Renewals from './components/Renewals';
 import ISPList from "./components/ISPList";
@@ -19,9 +20,10 @@ import ViewFeedbacks from './components/UserComponents/ViewFeedbacks'; //user
 import ViewReports from './components/UserComponents/ViewReports'; //user
 import UserCreateFeedback from "./components/UserComponents/CreateFeedback";
 import PendingDetails from './components/PendingDetails';
-import ConfirmConnection from './components/ConfirmConnection';
 import Login from "./components/LogInComponents/login";
 import ISPForm from "./components/Registration/ISPForm";
+import UserForm from "./components/RegistrationUser/UserForm";
+import IspConnections from "./components/ISPComponents/Connections";
 
 
 
@@ -33,13 +35,15 @@ function App() {
     <Router>
       <Route path="/" exact component={Login} />
       <Route path="/ispRegistration" exact component={ISPForm} />
+      <Route path="/userRegistration" exact component={UserForm} />
       <Route path="/nttn" exact component={Homepage} />
       <Route path="/nttn/reports" exact component={NTTNReports} />
       <Route path="/nttn/feedbacks" exact component={NTTNFeedbacks} />
       <Route path="/nttn/isplist" exact component={ISPList} />
       <Route path="/nttn/renewals" exact component={Renewals} />
       <Route path="/nttn/pendings" exact component={Pendings} />
-      <Route path="/nttn/confirmConnection" exact component={ConfirmConnection} />
+      <Route path="/nttn/connections" exact component={NTTNConnections} />
+   
       <Route path="/nttn/pendings/isp/details" exact component={PendingDetails} />
       <Route path="/nttn/connection" exact component={Pendings} />
       
@@ -48,6 +52,7 @@ function App() {
       <Route path="/isp/:id/createReport" exact component={ISPCreateReport} />
       <Route path="/isp/:id/viewReport" exact component={ISPViewReport} />
       <Route path="/isp/:id/pendings" exact component={IspPendings} />
+      <Route path="/isp/:id/connections" exact component={IspConnections} />
       <Route path="/isp/:id/feedbacks" exact component={ViewUserFeedback} />
       <Route path="/isp/:id/userReports" exact component={ViewUserReport} />
       <Route path="/user/:id" exact component={UserHome} />

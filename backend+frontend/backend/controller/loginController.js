@@ -12,7 +12,7 @@ const getHashedPassword = async (request, response) => {
     bcrypt.compare(passwordEnteredByUser, hash, function(err, isMatch) {
         if (err) {
             return response.send({
-                message : e.message,
+                message : "Error",
                 data : []
             })
         } else if (!isMatch) {

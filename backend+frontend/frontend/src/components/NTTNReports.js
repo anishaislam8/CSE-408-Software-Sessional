@@ -26,9 +26,9 @@ const Report = (props) => {
             <td>{props.average_rating}</td>
             <td>{props.problem_category}</td>
             <td>{props.details}</td>
-            <td>{new Date(props.report_arrival_time).toString()}</td>
+            <td>{new Date(props.report_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.resolve_status}</td>
-            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={() => {props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString()}</td>
+            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={() => {props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString().split(" ").slice(0,5).join(" ")}</td>
         </tr>
               
     );

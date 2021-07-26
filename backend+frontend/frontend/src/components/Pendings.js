@@ -24,10 +24,11 @@ const Pending = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.union_name}</td>
             
-            <td>{new Date(props.request_arrival_time).toString()}</td>
+            <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td><Link type="button" className="btn btn-info" to={{
-                pathname : "/",
+                pathname : "/nttn/pendings/isp/details",
                 state : {
+                  key : props.pending_id,
                   pending_id : props.pending_id
                 }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
             <td><Link type="button" className="btn btn-success" to={{

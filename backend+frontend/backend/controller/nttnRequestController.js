@@ -1,6 +1,33 @@
 let { ISP } = require('../models/ISP');
 let { Pending } = require('../models/Pending');
+const { PhysicalConnectionISP } = require('../models/PhysicalConnectionISP');
+
 let apiController = require('./apiController');
+
+
+
+const getISPConnections = async (request, response) => {
+    try{
+        let connections = await PhysicalConnectionISP.find();
+        if(!connections || connections.length === 0){
+            return response.send({
+                message : "No data found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : connections
+        })
+    } catch(e){
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
+
 
 const handlePending = async (request, response) => {
     try{
@@ -126,6 +153,112 @@ const insertPending = async (request, response) => {
     }
 
     
+}
+
+const handleConnectionFetchingSorted = async (request, response) => {
+    let sortByDistrict = request.body.district_id;
+    let sortByDivision = request.body.division_id;
+    let sortBySubDistrict = request.body.upazilla_id;
+    let sortByUnion = request.body.union_id;
+    let resolve_status = request.body.resolve_status;
+    
+    
+    //console.log(resolve_status);
+
+    try{
+        let requests;
+
+        if(sortByUnion){
+            requests = await PhysicalConnectionISP.find({
+                union_id : sortByUnion
+                
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortBySubDistrict){
+
+            let unions = await apiController.findUnionFromSubDistrict(sortBySubDistrict);
+            requests = await PhysicalConnectionISP.find({
+                union_id : { "$in": unions.map(union => union.union_id) },
+               
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortByDistrict){
+
+            let unions = await apiController.findUnionFromDistrict(sortByDistrict);
+            
+            requests = await PhysicalConnectionISP.find({
+                union_id : { "$in": unions.map(union => union.union_id) },
+                
+            }).sort({"request_arrival_time": 1});
+
+        } else if(sortByDivision){
+
+            let unions = await apiController.findUnionFromDivision(sortByDivision);
+            
+            requests = await PhysicalConnectionISP.find({
+                union_id : { "$in": unions.map(union => union.union_id) },
+                
+            
+            }).sort({"request_arrival_time": 1});
+
+
+        }
+   
+        if(!requests){
+            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion){
+                //empty
+              
+                return response.send({
+                    message : "No Connection Requests Found 1",
+                    data : []
+                })
+            } else {
+             
+                requests = await PhysicalConnectionISP.find().sort({"request_arrival_time": 1});
+         
+            }
+        }
+
+
+        if(!requests || requests.length === 0){
+      
+            return response.send({
+                message : "No Connection Requests Found 2",
+                data : []
+            })
+        }
+      
+       // console.log(resolve_status);
+
+        if(resolve_status !== undefined){
+            requests = requests.filter((Connection)=> Connection.resolve_status === resolve_status);
+        }
+
+       // console.log(requests);
+    
+        if(!requests || requests.length === 0){
+        
+            return response.send({
+                message : "No Connection Requests Found 3",
+                data : []
+            })
+        }
+      
+      
+       
+        return response.status(200).send({
+            message : "Connection Requests Found",
+            data : requests
+        })
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+
+    
+
 }
 
 
@@ -402,5 +535,7 @@ module.exports = {
     handleRenewal,
     insertPending,
     handlePendingFetchingSorted,
-    handleRenewalFetchingSorted
+    handleRenewalFetchingSorted,
+    handleConnectionFetchingSorted,
+    getISPConnections
 }

@@ -13,6 +13,7 @@ const { request, response } = require('express');
 
 
 
+
 const findAreaFromUnion = async(union) => {
     let areas = await Area.find({
         union_id : union
@@ -117,6 +118,152 @@ const getUnionFromArea = async (areaId) => {
     }
 }
 
+const getIspsOfUpazilla= async (request, response) => {
+
+    let upazilla_id = request.body.upazilla_id;
+
+    if(!upazilla_id){
+        return response.send({
+            message : "Not found",
+            data : []
+        })
+    }
+    try{
+
+        let unions = await findUnionFromSubDistrict(upazilla_id);
+       
+  
+        let contracts = await Contract.find({
+            union_id : { $in : unions.map(union => union.union_id)},
+            user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        //console.log(contracts);
+        let allIsps = await ISP.find();
+        let isps = allIsps.filter((allIsp) => contracts.map((contract) => contract.isp_id.toString()).includes(allIsp._id.toString()) );
+        if(isps.length > 0){
+            isps = isps.sort((a,b) => b.average_rating - a.average_rating )
+        }
+        //console.log("Unions ",unions);
+        return response.send({
+            message : "Found",
+            data : isps
+        })
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
+
+const getIspsOfDistrict= async (request, response) => {
+
+    let district_id = request.body.district_id;
+
+    if(!district_id){
+        return response.send({
+            message : "Not found",
+            data : []
+        })
+    }
+    try{
+
+        let unions = await findUnionFromDistrict(district_id);
+       
+  
+        let contracts = await Contract.find({
+            union_id : { $in : unions.map(union => union.union_id)},
+            user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        //console.log(contracts);
+        let allIsps = await ISP.find();
+        let isps = allIsps.filter((allIsp) => contracts.map((contract) => contract.isp_id.toString()).includes(allIsp._id.toString()) );
+        
+        if(isps.length > 0){
+            isps = isps.sort((a,b) => b.average_rating - a.average_rating )
+        }
+        //console.log("Unions ",unions);
+        return response.send({
+            message : "Found",
+            data : isps
+        })
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
+
+const getIspsOfDivision= async (request, response) => {
+
+    let division_id = request.body.division_id;
+    // console.log("division_id", division_id);
+    if(!division_id){
+        return response.send({
+            message : "Not found",
+            data : []
+        })
+    }
+    try{
+
+        let unions = await findUnionFromDivision(division_id);
+       
+        let contracts = await Contract.find({
+            union_id : { $in : unions.map(union => union.union_id)},
+            user_type : 0
+        });
+
+       //console.log("contracts : ", contracts)
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        //console.log(contracts);
+        let allIsps = await ISP.find();
+        
+        let isps = allIsps.filter((allIsp) => contracts.map((contract) => contract.isp_id.toString()).includes(allIsp._id.toString()) );
+        if(isps.length > 0){
+            isps = isps.sort((a,b) => b.average_rating - a.average_rating )
+        }
+        return response.send({
+            message : "Found",
+            data : isps
+        })
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
 const getRatingFromISP = async (ispId) =>{
     let isps = await ISP.find();
 
@@ -149,6 +296,57 @@ const getISP = async (request, response) => {
         })
     }
    
+}
+
+const getAllLocationData = async(request, respone) => {
+    try{
+        let union = await Union.find();
+        if(!union){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let area = await Area.find();
+        if(!area){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let division = await Division.find();
+        if(!division){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let district = await District.find();
+        if(!district){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        let subdistrict = await SubDistrict.find();
+        if(!subdistrict){
+            return response.status(404).send({
+                message : "Not found",
+                data : []
+            })
+        }
+        response.status(200).send({
+            message : "Found",
+            data : {
+                union, area, division, district, subdistrict
+            }
+        })
+    } catch (e) {
+        return response.status(500).send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
 }
 
 const getUnion = async (request, response) => {
@@ -439,6 +637,56 @@ const getUnionOfISP = async (request, response) => {
     }
 }
 
+
+const getIspsOfUnion= async (request, response) => {
+    
+    let union_id = request.body.union_id;
+   
+
+    if(!union_id){
+        return response.send({
+            message : "Not found",
+            data : []
+        })
+    }
+    try{
+       
+  
+        let contracts = await Contract.find({
+            union_id,
+            user_type : 0
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        //console.log(contracts);
+        let allIsps = await ISP.find();
+        let isps = allIsps.filter((allIsp) => contracts.map((contract) => contract.isp_id.toString()).includes(allIsp._id.toString()) );
+        
+        if(isps.length > 0){
+            isps = isps.sort((a,b) => b.average_rating - a.average_rating )
+        }
+        //console.log("Unions ",unions);
+        return response.send({
+            message : "Found",
+            data : isps
+        })
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
+
+
 const getContracts = async (request, response) => {
     
     try{
@@ -705,9 +953,14 @@ module.exports = {
     getDivision,
     getSubDistrict,
     getUnionOfISP,
+    getIspsOfUnion,
+    getIspsOfUpazilla,
+    getIspsOfDistrict,
+    getIspsOfDivision,
     getContracts,
     getUserContracts,
     getUnionFromArea,
     getRatingFromISP,
-    getNTTN, postNTTN
+    getNTTN, postNTTN,
+    getAllLocationData
 }

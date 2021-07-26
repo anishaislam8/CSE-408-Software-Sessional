@@ -175,6 +175,39 @@ export class ISPForm extends Component {
         })
       }
 
+      saveISP = () => {
+        let apiUrl = "http://localhost:7000/api/registerISP";
+        const object = {
+            isp_name : this.state.isp_name,
+            license_number : this.state.license_number,
+            head_office_address : this.state.head_office_address,
+            head_office_telephone: this.state.head_office_telephone,
+            head_office_mobile : this.state.head_office_mobile,
+            head_office_email : this.state.head_office_email,
+            office_address : this.state.office_address,
+            office_telephone: this.state.office_telephone,
+            office_mobile : this.state.office_mobile,
+            office_email : this.state.office_email,
+            contact_person_name : this.state.contact_person_name,
+            contact_person_address : this.state.contact_person_address,
+            contact_person_telephone : this.state.contact_person_telephone,
+            contact_person_mobile : this.state.contact_person_mobile,
+            contact_person_email : this.state.contact_person_email,
+            wire_type : this.state.wire_type,
+            division_id : this.state.selectedDivision,
+            district_id : this.state.selectedDistrict,
+            union_id : this.state.selectedUnion,
+            upazilla_id : this.state.selectedUpazilla
+        }
+        axios.post(apiUrl, object)
+        .then(response => {
+            console.log("Saved : ", response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+      }
+
     render() {
         const {step} = this.state;
         const {
@@ -285,6 +318,7 @@ export class ISPForm extends Component {
                         nextStep={this.nextStep}
                         prevStep={this.prevStep}
                         handleChange = {this.handleChange}
+                        saveISP = {this.saveISP}
                         values={values}
                     />
                 );

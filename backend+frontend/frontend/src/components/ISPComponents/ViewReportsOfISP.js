@@ -26,7 +26,7 @@ const Report = (props) => {
             <td>{props.union_name}</td>
             <td>{props.problem_category}</td>
             <td>{props.details}</td>
-            <td>{new Date(props.report_arrival_time).toString()}</td>
+            <td>{new Date(props.report_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.resolve_status}</td>
             <td>{props.resolve_status===true ? props.resolve_time : "N/A"}</td>
            

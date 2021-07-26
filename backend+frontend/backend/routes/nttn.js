@@ -60,5 +60,11 @@ router.get("/payments", nttnAfterPaymentController.findNewPayment);
 // set payment status to solved and solving time to current time
 router.post("/payments/resolve", nttnAfterPaymentController.handlePaymentDone);
 
+// get isp connection requests
+router.get('/connectionsISP', nttnRequestController.getISPConnections);
+// get isp connection requests
+router.get('/connections/sortBy', nttnRequestController.handleConnectionFetchingSorted);
+
+
 
 module.exports = router;

@@ -24,7 +24,7 @@ const Pending = (props) => {
             <td>{props.user_name}</td>
             <td>{props.area_name}</td>
             
-            <td>{new Date(props.request_arrival_time).toString()}</td>
+            <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td><Link type="button" className="btn btn-info" to={{
                 pathname : "",
                 state : {
@@ -132,12 +132,16 @@ class IspPendings extends React.Component {
         let apiUrl = "http://localhost:7000/api/isp";
         axios.get(apiUrl)
         .then(response => {
-            this.setState({ isps: response.data.data, searchISPs : response.data.data,isp_id : this.props.location.state.id,
-                name : this.props.location.state.data }, () => {
-                    this.setState({
-                        isp : this.state.isps.filter((isp) => isp._id.toString() === this.state.isp_id)[0]
-                    })
+            this.setState({ 
+              isps: response.data.data, 
+              searchISPs : response.data.data,
+              isp_id : this.props.location.state.id,
+              name : this.props.location.state.data 
+            }, () => {
+                this.setState({
+                    isp : this.state.isps.filter((isp) => isp._id.toString() === this.state.isp_id)[0]
                 })
+            })
         })
         .catch((error) => {
           console.log(error);

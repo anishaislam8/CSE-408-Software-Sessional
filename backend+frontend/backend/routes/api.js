@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const apiController = require('./../controller/apiController');
 const loginController = require('./../controller/loginController');
+const apiRegistrationController = require('./../controller/apiRegistrationController');
 
 // get all isps
 router.get('/isp', apiController.getISP);
@@ -44,11 +45,34 @@ router.post('/isp/unions', apiController.getUnionOfISP);
 //get all isp contracts
 router.get('/ispContracts', apiController.getContracts);
 
+//get all isps from a union
+router.post('/ispsOfUnion', apiController.getIspsOfUnion);
+
+//get all isps from a upazilla
+router.post('/ispsOfUpazilla', apiController.getIspsOfUpazilla);
+
+//get all isps from a district
+router.post('/ispsOfDistrict', apiController.getIspsOfDistrict);
+
+//get all isps from a division
+router.post('/ispsOfDivision', apiController.getIspsOfDivision);
+
 //get all user contracts
 router.get('/userContracts', apiController.getUserContracts);
 
 //get hashed password
 router.post('/hashedPass', loginController.getHashedPassword);
+
+
+// register isp
+router.post('/registerISP', apiRegistrationController.registerISP);
+
+// register user
+router.post('/registerUser', apiRegistrationController.registerUser);
+
+
+
+
 
 
 module.exports = router;

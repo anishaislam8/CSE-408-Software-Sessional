@@ -25,7 +25,7 @@ const ISPRow = (props) => {
             <td>{props.isp_name}</td>
             <td>{props.license_id}</td>
             <td>{new Date(props.physical).toString()}</td>
-            <td>{props.connection_started ? new Date(props.connection_started).toString(): "N/A"}</td>
+            <td>{props.connection_started ? new Date(props.connection_started).toString().split(" ").slice(0,5).join(" "): "N/A"}</td>
             <td>{props.connectionStatus}</td>
             <td>{props.average_rating || "N/A"}</td>
             <td><Link type="button" className="btn btn-info" to={{

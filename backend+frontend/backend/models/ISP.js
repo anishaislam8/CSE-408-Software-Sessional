@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const { ObjectID } = require('mongodb');
 
 
 var ISPSchema = new mongoose.Schema({
@@ -49,6 +50,13 @@ var ISPSchema = new mongoose.Schema({
         type : Number,
         default : null
     },
+    physical_connection_details : [{
+        connection_id : {
+            type : ObjectID,
+            default : null,
+            required : true
+        }
+    }],
     tokens : [{
         access : {
             type : String,

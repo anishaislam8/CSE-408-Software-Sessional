@@ -157,7 +157,7 @@ const handlePostFeedbacks = async (request, response) => {
         let feedback = await newFeedback.save();
 
         if(feedback.nInserted === 0){
-            return response.status(400).send({
+            return response.send({
                 message : "Insertion Failed",
                 data : []
             })
@@ -190,7 +190,7 @@ const handlePostFeedbacks = async (request, response) => {
             data : feedback
         })
     } catch(e) {
-        return response.status(500).send({
+        return response.send({
             message : e.message,
             data : []
         })

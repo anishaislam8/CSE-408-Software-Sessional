@@ -21,7 +21,7 @@ export class FormDeclaration extends Component {
     }
 
     handleFinalSubmission = () => {
-        this.props.saveISP();
+        this.props.saveUser();
     }
 
    
@@ -32,7 +32,7 @@ export class FormDeclaration extends Component {
            <div>
               
                 <nav className="navbar fixed-top">
-                    <span className="ms-auto"><h3 className="display-5" style={{"marginTop" : 20}}>Step 5 : Terms and Conditions</h3></span>
+                    <span className="ms-auto"><h3 className="display-5" style={{"marginTop" : 20}}>Step 3 : Terms and Conditions</h3></span>
                 </nav>
 
                 <div className="registration5Form">
@@ -40,11 +40,11 @@ export class FormDeclaration extends Component {
                 
                 <div className="row">
 
-                   
+                    
                    
 
                     <div className="col">
-                        <form className="registration5inner" style={{"marginTop":150, "marginLeft":150}} onSubmit={this.continue}>
+                        <form className="registration5inner" style={{"marginTop":200, "marginLeft":150}} onSubmit={this.continue}>
                             
                             
 
@@ -56,20 +56,13 @@ export class FormDeclaration extends Component {
 undertake to comply with the terms and conditions therein.
                             </label>
                             </div>
-                            <div className="form-check">
-                            <input className="form-check-input" type="checkbox" required/>
-                            <label className="form-check-label" htmlFor="flexCheckChecked">
-                            I/We hereby certify that I/We have carefully read the section 36 of Bangladesh Telecommunication Regulation
-Act, 2001 and I/We are not disqualified from obtaining the license
-                            </label>
-                            </div>
+                           
 
                             <div className="form-check">
                             <input className="form-check-input" type="checkbox" required/>
                             <label className="form-check-label" htmlFor="flexCheckChecked">
                             I/We understand that if at any time any information furnished for obtaining the connection is found incorrect then
-the connection if granted on the basis of such application shall deemed to be cancelled and shall be liable for action
-as per Bangladesh Telecommunication Regulation Act, 2001.
+the connection if granted on the basis of such application shall deemed to be cancelled and shall be liable for action.
                             </label>
                             </div>
 

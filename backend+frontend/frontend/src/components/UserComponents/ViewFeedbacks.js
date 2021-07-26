@@ -27,7 +27,7 @@ const Feedback = (props) => {
             <td>{props.area_name}</td>
             <td>{props.rating}</td>
             <td>{props.details}</td>
-            <td>{new Date(props.feedback_arrival_time).toString()}</td>
+            <td>{new Date(props.feedback_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             
         </tr>
               

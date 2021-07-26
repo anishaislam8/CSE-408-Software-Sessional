@@ -10,10 +10,8 @@ import * as FaIcons from 'react-icons/fa';
 import * as FcIcons from 'react-icons/fc';
 import * as BsIcons from 'react-icons/bs';
 import * as AiIcons from 'react-icons/ai';
-import Header from './Header';
-
-
-
+import * as VscIcons from 'react-icons/vsc';
+import ISPHeader from './Header';
 
 const pageSize = 5;
 
@@ -23,36 +21,40 @@ const Connection = (props) => {
         
         <tr> 
             <td>{props.count}</td>
-            <td>{props.isp_name}</td>
-            <td>{props.union_name}</td>
+            <td>{props.user_name}</td>
+            <td>{props.area_name}</td>
             
-            <td>{new Date(props.payment_time).toString()}</td>
-            <td>{props.gateway}</td>
+            <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
+            <td>{props.resolve_status}</td>
             <td><Link type="button" className="btn btn-info" to={{
                 pathname : "",
                 state : {
                     isp_id : props.isp_id
                 }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
-            <td><Link type="button" className="btn btn-success" to={{
+            {/* <td><Link type="button" className="btn btn-success" to={{
                 pathname : "",
                 state : {
-                    payment_id : props.payment_id
-                }}}><AiIcons.AiFillNotification/>  Confirm</Link></td>
-            
+                    connection_id : props.connection_id
+                }}}><AiIcons.AiFillNotification/>  Accept</Link></td>
+            <td><Link type="button" className="btn btn-danger" to={{
+                pathname : "",
+                state : {
+                    connection_id : props.connection_id
+                }}}><AiIcons.AiFillNotification/>  Reject</Link></td> */}
         </tr>
               
     );
     
 }
 
-class ConfirmConnection extends React.Component {
+class IspConnections extends React.Component {
 
     constructor(props){
         super(props);
 
         this.state = {
-            payments : [],
-            filteredPayments : [],
+            connections : [],
+            filteredConnections : [],
             isps : [],
             users :[],
             unions : [],
@@ -61,8 +63,7 @@ class ConfirmConnection extends React.Component {
             currentPage : 1,
             pages : [],
             pageCount : 0,
-            rating : "",
-            ratingAll : "",
+           
             timeAll:"",
             time : "",
             districts : [],
@@ -77,14 +78,22 @@ class ConfirmConnection extends React.Component {
             showAreaSearch : false,
             showSortRatingOrder:false,
             showDate : false,
+            showReport:false,
+            showPackage:false,
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",
             searchText:"",
-            selectedStartDate:new Date(),selectedEndDate:new Date()
+            selectedStartDate:new Date(),selectedEndDate:new Date(),
+            selectedPackage:"",
+            packages:[],
+            resolve_status:"All",
+            name:"",
+            isp_id:"",
+            isp:""
            
         }
-        this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
+      
         this.handleChangeArrivalTimeOrder = this.handleChangeArrivalTimeOrder.bind(this);
-        this.handleChangeRatingOrderAll = this.handleChangeRatingOrderAll.bind(this);
+       
         this.handleChangeArrivalTimeOrderAll = this.handleChangeArrivalTimeOrderAll.bind(this);
         this.handleChangeSearchText = this.handleChangeSearchText.bind(this);
         this.handleChangeDistrict = this.handleChangeDistrict.bind(this);
@@ -98,7 +107,7 @@ class ConfirmConnection extends React.Component {
         this.getUnionName = this.getUnionName.bind(this);
         this.getUserName = this.getUserName.bind(this);
         this.getAreaName = this.getAreaName.bind(this);
-        this.paginationpayments= this.paginationpayments.bind(this);
+        this.paginationconnections= this.paginationconnections.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
         this.findFromDivision = this.findFromDivision.bind(this);
@@ -109,6 +118,10 @@ class ConfirmConnection extends React.Component {
         this.showDatePicker = this.showDatePicker.bind(this);
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate = this.handleEndDate.bind(this);
+        this.handleChangePackage = this.handleChangePackage.bind(this);
+        this.showReportArea = this.showReportArea.bind(this);
+        this.showPackageArea = this.showPackageArea.bind(this);
+        this.handleChangeReportType = this.handleChangeReportType.bind(this);
         
 
     }
@@ -116,12 +129,33 @@ class ConfirmConnection extends React.Component {
     
 
     componentDidMount() {
-        let apiUrl = "http://localhost:7000/nttn/payments";
 
+        let apiUrl = "http://localhost:7000/api/isp";
         axios.get(apiUrl)
         .then(response => {
-          this.setState({ payments: response.data.data, filteredPayments : response.data.data }, () => {
-            let pageCountVal = this.state.payments ? Math.ceil(this.state.payments.length / pageSize) : 0;
+            this.setState({ 
+              isps: response.data.data, 
+              searchISPs : response.data.data,
+              isp_id : this.props.location.state.id,
+              name : this.props.location.state.data 
+            }, () => {
+                this.setState({
+                    isp : this.state.isps.filter((isp) => isp._id.toString() === this.state.isp_id)[0]
+                })
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/isp/connections";
+        const object = {
+            isp_id : this.state.isp_id || this.props.location.state.id
+        }
+        axios.post(apiUrl, object)
+        .then(response => {
+          this.setState({ connections: response.data.data, filteredConnections : response.data.data }, () => {
+            let pageCountVal = this.state.connections ? Math.ceil(this.state.connections.length / pageSize) : 0;
             let pagesVal = _.range(1, pageCountVal + 1);
     
             this.setState({
@@ -129,21 +163,14 @@ class ConfirmConnection extends React.Component {
               pages : pagesVal 
             })
           });
-          this.paginationpayments(1);
+          this.paginationconnections(1);
         })
         .catch((error) => {
           console.log(error);
         })
         
 
-        apiUrl = "http://localhost:7000/api/isp";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ isps: response.data.data, searchISPs : response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
+       
 
         apiUrl = "http://localhost:7000/api/union";
         axios.get(apiUrl)
@@ -198,35 +225,45 @@ class ConfirmConnection extends React.Component {
         .catch((error) => {
           console.log(error);
         })
+
+       
         
     }
 
     loadnewData(e){
-      e.preventDefault();
-      let apiUrl = "http://localhost:7000/nttn/payments/sortBy";
+      if(e){
+        e.preventDefault();
+      }
+     
+      let apiUrl = "http://localhost:7000/isp/connections/sortBy";
+      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
+     
       const object = {
         district_id : this.state.selectedDistrict,
         division_id :  this.state.selectedDivision,
         union_id :  this.state.selectedUnion,
         area_id:  this.state.selectedArea,
-        upazilla_id :  this.state.selectedUpazilla
+        upazilla_id :  this.state.selectedUpazilla,
+       resolve_status : resolveStatus,
+      
+       isp_id:this.state.isp_id
       }
       //console.log(object);
 
       axios.post(apiUrl, object)
       .then(response => {
        
-        this.setState({filteredPayments:response.data.data }, () => {
+        this.setState({filteredConnections:response.data.data }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredPayments ? Math.ceil(this.state.filteredPayments.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationpayments(1);
+            this.paginationconnections(1);
           })
         
         });
@@ -235,20 +272,21 @@ class ConfirmConnection extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ payments: [] });
+        //this.setState({ connections: [] });
       })
     }
 
     showAllData(){
 
-      let apiUrl = "http://localhost:7000/nttn/payments";
-    
-
-      axios.get(apiUrl)
+      let apiUrl = "http://localhost:7000/isp/connections";
+      const object = {
+        isp_id : this.state.isp_id || this.props.location.state.id
+    }
+      axios.post(apiUrl, object)
       .then(response => {
        
         this.setState({
-          filteredPayments:response.data.data, 
+          filteredConnections:response.data.data, 
           searchdistricts:this.state.districts, 
           searchupazillas : this.state.upazillas, 
           searchUnions : this.state.unions, 
@@ -256,7 +294,7 @@ class ConfirmConnection extends React.Component {
         }, () => {
           
           //console.log("here");
-          let pageCountVal = this.state.filteredPayments ? Math.ceil(this.state.filteredPayments.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
@@ -270,11 +308,16 @@ class ConfirmConnection extends React.Component {
             ratingAll : "",
             timeAll:"",
             time : "",
+            selectedPackage:"",
+            showReport:"",
+            showPackage:"",
+            resolve_status:"All",
+           
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"", selectedArea:"",selectedISP:"",
             selectedStartDate:new Date(), selectedEndDate:new Date()
 
           }, () => {
-            this.paginationpayments(1);
+            this.paginationconnections(1);
           })
         
         });
@@ -283,7 +326,7 @@ class ConfirmConnection extends React.Component {
       })
       .catch((error) => {
         console.log(error);
-        //this.setState({ payments: [] });
+        //this.setState({ connections: [] });
       })
     }
 
@@ -297,24 +340,29 @@ class ConfirmConnection extends React.Component {
       } else {
         this.setState({
           searchText : e.target.value,
-          filteredPayments : this.state.payments.filter((payment) => {
-            return this.getIspName(payment.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
-            this.getUnionName(payment.union_id).toLowerCase().includes((e.target.value).toLowerCase())
+          filteredConnections : this.state.connections.filter((connection) => {
+            return connection.user_name.toLowerCase().includes((e.target.value).toLowerCase()) || 
+            this.getAreaName(connection.area_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
+            connection.contact_person_telephone.includes((e.target.value).toLowerCase()) ||
+            connection.contact_person_mobile.includes((e.target.value).toLowerCase()) ||
+            connection.nid_number.includes((e.target.value))
           })
         }, () => {
-          let pageCountVal = this.state.filteredPayments ? Math.ceil(this.state.filteredPayments.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationpayments(1);
+            this.paginationconnections(1);
           })
           
         });
       }
     }
+
+  
 
     handleStartDate(date){
         
@@ -450,6 +498,7 @@ class ConfirmConnection extends React.Component {
 
       
     };
+
    
 
     handleChangeISP(e){
@@ -460,54 +509,28 @@ class ConfirmConnection extends React.Component {
       })
     }
 
-    handleChangeRatingOrder(e){
-        this.setState({
-          rating : e.target.value,
-          ratingAll: "", time : "", timeAll : ""
-        }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.rating - b.rating)}))
-          } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.rating - a.rating)}))
-          }
-    
-          //this.paginationpayments(this.state.currentPage);
-          
-        })
-        
-        
-      }
+    handleChangePackage(e){
+      this.setState({
+        selectedPackage : e.target.value,
+      }, () => {
+        this.loadnewData();
+      })
+    }
 
-      handleChangeRatingOrderAll(e){
-        this.setState({
-          ratingAll : e.target.value,
-          rating: "", time : "", timeAll : ""
-        }, () =>{
-          if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredPayments : prevstate.filteredPayments.sort((a,b) => a.rating - b.rating)}))
-          } else {
-            this.setState((prevstate) => ({filteredPayments : prevstate.filteredPayments.sort((a,b) => b.rating - a.rating)}))
-          }
-    
-          this.paginationpayments(1);
-          
-        })
-        
-        
-      }
+   
 
       handleChangeArrivalTimeOrder(e){
         this.setState({
           time : e.target.value,
-          rating: "", ratingAll : "", timeAll : ""
+           timeAll : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.payment_time.localeCompare(b.payment_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => a.request_arrival_time.localeCompare(b.request_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.payment_time.localeCompare(a.payment_time))}))
+            this.setState((prevstate) => ({paginatedData : prevstate.paginatedData.sort((a,b) => b.request_arrival_time.localeCompare(a.request_arrival_time))}))
           }
     
-          //this.paginationpayments(this.state.currentPage);
+          //this.paginationconnections(this.state.currentPage);
           
         })
         
@@ -517,15 +540,15 @@ class ConfirmConnection extends React.Component {
       handleChangeArrivalTimeOrderAll(e){
         this.setState({
           timeAll : e.target.value,
-          rating: "", ratingAll : "", time : ""
+          time : ""
         }, () =>{
           if(e.target.value === "1"){
-            this.setState((prevstate) => ({filteredPayments : prevstate.filteredPayments.sort((a,b) => a.payment_time.localeCompare(b.payment_time))}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => a.request_arrival_time.localeCompare(b.request_arrival_time))}))
           } else {
-            this.setState((prevstate) => ({filteredPayments : prevstate.filteredPayments.sort((a,b) => b.payment_time.localeCompare(a.payment_time))}))
+            this.setState((prevstate) => ({filteredConnections : prevstate.filteredConnections.sort((a,b) => b.request_arrival_time.localeCompare(a.request_arrival_time))}))
           }
     
-          this.paginationpayments(1);
+          this.paginationconnections(1);
           
         })
         
@@ -541,35 +564,62 @@ class ConfirmConnection extends React.Component {
           [start, end] = [end, start];
         }
         this.setState({
-          filteredPayments:this.state.filteredPayments.filter((payment)=>{
-            var current = new Date(payment.payment_time).getTime(); 
+          filteredConnections:this.state.filteredConnections.filter((connection)=>{
+            var current = new Date(connection.request_arrival_time).getTime(); 
             return  current <= end && current >= start
           })
         }, () => {
-          let pageCountVal = this.state.filteredPayments ? Math.ceil(this.state.filteredPayments.length / pageSize) : 0;
+          let pageCountVal = this.state.filteredConnections ? Math.ceil(this.state.filteredConnections.length / pageSize) : 0;
           let pagesVal = _.range(1, pageCountVal + 1);
   
           this.setState({
             pageCount : pageCountVal,
             pages : pagesVal 
           }, () => {
-            this.paginationpayments(1);
+            this.paginationconnections(1);
           })
         });
 
           
       }
     
+      handleChangeReportType(e){
+        if(e.target.value === "All"){
+           this.setState({
+             resolve_status:"All",
+              time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Solved"){
+           this.setState({
+             resolve_status:"Solved",
+             time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Unsolved"){
+           this.setState({
+             resolve_status:"Unsolved",
+            time:"", timeAll:""
+           }, () => {
+             this.loadnewData();
+           })
+        } else if(e.target.value === "Unselect"){
+          this.showAllData();
+        }
+      }
+
     
     
 
-    paginationpayments(pageNo) {
+    paginationconnections(pageNo) {
         this.setState({
           currentPage : pageNo
         }, () => {
           const startIndex = (pageNo - 1) * pageSize;
           
-          const newPaginatedData = this.state.filteredPayments.length === 0 ? [] :  _(this.state.filteredPayments).slice(startIndex).take(pageSize).value();
+          const newPaginatedData = this.state.filteredConnections.length === 0 ? [] :  _(this.state.filteredConnections).slice(startIndex).take(pageSize).value();
           //console.log ("Paginated :" ,newPaginatedData);
           this.setState({
             paginatedData : newPaginatedData
@@ -620,33 +670,53 @@ class ConfirmConnection extends React.Component {
         }
       }
 
+      showReportArea(){
+        this.setState({
+          showReport : !this.state.showReport
+        })
+      }
+
+      showPackageArea(){
+        this.setState({
+          showPackage : !this.state.showPackage
+        })
+      }
+
    
     
     render() {
         return(
-            <div>
-                <Header />
+            <div className="container">
+               <ISPHeader data={this.state.name} id={this.state.isp_id} />
+                
                 <br></br>
                 <br></br>
                 <br></br>
-                <div className="container">
-                <center><h3 style={{"margin":20}}>Payment from ISPs</h3><br></br></center>
+                <center><h3 style={{"margin":20}}>Connection Requests from Users</h3><br></br></center>
+
+                <div className="row">
+                    <div className="col">
+                    <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Connection Requests"/>
+                    </div>
+                    <div className="col">
+                    <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20}} ><BsIcons.BsClipboardData size={20}/>  Show All Data</Button>
+                    </div>
+                  </div>
                 <div className = "row">
                 <div className="col">
-                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 200}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
+                <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 230}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Payments"}</Button>
+                <Button variant="warning" onClick={this.showSortDiv} style={{"marginBottom":20, "marginRight":10, "width" : 230}} ><FaIcons.FaArrowsAltV size={30}/>{this.state.showSortRatingOrder ? "  Hide Sorting" : "  Sort Connections"}</Button>
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
+                <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "marginRight":10, "width" : 230}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
                 </div>
+               
                 <div className="col">
-                <Button variant="success" onClick={this.showAllData} style={{"marginBottom":20, "marginRight":10, "width" : 200}} ><BsIcons.BsCardChecklist size={30}/> Show All Payment</Button>       
+                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 230}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Request Type" : "  Show Request Types"}</Button>       
                 </div>
-                <div className="col">
-                <input type="text" className="form-control" style={{"marginBottom":20, "width" : 300}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Enter your search"/>
-                </div>
+                
                   
                   
                  </div>
@@ -825,32 +895,55 @@ class ConfirmConnection extends React.Component {
                   </div>
                 </div>
                </div>
+
+               <div hidden={!(this.state.showReport)} style={{"backgroundColor":"#e6e6e6", "padding":10, "width":300, "borderRadius":5, "marginBottom":20}}>
+                  <Form>
+                      <Form.Row>
+                      <Col>
+                      <Form.Group style={{"marginRight":20, "marginLeft":20}}>
+                          <Form.Label>Select Request type</Form.Label>
+                          <Form.Control as="select" value={this.state.resolve_status} onChange={this.handleChangeReportType}>
+                          {/* <option disabled hidden value="">Select Reports</option> */}
+                          <option value="All">All</option>
+                          <option value="Solved">Solved</option>
+                          <option value="Unsolved">Unsolved</option>
+                          {/* <option value="Unselect">Unselect</option> */}
+                          </Form.Control>
+                      </Form.Group>
+                      </Col>
+
+                     
+                    </Form.Row>
+                  </Form>
+                </div>
+
+               
                 
                 
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
                         <tr>
                         <th>#</th>
-                        <th>ISP Name</th>
-                        <th>Union Name</th>
-                        <th>Payment Arrival Time</th>
-                        <th>Gateway</th>
-                        <th></th>
+                        <th>User Name</th>
+                        <th>Area Name</th>
+                        <th>Request Arrival Time</th>
+                        <th>Resolve Status</th>
                         <th>Take Action</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
                     { 
-                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((payment, index) => {
+                        this.state.paginatedData.length > 0 && this.state.paginatedData.map((connection, index) => {
                            
                             return <Connection 
-                                key={payment._id} 
-                                isp_name={this.getIspName(payment.isp_id)}   
-                                union_name = {this.getUnionName(payment.union_id)}
-                                payment_time = {payment.payment_time} 
-                                gateway = {payment.gateway}
+                                key={connection._id} 
+                                user_name={connection.user_name}   
+                                area_name = {this.getAreaName(connection.area_id)}
+                                request_arrival_time = {connection.request_arrival_time} 
+                                resolve_status = {connection.resolve_status === true ? "True" : "False"}
                                 count={index + 1}
-                                payment_id={payment._id}
+                                connection_id={connection._id}
                             />})
                         }
                     </tbody>
@@ -859,7 +952,7 @@ class ConfirmConnection extends React.Component {
                 <nav className="d-flex justify-content-center">
                     <ul className="pagination">
                     <li className={this.state.currentPage === 1 ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationpayments(this.state.currentPage - 1)} aria-label="Previous">
+                    <p className="page-link"  onClick={()=>this.paginationconnections(this.state.currentPage - 1)} aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -868,13 +961,13 @@ class ConfirmConnection extends React.Component {
                         this.state.pages.map((page) => {
                             return <li key={page} className={
                                 page === this.state.currentPage ? "page-item active" : "page-item"
-                            }><p className="page-link" onClick={()=>this.paginationpayments(page)}>{page}</p></li>
+                            }><p className="page-link" onClick={()=>this.paginationconnections(page)}>{page}</p></li>
                         })
 
                         
                     }
                     <li className={this.state.currentPage === this.state.pageCount ? "page-item disabled": "page-item"}>
-                    <p className="page-link"  onClick={()=>this.paginationpayments(this.state.currentPage + 1)} aria-label="Next">
+                    <p className="page-link"  onClick={()=>this.paginationconnections(this.state.currentPage + 1)} aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                         <span className="sr-only">Next</span>
                     </p>
@@ -882,12 +975,10 @@ class ConfirmConnection extends React.Component {
                     
                     </ul>
                 </nav>
-                {this.state.filteredPayments.length === 0 && <h4>"No payments found"</h4>}
+                {this.state.filteredConnections.length === 0 && <h4>"No connections found"</h4>}
             </div>
-            </div>
-            
         );
     }
 }
 
-export default ConfirmConnection;
+export default IspConnections;
