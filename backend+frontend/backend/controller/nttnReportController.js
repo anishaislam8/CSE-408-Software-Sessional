@@ -1,3 +1,4 @@
+const { ObjectID } = require('mongodb');
 let { Report } = require('../models/Report');
 let apiController = require('./apiController');
 
@@ -208,6 +209,7 @@ const handleOneReport = async (request, response) => {
 
 const handleSolvedReport = async (request, response) => {
     let report_id = request.body.report_id;
+    let employee_id = request.body.employee_id;
     if(!report_id){
         return response.send({
             message : "Report ID invalid",
@@ -223,6 +225,7 @@ const handleSolvedReport = async (request, response) => {
             })
         }
         report.resolve_status = true;
+        report.employee_id = ObjectID(employee_id);
         report.report_resolve_time = new Date()
 
         let updatedReport = await report.save();

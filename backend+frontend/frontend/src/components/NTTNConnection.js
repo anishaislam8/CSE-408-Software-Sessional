@@ -27,7 +27,7 @@ const Connection = (props) => {
             
             <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.request_status}</td>
-            <td>{props.employee_name}</td>
+           
             <td><Link type="button" className="btn btn-info" to={{
                 pathname : "/nttn/connections/details",
                 state : {
@@ -341,7 +341,7 @@ class NTTNConnections extends React.Component {
           filteredConnections : this.state.connections.filter((connection) => {
             return connection.isp_name.toLowerCase().includes((e.target.value).toLowerCase()) || 
             this.getUnionName(connection.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            connection.license_number.includes(e.target.value) ||
+            connection.license_number.toLowerCase().includes((e.target.value).toLowerCase()) ||
             connection.head_office_telephone.includes((e.target.value).toLowerCase()) ||
             connection.head_office_mobile.includes((e.target.value).toLowerCase()) ||
             connection.office_telephone.includes((e.target.value).toLowerCase()) ||
@@ -979,7 +979,7 @@ class NTTNConnections extends React.Component {
                         <th>Union Name</th>
                         <th>Request Arrival Time</th>
                         <th>Connection Status</th>
-                        <th>Employee Name</th>
+                       
                         <th>Take Action</th>
                         
                         </tr>

@@ -40,6 +40,10 @@ var ContractSchema = new mongoose.Schema({
         type : Boolean,
         required : true,
         default : false
+    },
+    payment_id : {
+        type : ObjectID,
+        default : null
     }
 
 });

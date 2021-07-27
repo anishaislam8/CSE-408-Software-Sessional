@@ -23,3 +23,18 @@
   }
 
   
+
+  .connectioninner3{
+    margin: auto;
+    font-weight: bolder;
+    background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+    background: linear-gradient(to right, #ee9ca7 0%, #ffdde1  51%, #ee9ca7  100%);
+    /* box-shadow: 0px 14px 80px rgba(34, 35, 58, 0.2); */
+    padding: 40px 55px 45px 55px;
+    border-radius: 15px;
+    transition: all .3s;
+  }
+
+ 
+  
+  

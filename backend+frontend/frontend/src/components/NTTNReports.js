@@ -21,14 +21,24 @@ const Report = (props) => {
     return(
         
         <tr> 
-            <td>{props.isp_name}</td>
+            <td><Link style={{"textDecoration" : "none"}} to={{
+                pathname : "/nttn/ispList/details",
+                state : {
+                    isp_id : props.isp_id
+                }}}>{props.isp_name}</Link></td>
             <td>{props.union_name}</td>
             <td>{props.average_rating}</td>
             <td>{props.problem_category}</td>
-            <td>{props.details}</td>
+        
             <td>{new Date(props.report_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.resolve_status}</td>
-            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={() => {props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString().split(" ").slice(0,5).join(" ")}</td>
+            <td><Link type="button" className="btn btn-info" to={{
+                pathname : "/nttn/reports/details",
+                state : {
+                  key : props.report_id,
+                  report_id : props.report_id
+                }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
+            {/* <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={() => {props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString().split(" ").slice(0,5).join(" ")}</td> */}
         </tr>
               
     );
@@ -73,7 +83,8 @@ class NTTNReports extends React.Component {
             problem_category:"",
             selectedStartDate:new Date(),selectedEndDate:new Date(),
             modalTitle:"",
-            modalBody:""
+            modalBody:"",
+            connections:[]
            
         }
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
@@ -89,12 +100,12 @@ class NTTNReports extends React.Component {
         this.handleChangeProblemCategory = this.handleChangeProblemCategory.bind(this);
         this.handleStartDate = this.handleStartDate.bind(this);
         this.handleEndDate=  this.handleEndDate.bind(this);
-        this.handleSolveReport = this.handleSolveReport.bind(this);
+        // this.handleSolveReport = this.handleSolveReport.bind(this);
         this.loadnewData = this.loadnewData.bind(this);
         this.getIspName = this.getIspName.bind(this);
         this.getUnionName = this.getUnionName.bind(this);
         this.getISPRating = this.getISPRating.bind(this);
-        this.handleClose = this.handleClose.bind(this);
+        // this.handleClose = this.handleClose.bind(this);
         this.paginationReports= this.paginationReports.bind(this);
         this.showAreaSearchDiv = this.showAreaSearchDiv.bind(this);
         this.showSortDiv = this.showSortDiv.bind(this);
@@ -108,6 +119,8 @@ class NTTNReports extends React.Component {
         this.showDatePicker = this.showDatePicker.bind(this);
         this.showReportArea = this.showReportArea.bind(this);
         this.showReportProblemArea = this.showReportProblemArea.bind(this);
+        this.getISP = this.getISP.bind(this);
+        this.getConnection= this.getConnection.bind(this);
         
 
     
@@ -137,6 +150,16 @@ class NTTNReports extends React.Component {
           console.log(error);
         })
         
+        apiUrl = "http://localhost:7000/nttn/connectionsISP";
+
+        axios.get(apiUrl)
+        .then(response => {
+          this.setState({ connections: response.data.data });
+         
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
         apiUrl = "http://localhost:7000/api/isp";
         axios.get(apiUrl)
@@ -286,6 +309,22 @@ class NTTNReports extends React.Component {
     }
 
 
+    getISP= (isp_id) => {
+      for(let i= 0; i < this.state.isps.length; i++){
+          if(this.state.isps[i]._id.toString() ===isp_id.toString()){
+              return this.state.isps[i]
+          }
+      }
+  }
+
+    getConnection= (connection_id) => {
+        for(let i= 0; i < this.state.connections.length; i++){
+            if(this.state.connections[i]._id.toString() ===connection_id.toString()){
+                return this.state.connections[i]
+            }
+        }
+    }
+
     handleChangeSearchText(e){
       if(e.target.value===""){
         this.setState({
@@ -299,6 +338,14 @@ class NTTNReports extends React.Component {
             return this.getIspName(report.isp_id).toLowerCase().includes((e.target.value).toLowerCase()) || 
             this.getUnionName(report.union_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
             this.getISPRating(report.isp_id).toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
+            this.getISP(report.isp_id).license_id.toLowerCase().includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).head_office_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).head_office_telephone.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).office_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).office_telephone.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).contact_person_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(this.getISP(report.isp_id).physical_connection_details[0].connection_id).contact_person_telephone.includes((e.target.value).toLowerCase()) || 
+
             report.details.toLowerCase().includes((e.target.value).toLowerCase())
           })
         }, () => {
@@ -599,50 +646,7 @@ class NTTNReports extends React.Component {
         
       }
 
-    handleSolveReport(report_id){
-      let apiUrl = "http://localhost:7000/nttn/reports/solve";
-      let object = {
-        report_id
-      }
-      axios.post(apiUrl, object)
-      .then(response => {
-          if(response.data.data.length === 0){
-            //failed
-            this.setState({
-              modalBody:"Report handling failed, try again!",
-              modalTitle:"Error",
-              
-            }, () => {
-              this.setState({
-                done : true
-              })
-            })
-          } else {
-            this.setState({
-              modalBody:"Solved!!",
-              modalTitle:"Success",
-              
-            }, () => {
-              this.setState({
-                done : true
-              })
-            })
-          }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-    }
-
-    handleClose(){
-      this.setState({
-        done:false,
-        modalTitle:"",
-        modalBody:""
-      }, () => {
-        this.loadnewData();
-      })
-    }
+   
 
       
     getIspName = (isp_id) => {
@@ -706,7 +710,7 @@ class NTTNReports extends React.Component {
             <br></br>
             <br></br>
              <div className="container">
-             <center><h3 style={{"margin":20}}>Reports from ISPs</h3><br></br></center>
+             <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Complaints From ISP</h3></center>
                 {/* <center> */}
                   <div className="row">
                     <div className="col">
@@ -728,7 +732,7 @@ class NTTNReports extends React.Component {
                 <Button variant="warning" onClick={this.showDatePicker} style={{"marginBottom":20, "width" : 240}} ><FcIcons.FcCalendar size={30}/>{this.state.showDate ? "  Hide Date Search" : "  Search By Date"}</Button>       
                 </div>
                 <div className="col">
-                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 240}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Show Report" : "  Show Reports"}</Button>       
+                <Button variant="warning" onClick={this.showReportArea} style={{"marginBottom":20,  "width" : 240}} ><BsIcons.BsCardChecklist size={30}/>{this.state.showReport ? "  Hide Resolve Status" : "  Resolve Status"}</Button>       
                 </div>
                 <div className="col">
                 <Button variant="warning" onClick={this.showReportProblemArea} style={{"marginBottom":20,  "width" : 240}} ><VscIcons.VscGroupByRefType size={30}/>{this.state.showProblem ? "  Hide Problem Type" : "  Problem Category"}</Button>       
@@ -951,10 +955,10 @@ class NTTNReports extends React.Component {
                             <th>Union Name</th>
                             <th>Rating</th>
                             <th>Problem Category</th>
-                            <th>Details</th>
+                            
                             <th>Report Arrival Time</th>
                             <th>Resolve Status</th>
-                            <th>Solve</th>
+                            <th>View Details</th>
 
                         </tr>
                     </thead>
@@ -965,6 +969,7 @@ class NTTNReports extends React.Component {
                              return <Report 
                                 key={report._id} 
                                 isp_name={this.getIspName(report.isp_id)} 
+                                isp_id={report.isp_id}
                                 union_name = {this.getUnionName(report.union_id)} 
                                 problem_category = {(report.category === "0") ? "Low Bandwidth" : (report.category === "1" ? "Physical Connection Problem" : (report.category === "2" ? "Platform Related Problem" : "Others")) } 
                                 report_arrival_time = {report.report_arrival_time} 
@@ -976,7 +981,7 @@ class NTTNReports extends React.Component {
                                 resolve_time={report.report_resolve_time}
                                 handleSolveReport={this.handleSolveReport}
                             />})
-                        }
+                    }
                     </tbody>
                 </table>
 

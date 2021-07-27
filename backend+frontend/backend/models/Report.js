@@ -49,6 +49,10 @@ var ReportSchema = new mongoose.Schema({
     rating : {
         type : Number,
         default : null
+    },
+    employee_id : {
+        type : ObjectID,
+        default: null
     }
 });
 

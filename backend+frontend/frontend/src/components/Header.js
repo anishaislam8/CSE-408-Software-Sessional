@@ -6,7 +6,7 @@ import * as FaIcons from 'react-icons/fa';
 import * as ImIcons from 'react-icons/im';
 import * as BsIcons from 'react-icons/bs';
 import * as IoIcons from 'react-icons/io';
-import * as VscIcons from 'react-icons/vsc';
+import * as AiIcons from 'react-icons/ai';
 import * as GoIcons from 'react-icons/go';
 import {NavDropdown} from 'react-bootstrap';
 
@@ -15,28 +15,44 @@ function Header() {
         <div>
         <nav className="navbar navbar-expand-lg  bg-dark fixed-top" style={{ "color": "white"}}>
         <div className="container-fluid">
-          <NavLink className="navbar-brand" to="/" style={{"paddingLeft":20, "color" : "white"}}>Fiber@Home</NavLink>
+          <NavLink className="navbar-brand" to="/nttn" style={{"paddingLeft":20, "color" : "white"}}>Fiber@Home</NavLink>
          
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav nav-pills ms-auto">
             
-            <li className="nav-item dropdown"  style={{"paddingRight":20, "color" : 'white'}}>
+            {/* <li className="nav-item dropdown"  style={{"paddingRight":20, "color" : 'white'}}>
             
             <NavDropdown title= "Connection" id="basic-nav-dropdown" style={{"color":"white"}}>
               <NavDropdown.Item href="/nttn/connections">Connection Requests</NavDropdown.Item>
               <NavDropdown.Item href="/nttn/pendings">Pending Requests</NavDropdown.Item>
-              {/* <NavDropdown.Item href="/nttn/confirmConnection">Confirm Connection</NavDropdown.Item> */}
+              
               
               <NavDropdown.Item href="/nttn/renewals">Renewal Requests</NavDropdown.Item>
             </NavDropdown>
              
-            </li>
+            </li> */}
+
+
+
+            <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/connections"><ImIcons.ImConnection size={30}/>  Connection Requests</NavLink>
+              </li>
+
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/pendings"><AiIcons.AiOutlineFieldTime size={30}/>  Pending Requests</NavLink>
+              </li>
+
+              <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/renewals"><BsIcons.BsArrowRepeat size={30}/>  Renewal Requests</NavLink>
+              </li>
+
+
           
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/isplist"><FaIcons.FaList size={20}/>  ISP List</NavLink>
               </li>
               <li className="nav-item" style={{"paddingRight":20}}>
-                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/reports"><GoIcons.GoAlert size={20}/>  Reports</NavLink>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/reports"><GoIcons.GoAlert size={20}/>  Complaints</NavLink>
               </li>
               {/* <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/feedbacks"><VscIcons.VscFeedback size={20}/> Feedbacks</NavLink>
@@ -47,17 +63,15 @@ function Header() {
 
             <div className="dropdown">
                 <button className="btn dark dropdown-toggle" type="button" id="dropdownMenuButton" style={{"color": "white"}} data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <IoIcons.IoMdSettings size={20}/>
+                {/* <IoIcons.IoMdSettings size={20}/> */}
+                <FaIcons.FaSignOutAlt size={20} />
                 </button>
                 <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                <Link className="dropdown-item" to={{
+                {/* <Link className="dropdown-item" to={{
                         pathname: `/`
                        
-                        }}>Edit Profile</Link>
-                <Link className="dropdown-item" to={{
-                    pathname: `/`
-                    
-                    }}>Logistics</Link>
+                        }}>Edit Profile</Link> */}
+               
                 <Link className="dropdown-item" to={{
                         pathname: "/",
                        

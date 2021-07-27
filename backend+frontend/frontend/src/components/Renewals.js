@@ -21,7 +21,11 @@ const Renewal = (props) => {
         
         <tr> 
             <td>{props.count}</td>
-            <td>{props.isp_name}</td>
+            <td><Link style={{"textDecoration" : "none"}} to={{
+                pathname : "/nttn/ispList/details",
+                state : {
+                    isp_id : props.isp_id
+                }}}>{props.isp_name}</Link></td>
             <td>{props.union_name}</td>
             
             <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
@@ -974,6 +978,7 @@ class NTTNRenewals extends React.Component {
                             return <Renewal 
                                 key={renewal._id} 
                                 isp_name={this.getIspName(renewal.isp_id)}   
+                                isp_id={renewal.isp_id}
                                 union_name = {this.getUnionName(renewal.union_id)}
                                 request_arrival_time = {renewal.request_arrival_time} 
                                 count={index + 1}

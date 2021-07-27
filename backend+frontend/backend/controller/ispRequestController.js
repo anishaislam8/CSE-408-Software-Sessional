@@ -5,6 +5,7 @@ let { Pending } = require('../models/Pending');
 let apiController = require('./apiController');
 const { UserConnection } = require('../models/UserConnection');
 const { PhysicalConnectionISP } =require('../models/PhysicalConnectionISP');
+const { Contract } = require('../models/Contract');
 
 
 const getUserConnections = async (request, response) => {
@@ -603,6 +604,40 @@ const rejectConnection = async (request, response) => {
     
 }
 
+const getAllContractsWithNTTN = async (request, response) => {
+    let isp_id = request.body.isp_id;
+    if(!isp_id){
+        return response.send({
+            message : "ISP ID required",
+            data : []
+        })
+    }
+
+    try{
+        let contracts = await Contract.find({
+            isp_id,
+            user_type : 0
+        })
+
+        if(!contracts || contracts.length === 0){
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        return response.send({
+            message : "Found",
+            data : contracts
+        })
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
 
 
 module.exports = {
@@ -614,5 +649,6 @@ module.exports = {
     getUserConnections,
     handleConnection,
     acceptConnection,
-    rejectConnection
+    rejectConnection,
+    getAllContractsWithNTTN
 }

@@ -3,7 +3,7 @@ import React from 'react'
 import { Link , NavLink } from 'react-router-dom';
 import './../../styles/ispHeader.css';
 import * as FaIcons from 'react-icons/fa';
-import * as ImIcons from 'react-icons/im';
+import * as AiIcons from 'react-icons/ai';
 import * as BsIcons from 'react-icons/bs';
 import * as IoIcons from 'react-icons/io';
 import * as VscIcons from 'react-icons/vsc';
@@ -46,7 +46,7 @@ function ISPHeader(props) {
                        data : props.data,
                        id : props.id
                    }
-                }}><FaIcons.FaConnectdevelop size={20}/>  Connection Requests</NavLink>
+                }}><FaIcons.FaConnectdevelop size={30}/>  Connection Requests</NavLink>
               </li>
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
@@ -55,7 +55,7 @@ function ISPHeader(props) {
                        data : props.data,
                        id : props.id
                    }
-                }}><FaIcons.FaList size={20}/>  Pending Requests</NavLink>
+                }}><AiIcons.AiOutlineFieldTime size={30}/>  Pending Requests</NavLink>
               </li>
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
@@ -64,7 +64,7 @@ function ISPHeader(props) {
                        data : props.data,
                        id : props.id
                    }
-                }}><GoIcons.GoAlert size={20}/>  Reports</NavLink>
+                }}><GoIcons.GoAlert size={20}/>  Complaints</NavLink>
               </li>
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{

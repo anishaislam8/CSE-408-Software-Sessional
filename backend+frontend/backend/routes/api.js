@@ -3,6 +3,7 @@ const apiController = require('./../controller/apiController');
 const loginController = require('./../controller/loginController');
 const apiRegistrationController = require('./../controller/apiRegistrationController');
 const apiNotificationController = require('./../controller/apiNotificationController');
+const { runInContext } = require('lodash');
 
 // get all isps
 router.get('/isp', apiController.getISP);
@@ -85,6 +86,8 @@ router.post('/employeesISP', apiRegistrationController.getEmployeeISP);
 
 //send isp notification
 router.post('/notificationToIsp', apiNotificationController.sendNotificationToISP);
+
+router.post('/isp/payments', apiController.getPaymentOfOneISP);
 
 
 

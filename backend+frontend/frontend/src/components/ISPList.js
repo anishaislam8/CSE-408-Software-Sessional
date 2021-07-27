@@ -24,12 +24,12 @@ const ISPRow = (props) => {
             
             <td>{props.isp_name}</td>
             <td>{props.license_id}</td>
-            <td>{new Date(props.physical).toString()}</td>
-            <td>{props.connection_started ? new Date(props.connection_started).toString().split(" ").slice(0,5).join(" "): "N/A"}</td>
+            <td>{new Date(props.physical).toString().split(" ").slice(0,5).join(" ")}</td>
+           
             <td>{props.connectionStatus}</td>
             <td>{props.average_rating || "N/A"}</td>
             <td><Link type="button" className="btn btn-info" to={{
-                pathname : "",
+                pathname : "/nttn/ispList/details",
                 state : {
                     isp_id : props.isp_id
                 }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
@@ -72,7 +72,7 @@ class ISPList extends React.Component {
             showDate : false,
            
             selectedDivision:"", selectedDistrict:"", selectedUpazilla:"", selectedUnion:"",
-            searchText:"",
+            searchText:"", connections :[],
             
             selectedStartDate:new Date(),selectedEndDate:new Date()
            
@@ -116,7 +116,18 @@ class ISPList extends React.Component {
     
 
     componentDidMount() {
-        let apiUrl = "http://localhost:7000/api/isp";
+      let apiUrl = "http://localhost:7000/nttn/connectionsISP";
+
+      axios.get(apiUrl)
+      .then(response => {
+        this.setState({ connections: response.data.data });
+       
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+
+        apiUrl = "http://localhost:7000/api/isp";
 
         axios.get(apiUrl)
         .then(response => {
@@ -281,6 +292,14 @@ class ISPList extends React.Component {
       })
     }
 
+    getConnection= (connection_id) => {
+      for(let i= 0; i < this.state.connections.length; i++){
+          if(this.state.connections[i]._id.toString() ===connection_id.toString()){
+              return this.state.connections[i]
+          }
+      }
+  }
+
 
     handleChangeSearchText(e){
       if(e.target.value===""){
@@ -296,7 +315,15 @@ class ISPList extends React.Component {
             (isp.average_rating && isp.average_rating.toString().toLowerCase().includes((e.target.value).toLowerCase())) ||
             isp.license_id.toLowerCase().includes((e.target.value).toLowerCase()) ||
             (isp.connection_establishment_time && isp.connection_establishment_time.toString().toLowerCase().includes((e.target.value).toLowerCase())) ||
-            isp.physical_connection_establishment_time.toString().toLowerCase().includes((e.target.value).toLowerCase())
+            isp.physical_connection_establishment_time.toString().toLowerCase().includes((e.target.value).toLowerCase()) ||
+            this.getConnection(isp.physical_connection_details[0].connection_id).head_office_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(isp.physical_connection_details[0].connection_id).head_office_telephone.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(isp.physical_connection_details[0].connection_id).office_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(isp.physical_connection_details[0].connection_id).office_telephone.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(isp.physical_connection_details[0].connection_id).contact_person_mobile.includes((e.target.value).toLowerCase()) || 
+            this.getConnection(isp.physical_connection_details[0].connection_id).contact_person_telephone.includes((e.target.value).toLowerCase())
+
+
           })
         }, () => {
           let pageCountVal = this.state.filteredISPs ? Math.ceil(this.state.filteredISPs.length / pageSize) : 0;
@@ -631,11 +658,11 @@ class ISPList extends React.Component {
             <br></br>
             <br></br>
                <div className="container">
-                <center><h3 style={{"margin":20}}>ISP List</h3><br></br></center>
+               <center><h3 className="display-6" style={{"marginTop" : 20}}>ISP List</h3></center>
                 <center>
                   <div className="row">
                   <div className="col">
-                  <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search ISPs"/>
+                  <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":70, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search ISPs"/>
                 </div>
                    
                   </div>
@@ -835,7 +862,7 @@ class ISPList extends React.Component {
                           <option value="">Any</option>
                           <option value="1">Connected</option>
                           <option value="0">Disonnected</option>
-                          <option value="-1">Not Connected</option>
+                          <option value="-1">Registered</option>
                           {/* <option value="Unselect">Unselect</option> */}
                           </Form.Control>
                       </Form.Group>
@@ -856,7 +883,7 @@ class ISPList extends React.Component {
                         <th>ISP Name</th>
                         <th>License ID</th>
                         <th>Manual Connection Started</th>
-                        <th>Connection Started</th>
+                       
                         <th>Connection Status</th>
                         <th>Average Rating</th>
                         <th>View Details</th>
@@ -873,8 +900,9 @@ class ISPList extends React.Component {
                             connection_started = {isp.connection_establishment_time}
                             average_rating = {isp.average_rating}
                             count={index + 1}
-                            connectionStatus={isp.connection_status === true ? "Connected" :"Not Connected"}
+                            connectionStatus={isp.connection_status === true ? "Connected" :(isp.connection_establishment_time ? "Disconnected" : "Registered")}
                             physical = {isp.physical_connection_establishment_time}
+                            isp_id={isp._id}
                         />})
                         }
                     </tbody>

@@ -65,6 +65,8 @@ router.post('/connections/accept', ispRequestController.acceptConnection);
 
 router.post('/connections/reject', ispRequestController.rejectConnection);
 
+router.post('/contracts', ispRequestController.getAllContractsWithNTTN);
+
 
 
 module.exports = router;

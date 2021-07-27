@@ -38,6 +38,10 @@ var PendingSchema = new mongoose.Schema({
     request_accept_time : {
         type : Date,
         default : null
+    },
+    payment_id : {
+        type : ObjectID,
+        default : null
     }
 });
 

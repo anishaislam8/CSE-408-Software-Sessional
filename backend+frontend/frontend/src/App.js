@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Homepage from './components/Homepage';
 import NTTNReports from './components/NTTNReports';
+import NTTNReportsDetails from './components/NTTNReportsDetails';
 import NTTNFeedbacks from './components/NTTNFeedbacks';
 import NTTNConnections from "./components/NTTNConnection";
 import Pendings from './components/Pendings';
@@ -27,6 +28,9 @@ import IspConnections from "./components/ISPComponents/Connections";
 import ConnectionDetails from "./components/ConnectionDetails";
 import IspConnectionDetails from "./components/ISPComponents/ISPConnectionDetails";
 import ISPEditProfile from "./components/ISPEditProfile/IspEditProfile";
+import ISPDetails from "./components/ISPViewDetails";
+import ISPDetailsPackage from "./components/ViewPackage";
+import ISPDetailsPayment from "./components/ViewPayment";
 
 
 
@@ -41,8 +45,12 @@ function App() {
       <Route path="/userRegistration" exact component={UserForm} />
       <Route path="/nttn" exact component={Homepage} />
       <Route path="/nttn/reports" exact component={NTTNReports} />
+      <Route path="/nttn/reports/details" exact component={NTTNReportsDetails} />
       <Route path="/nttn/feedbacks" exact component={NTTNFeedbacks} />
       <Route path="/nttn/isplist" exact component={ISPList} />
+      <Route path="/nttn/isplist/details" exact component={ISPDetails} />
+      <Route path="/nttn/isplist/details/package" exact component={ISPDetailsPackage} />
+      <Route path="/nttn/isplist/details/payment" exact component={ISPDetailsPayment} />
       <Route path="/nttn/renewals" exact component={Renewals} />
       <Route path="/nttn/pendings" exact component={Pendings} />
       <Route path="/nttn/connections" exact component={NTTNConnections} />
