@@ -26,11 +26,15 @@ const Connection = (props) => {
             
             <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.resolve_status}</td>
-            <td><Link type="button" className="btn btn-info" to={{
-                pathname : "",
-                state : {
-                    isp_id : props.isp_id
-                }}}><BsIcons.BsFillEyeFill size={30}/>  View Details</Link></td>
+
+            <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
+              pathname: `/isp/${props.isp_id}/connections/details`,
+              state: {
+                  data : props.name,
+                  id : props.isp_id,
+                  connection_id : props.connection_id
+              }}}><BsIcons.BsFillEyeFill size={20}/>   View Details</Link></td>
+           
             {/* <td><Link type="button" className="btn btn-success" to={{
                 pathname : "",
                 state : {
@@ -129,6 +133,8 @@ class IspConnections extends React.Component {
     
 
     componentDidMount() {
+
+      console.log(this.props.location)
 
         let apiUrl = "http://localhost:7000/api/isp";
         axios.get(apiUrl)
@@ -236,8 +242,8 @@ class IspConnections extends React.Component {
       }
      
       let apiUrl = "http://localhost:7000/isp/connections/sortBy";
-      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
-     
+      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Accepted" ? 1 : (this.state.resolve_status === "Rejected" ? -1 : 0) ); 
+
       const object = {
         district_id : this.state.selectedDistrict,
         division_id :  this.state.selectedDivision,
@@ -338,12 +344,13 @@ class IspConnections extends React.Component {
         })
         this.showAllData();
       } else {
+        console.log(this.state.connections);
         this.setState({
+          
           searchText : e.target.value,
           filteredConnections : this.state.connections.filter((connection) => {
             return connection.user_name.toLowerCase().includes((e.target.value).toLowerCase()) || 
             this.getAreaName(connection.area_id).toLowerCase().includes((e.target.value).toLowerCase()) ||
-            connection.contact_person_telephone.includes((e.target.value).toLowerCase()) ||
             connection.contact_person_mobile.includes((e.target.value).toLowerCase()) ||
             connection.nid_number.includes((e.target.value))
           })
@@ -591,22 +598,27 @@ class IspConnections extends React.Component {
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Solved"){
+        } else if(e.target.value === "Accepted"){
            this.setState({
-             resolve_status:"Solved",
+             resolve_status:"Accepted",
              time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Unsolved"){
+        } else if(e.target.value === "Rejected"){
            this.setState({
-             resolve_status:"Unsolved",
+             resolve_status:"Rejected",
             time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Unselect"){
-          this.showAllData();
+        } else if(e.target.value === "Unsolved"){
+            this.setState({
+                resolve_status:"Unsolved",
+               time:"", timeAll:""
+              }, () => {
+                this.loadnewData();
+              })
         }
       }
 
@@ -654,7 +666,7 @@ class IspConnections extends React.Component {
        
 
         for(let i = 0; i < this.state.areas.length; i++){
-            if(this.state.areas[i]._id === area_id){
+            if(this.state.areas[i]._id.toString() === area_id.toString()){
                 return this.state.areas[i].name
             }
         }
@@ -905,7 +917,8 @@ class IspConnections extends React.Component {
                           <Form.Control as="select" value={this.state.resolve_status} onChange={this.handleChangeReportType}>
                           {/* <option disabled hidden value="">Select Reports</option> */}
                           <option value="All">All</option>
-                          <option value="Solved">Solved</option>
+                          <option value="Accepted">Accepted</option>
+                          <option value="Rejected">Rejected</option>
                           <option value="Unsolved">Unsolved</option>
                           {/* <option value="Unselect">Unselect</option> */}
                           </Form.Control>
@@ -927,7 +940,7 @@ class IspConnections extends React.Component {
                         <th>User Name</th>
                         <th>Area Name</th>
                         <th>Request Arrival Time</th>
-                        <th>Resolve Status</th>
+                        <th>Connection Status</th>
                         <th>Take Action</th>
                         
                         </tr>
@@ -941,9 +954,11 @@ class IspConnections extends React.Component {
                                 user_name={connection.user_name}   
                                 area_name = {this.getAreaName(connection.area_id)}
                                 request_arrival_time = {connection.request_arrival_time} 
-                                resolve_status = {connection.resolve_status === true ? "True" : "False"}
+                                resolve_status = {(connection.resolve_status === true && connection.rejected === false) ? "Accepted" : ((connection.resolve_status === true && connection.rejected === true) ? "Rejected" : "Unsolved" ) }
                                 count={index + 1}
                                 connection_id={connection._id}
+                                isp_id = {this.state.isp_id}
+                                name = {this.state.name}
                             />})
                         }
                     </tbody>

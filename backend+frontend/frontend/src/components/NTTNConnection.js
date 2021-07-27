@@ -27,6 +27,7 @@ const Connection = (props) => {
             
             <td>{new Date(props.request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.request_status}</td>
+            <td>{props.employee_name}</td>
             <td><Link type="button" className="btn btn-info" to={{
                 pathname : "/nttn/connections/details",
                 state : {
@@ -90,6 +91,7 @@ class NTTNConnections extends React.Component {
             selectedPackage:"",
             packages:[],
             resolve_status:"All",
+            employees:[]
            
         }
         this.handleChangeRatingOrder = this.handleChangeRatingOrder.bind(this);
@@ -213,9 +215,20 @@ class NTTNConnections extends React.Component {
           console.log(error);
         })
 
+        apiUrl = "http://localhost:7000/api/employees";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ employees: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
       
         
     }
+
+    
 
     loadnewData(e){
       if(e){
@@ -223,7 +236,7 @@ class NTTNConnections extends React.Component {
       }
      
       let apiUrl = "http://localhost:7000/nttn/connections/sortBy";
-      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Solved" ? true : false ); 
+      let resolveStatus = this.state.resolve_status === "All" ? undefined : (this.state.resolve_status === "Accepted" ? 1 : (this.state.resolve_status === "Rejected" ? -1 : 0) ); 
      
       const object = {
         district_id : this.state.selectedDistrict,
@@ -231,7 +244,7 @@ class NTTNConnections extends React.Component {
         union_id :  this.state.selectedUnion,
         area_id:  this.state.selectedArea,
         upazilla_id :  this.state.selectedUpazilla,
-       resolve_status : resolveStatus,
+        resolve_status : resolveStatus,
        
       }
       //console.log(object);
@@ -612,22 +625,27 @@ class NTTNConnections extends React.Component {
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Solved"){
+        } else if(e.target.value === "Accepted"){
            this.setState({
-             resolve_status:"Solved",
+             resolve_status:"Accepted",
              time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Unsolved"){
+        } else if(e.target.value === "Rejected"){
            this.setState({
-             resolve_status:"Unsolved",
+             resolve_status:"Rejected",
             time:"", timeAll:""
            }, () => {
              this.loadnewData();
            })
-        } else if(e.target.value === "Unselect"){
-          this.showAllData();
+        } else if(e.target.value === "Unsolved"){
+            this.setState({
+                resolve_status:"Unsolved",
+               time:"", timeAll:""
+              }, () => {
+                this.loadnewData();
+              })
         }
       }
 
@@ -659,6 +677,16 @@ class NTTNConnections extends React.Component {
             }
         }
     }
+
+    getEmployeeName = (employee_id) => {
+       
+
+      for(let i = 0; i < this.state.employees.length; i++){
+          if(this.state.employees[i]._id === employee_id){
+              return this.state.employees[i].name
+          }
+      }
+  }
 
 
     getUserName = (user_id) => {
@@ -927,7 +955,8 @@ class NTTNConnections extends React.Component {
                           <Form.Control as="select" value={this.state.resolve_status} onChange={this.handleChangeReportType}>
                           {/* <option disabled hidden value="">Select Reports</option> */}
                           <option value="All">All</option>
-                          <option value="Solved">Solved</option>
+                          <option value="Accepted">Accepted</option>
+                          <option value="Rejected">Rejected</option>
                           <option value="Unsolved">Unsolved</option>
                           {/* <option value="Unselect">Unselect</option> */}
                           </Form.Control>
@@ -949,7 +978,8 @@ class NTTNConnections extends React.Component {
                         <th>ISP Name</th>
                         <th>Union Name</th>
                         <th>Request Arrival Time</th>
-                        <th>Request Processing Status</th>
+                        <th>Connection Status</th>
+                        <th>Employee Name</th>
                         <th>Take Action</th>
                         
                         </tr>
@@ -964,8 +994,9 @@ class NTTNConnections extends React.Component {
                                 union_name = {this.getUnionName(connection.union_id)}
                                 request_arrival_time = {connection.request_arrival_time} 
                                 count={index + 1}
-                                request_status = {connection.resolve_status === true ? "True" : "False"}
+                                request_status = {(connection.resolve_status === true && connection.rejected === false) ? "Accepted" : ((connection.resolve_status === true && connection.rejected === true) ? "Rejected" : "Unsolved" ) }
                                 connection_id={connection._id}
+                                employee_name = {connection.resolve_status === true && connection.rejected === false ? this.getEmployeeName(connection.employee_id) : "N/A" }
                             />})
                         }
                     </tbody>

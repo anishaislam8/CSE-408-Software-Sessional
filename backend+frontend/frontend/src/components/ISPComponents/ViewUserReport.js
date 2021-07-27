@@ -775,7 +775,7 @@ class ViewUserReport extends React.Component{
                <div className="container">
              
                <div className="container">
-                    <center><h2 style={{"margin" : 30}}>User Reports</h2></center>
+                    <center><h2 style={{"margin" : 30}}>User Complaints</h2></center>
                     <div className="row">
                     <div className="col">
                     <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Reports"/>

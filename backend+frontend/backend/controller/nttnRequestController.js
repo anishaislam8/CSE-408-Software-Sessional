@@ -1,6 +1,8 @@
+const { request } = require('express');
 let { ISP } = require('../models/ISP');
 let { Pending } = require('../models/Pending');
 const { PhysicalConnectionISP } = require('../models/PhysicalConnectionISP');
+let { Notification } = require("../models/Notification");
 
 let apiController = require('./apiController');
 
@@ -156,6 +158,7 @@ const insertPending = async (request, response) => {
 }
 
 const handleConnectionFetchingSorted = async (request, response) => {
+    console.log("called");
     let sortByDistrict = request.body.district_id;
     let sortByDivision = request.body.division_id;
     let sortBySubDistrict = request.body.upazilla_id;
@@ -163,7 +166,7 @@ const handleConnectionFetchingSorted = async (request, response) => {
     let resolve_status = request.body.resolve_status;
     
     
-    //console.log(resolve_status);
+    
 
     try{
         let requests;
@@ -231,7 +234,13 @@ const handleConnectionFetchingSorted = async (request, response) => {
        // console.log(resolve_status);
 
         if(resolve_status !== undefined){
-            requests = requests.filter((Connection)=> Connection.resolve_status === resolve_status);
+            if(resolve_status === 1){ // Accepted
+                requests = requests.filter((Connection)=> (Connection.resolve_status === true && Connection.rejected === false));
+            } else if(resolve_status === -1){ //rejected
+                requests = requests.filter((Connection)=> (Connection.resolve_status === true && Connection.rejected === true));
+            } else if(resolve_status === 0){ // unsolved
+                requests = requests.filter((Connection)=> (Connection.resolve_status === false && Connection.rejected === false));
+            }
         }
 
        // console.log(requests);
@@ -380,7 +389,7 @@ const handlePendingFetchingSorted = async (request, response) => {
         }
   
         if(updatedPendings.length === 0){ // all renewals
-            return response.status(404).send({
+            return response.send({
                 message : "Nothing to show",
                 data : []
             })
@@ -507,7 +516,7 @@ const handleRenewalFetchingSorted = async (request, response) => {
 
 
         if(updatedPendings.length === 0){ // all new pendings
-            return response.status(404).send({
+            return response.send({
                 message : "Nothing to show",
                 data : []
             })
@@ -529,6 +538,145 @@ const handleRenewalFetchingSorted = async (request, response) => {
 
 }
 
+const acceptConnection = async (request, response) => {
+
+    //console.log("called");
+    let connection_id = request.body.connection_id;
+    let employee_id = request.body.employee_id;
+    let resolve_status = true;
+    let name = request.body.isp_name;
+    let password = "123456";
+    let license_id = request.body.license_id;
+    let physical_connection_establishment_time = new Date();
+    let physical_connection_details = [];
+    let request_type = 0; // isp ke dicchi 
+    let details = request.body.details;
+    physical_connection_details.push({
+        connection_id
+    });
+    
+    try{
+
+        // update connection entry
+        let connection = await PhysicalConnectionISP.findById(connection_id);
+        if(!connection){
+            return response.send({
+                message : "Nothing to show",
+                data : []
+            })
+        }
+
+        connection.employee_id = employee_id;
+        connection.resolve_status = resolve_status;
+        connection.request_resolve_time = new Date();
+
+
+        connection.save();
+
+        //console.log("creating isp profile");
+        // create new ISP profile
+        
+        let existing = await ISP.find({
+            license_id
+        });
+
+        let data;
+        if(existing.length === 0){ // no isp
+           
+            let newISP = new ISP ({
+                name, password, license_id, physical_connection_establishment_time,
+                physical_connection_details
+            })
+    
+            data = await newISP.save();
+            //console.log("data", data);
+    
+            if(data.nInserted === 0){
+                return response.send({
+                    message : "Insertion Failed",
+                    data : []
+                })
+            }
+        } else {
+            existing.physical_connection_details.push({
+                connection_id
+            })
+            data = await existing.save();
+        }
+       
+
+
+        // send notification
+        let isp_id = data._id;
+        
+        let newNotification = new Notification({
+            request_type,
+            isp_id,
+            details
+        })
+
+        let insertedNotification = await newNotification.save();
+
+        if(insertedNotification.nInserted === 0){
+            return response.send({
+                message : "Insertion failed",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Sent notification",
+            data : insertedNotification
+        })
+
+
+      
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+
+
+    
+}
+
+const rejectConnection = async (request, response) => {
+    let connection_id = request.body.connection_id;
+    let resolve_status = true;
+    
+    
+    try{
+        let connection = await PhysicalConnectionISP.findById(connection_id);
+        if(!connection){
+            return response.send({
+                message : "Nothing to show",
+                data : []
+            })
+        }
+
+
+        connection.resolve_status = resolve_status;
+        connection.rejected = true;
+
+
+        connection.save();
+
+        return response.status(200).send({
+            message : "Rejected",
+            data : []
+        })
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+
+
+    
+}
+
 
 module.exports = {
     handlePending,
@@ -537,5 +685,7 @@ module.exports = {
     handlePendingFetchingSorted,
     handleRenewalFetchingSorted,
     handleConnectionFetchingSorted,
-    getISPConnections
+    getISPConnections,
+    acceptConnection,
+    rejectConnection
 }

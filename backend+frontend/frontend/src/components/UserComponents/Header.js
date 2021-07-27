@@ -71,6 +71,10 @@ function UserHeader(props) {
                                 id : props.id
                             }
                             }}>Give Us Feedback</Link>
+                    <Link className="dropdown-item" to={{
+                        pathname: "/",
+                       
+                        }}>Log Out</Link>
                         
                     </div>
                 </div>

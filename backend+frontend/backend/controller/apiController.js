@@ -9,6 +9,7 @@ const { Package } = require('./../models/Package');
 const { Contract } = require('../models/Contract');
 const { NTTN} = require('../models/NTTN');
 const { request, response } = require('express');
+const { connection } = require('mongoose');
 
 
 
@@ -593,6 +594,54 @@ const postNTTN = async (request, response) => {
    
 }
 
+const postISP = async (request, response) => {
+    const name = request.body.isp_name;
+    const password = "123456";
+    const license_id = reques.body.license_id;
+    const physical_connection_establishment_time = new Date();
+    const connection_id = request.body.connection_id;
+    const physical_connection_details = [];
+    physical_connection_details.push({
+        connection_id
+    });
+
+     try{
+         let existing = await ISP.find({
+             license_id
+         });
+         if(existing){
+            return response.send({
+                message : "Already exists",
+                data : []
+            })
+         }
+         let newISP = new ISP ({
+            name, password, license_id, physical_connection_establishment_time,
+            physical_connection_details
+         })
+     
+         let data = await newISP.save();
+     
+         if(data.nInserted === 0){
+             return response.send({
+                 message : "Insertion Failed",
+                 data : []
+             })
+         }
+     
+         return response.send({
+             message : "Insertion Successful",
+             data
+         })
+     } catch (e) {
+         return response.send({
+             message : "EXCEPTION",
+             data : []
+         })
+     }
+    
+ }
+
 const getUnionOfISP = async (request, response) => {
 
     let isp_id = request.body.isp_id;
@@ -962,5 +1011,6 @@ module.exports = {
     getUnionFromArea,
     getRatingFromISP,
     getNTTN, postNTTN,
-    getAllLocationData
+    getAllLocationData,
+    postISP
 }

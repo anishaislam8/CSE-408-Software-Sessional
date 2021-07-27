@@ -114,6 +114,62 @@ const addEmployee = async (request, response) => {
     }
 }
 
+const getEmployeeNTTN = async (request, response) => {
+    try{
+        let employees = await Employee.find({
+            employee_type : 1
+        });
+
+        if(!employees || employees.length === 0){
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        return response.status(200).send({
+            message : "Found",
+            data : employees
+        })
+
+    } catch(e){
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
+const getEmployeeISP = async (request, response) => {
+    let isp_id = request.body.isp_id;
+    try{
+        let employees = await Employee.find({
+            employee_type : 0,
+            isp_id
+        });
+
+        if(!employees || employees.length === 0){
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+
+        return response.status(200).send({
+            message : "Found",
+            data : employees
+        })
+
+    } catch(e){
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+}
+
+
+
 const registerUser = async (request, response) => {
     const user_name = request.body.user_name;
     const nid_number = request.body.nid_number;
@@ -172,5 +228,7 @@ const registerUser = async (request, response) => {
 module.exports = {
     registerISP,
     registerUser,
-    addEmployee
+    addEmployee,
+    getEmployeeISP,
+    getEmployeeNTTN
 }

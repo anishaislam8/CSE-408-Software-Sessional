@@ -88,19 +88,23 @@ function ISPHeader(props) {
                     </button>
                     <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                     <Link className="dropdown-item" to={{
-                            pathname: `/isp/${props.id}`,
+                            pathname: `/isp/${props.id}/edit`,
                             state: {
                                 data : props.data,
                                 id : props.id
                             }
                             }}>Edit Profile</Link>
-                        <Link className="dropdown-item" to={{
-                            pathname: `/isp/${props.id}/createReport`,
-                            state: {
-                                data : props.data,
-                                id : props.id
-                            }
-                            }}>Report a Problem</Link>
+                    <Link className="dropdown-item" to={{
+                        pathname: `/isp/${props.id}/createReport`,
+                        state: {
+                            data : props.data,
+                            id : props.id
+                        }
+                        }}>Report a Problem</Link>
+                    <Link className="dropdown-item" to={{
+                        pathname: "/",
+                       
+                        }}>Log Out</Link>
                         
                     </div>
                 </div>

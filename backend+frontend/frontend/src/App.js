@@ -25,6 +25,8 @@ import ISPForm from "./components/Registration/ISPForm";
 import UserForm from "./components/RegistrationUser/UserForm";
 import IspConnections from "./components/ISPComponents/Connections";
 import ConnectionDetails from "./components/ConnectionDetails";
+import IspConnectionDetails from "./components/ISPComponents/ISPConnectionDetails";
+import ISPEditProfile from "./components/ISPEditProfile/IspEditProfile";
 
 
 
@@ -46,16 +48,20 @@ function App() {
       <Route path="/nttn/connections" exact component={NTTNConnections} />
       <Route path="/nttn/connections/details" exact component={ConnectionDetails} />
       <Route path="/nttn/pendings/isp/details" exact component={PendingDetails} />
-      
-      
       <Route path="/nttn/settings" exact component={Pendings} />
+
+      
       <Route path="/isp/:id" exact component={ISPHome} />
+      <Route path="/isp/:id/edit" exact component={ISPEditProfile} />
       <Route path="/isp/:id/createReport" exact component={ISPCreateReport} />
       <Route path="/isp/:id/viewReport" exact component={ISPViewReport} />
       <Route path="/isp/:id/pendings" exact component={IspPendings} />
       <Route path="/isp/:id/connections" exact component={IspConnections} />
+      <Route path="/isp/:id/connections/details" exact component={IspConnectionDetails} />
       <Route path="/isp/:id/feedbacks" exact component={ViewUserFeedback} />
       <Route path="/isp/:id/userReports" exact component={ViewUserReport} />
+
+
       <Route path="/user/:id" exact component={UserHome} />
       <Route path="/user/:id/createReport" exact component={UserCreateReport} />
       <Route path="/user/:id/createFeedback" exact component={UserCreateFeedback} />

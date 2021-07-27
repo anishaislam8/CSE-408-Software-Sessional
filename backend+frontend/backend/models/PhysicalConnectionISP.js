@@ -137,6 +137,10 @@ var PhysicalConnectionISPSchema = new mongoose.Schema({
     rejected : {
         type : Boolean,
         default : false
+    },
+    employee_id :{
+        type : ObjectID,
+        default : null
     }
 
 

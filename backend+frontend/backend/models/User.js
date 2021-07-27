@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 const moment = require('moment');
+const { ObjectID } = require('mongodb');
 
 var UserSchema  = new mongoose.Schema({
     name : {
@@ -25,6 +26,10 @@ var UserSchema  = new mongoose.Schema({
         required : true,
         trim : true
     },
+    physical_connection_establishment_time : {
+        type : Date,
+        default : null
+    },
     connection_establishment_date: {
         type: Date,
         default: null
@@ -37,6 +42,13 @@ var UserSchema  = new mongoose.Schema({
         type : Boolean,
         default : false
     },
+    physical_connection_details : [{
+        connection_id : {
+            type : ObjectID,
+            default : null,
+            required : true
+        }
+    }],
     tokens : [{
         access : {
             type : String,

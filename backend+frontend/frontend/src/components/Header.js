@@ -54,10 +54,14 @@ function Header() {
                         pathname: `/`
                        
                         }}>Edit Profile</Link>
-                    <Link className="dropdown-item" to={{
-                        pathname: `/`
+                <Link className="dropdown-item" to={{
+                    pathname: `/`
+                    
+                    }}>Logistics</Link>
+                <Link className="dropdown-item" to={{
+                        pathname: "/",
                        
-                        }}>Logistics</Link>
+                        }}>Log Out</Link>
                     
                 </div>
             </div>

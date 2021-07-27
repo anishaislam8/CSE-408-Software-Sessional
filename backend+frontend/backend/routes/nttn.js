@@ -63,8 +63,12 @@ router.post("/payments/resolve", nttnAfterPaymentController.handlePaymentDone);
 // get isp connection requests
 router.get('/connectionsISP', nttnRequestController.getISPConnections);
 // get isp connection requests
-router.get('/connections/sortBy', nttnRequestController.handleConnectionFetchingSorted);
+router.post('/connections/sortBy', nttnRequestController.handleConnectionFetchingSorted);
 
+
+router.post('/connections/accept', nttnRequestController.acceptConnection);
+
+router.post('/connections/reject', nttnRequestController.rejectConnection);
 
 
 module.exports = router;

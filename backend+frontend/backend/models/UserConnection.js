@@ -25,13 +25,7 @@ var UserConnectionSchema = new mongoose.Schema({
         trim : true,
         default: null
     },
-    contact_person_telephone : {
-        type : String,
-        minlength : 14,
-        maxlength : 14,
-        trim : true,
-        default: null
-    },
+    
     contact_person_mobile : {
         type : String,
         minlength : 14,
@@ -89,6 +83,10 @@ var UserConnectionSchema = new mongoose.Schema({
     rejected : {
         type : Boolean,
         default : false
+    },
+    employee_id :{
+        type : ObjectID,
+        default : null
     }
 
 

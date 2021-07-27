@@ -1,14 +1,16 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { Link, Redirect } from 'react-router-dom';
-import './../styles/connection.css'
+import './../../styles/connection.css'
 import * as AiIcons from 'react-icons/ai';
 import * as FaIcons from 'react-icons/fa';
 import * as ImIcons from 'react-icons/im';
-import Header from './Header';
+import ISPHeader from './Header';
 
-export class ConnectionDetails extends Component {
-    state = {
+
+class IspConnectionDetails extends React.Component {
+
+   state = {
         connection_id : this.props.location.state.connection_id,
         connections :[],
         showDetails:true,
@@ -21,15 +23,44 @@ export class ConnectionDetails extends Component {
         districts:[],
         unions:[],
         upazillas:[],
-        redirectNTTNConnection:false,
-        employees :[]
+        areas : [],
+        redirectISPConnection:false,
+        employees :[],
+        name:this.props.location.state.data,
+        isp_id:this.props.location.state.id,
+        isp:"" // current isp
+           
         
+      
+
     }
 
-    componentDidMount(){
-        let apiUrl = "http://localhost:7000/nttn/connectionsISP";
+    
 
+    componentDidMount() {
+
+        let apiUrl = "http://localhost:7000/api/isp";
         axios.get(apiUrl)
+        .then(response => {
+            this.setState({ 
+              isps: response.data.data, 
+              isp_id : this.props.location.state.id,
+              name : this.props.location.state.data 
+            }, () => {
+                this.setState({
+                    isp : this.state.isps.filter((isp) => isp._id.toString() === this.state.isp_id)[0]
+                })
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/isp/connections";
+        let object = {
+            isp_id : this.state.isp_id ||  this.props.location.state.id
+        }
+        axios.post(apiUrl, object)
         .then(response => {
             
           this.setState({ connections : response.data.data,connection_id : this.props.location.state.connection_id })
@@ -42,6 +73,15 @@ export class ConnectionDetails extends Component {
         axios.get(apiUrl)
         .then(response => {
             this.setState({ unions: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/area";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ areas: response.data.data })
         })
         .catch((error) => {
           console.log(error);
@@ -75,14 +115,77 @@ export class ConnectionDetails extends Component {
           console.log(error);
         })
 
-        apiUrl = "http://localhost:7000/api/employees";
-        axios.get(apiUrl)
+        apiUrl = "http://localhost:7000/api/employeesISP";
+        object = {
+            isp_id : this.state.isp_id ||  this.props.location.state.id
+        }
+        axios.post(apiUrl, object)
         .then(response => {
             this.setState({ employees: response.data.data })
         })
         .catch((error) => {
           console.log(error);
         })
+        
+
+       
+
+        apiUrl = "http://localhost:7000/api/union";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ unions: response.data.data, searchUnions : response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/area";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ areas: response.data.data, searchAreas : response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/division";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ divisions: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/district";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ districts: response.data.data, searchdistricts:response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/subdistrict";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ upazillas: response.data.data, searchupazillas:response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+        apiUrl = "http://localhost:7000/api/user";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ users: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+
+       
+        
     }
 
     getConnection = (connection_id) => {
@@ -201,9 +304,17 @@ export class ConnectionDetails extends Component {
         }
     }
 
+    getAreaName = (area_id) => {
+        for(let i= 0; i < this.state.areas.length; i++){
+            if(this.state.areas[i]._id.toString() === area_id.toString()){
+                return this.state.areas[i].name
+            }
+        }
+    }
+
     back = () =>{
         this.setState({
-            redirectNTTNConnection:true
+            redirectISPConnection:true
         })
     }
 
@@ -212,12 +323,13 @@ export class ConnectionDetails extends Component {
         const employeeLength = this.state.employees.length;
         const index = Math.floor(Math.random() * employeeLength);
 
-        let apiUrl = "http://localhost:7000/nttn/connections/accept";
+        let apiUrl = "http://localhost:7000/isp/connections/accept";
         let object = {
             connection_id : this.state.connection_id,
             employee_id : this.state.employees[index]._id,
-            isp_name : this.getConnection(this.state.connection_id).isp_name,
-            license_id : this.getConnection(this.state.connection_id).license_number,
+            user_name : this.getConnection(this.state.connection_id).user_name,
+            nid : this.getConnection(this.state.connection_id).nid,
+            isp_id : this.state.isp_id,
             details : "Your connection request completed processing. Find your temporary account password in your email."
         }
 
@@ -225,7 +337,7 @@ export class ConnectionDetails extends Component {
         .then(response => {
             console.log(response.data.message);
             this.setState({
-                redirectNTTNConnection : true
+                redirectISPConnection : true
             })
         })
         .catch((error) => {
@@ -238,7 +350,7 @@ export class ConnectionDetails extends Component {
     reject = () => {
         
 
-        let apiUrl = "http://localhost:7000/nttn/connections/reject";
+        let apiUrl = "http://localhost:7000/isp/connections/reject";
         const object = {
             connection_id : this.state.connection_id
 
@@ -248,7 +360,7 @@ export class ConnectionDetails extends Component {
         .then(response => {
             console.log(response.data.message);
             this.setState({
-                redirectNTTNConnection : true
+                redirectISPConnection : true
             })
         })
         .catch((error) => {
@@ -273,16 +385,23 @@ export class ConnectionDetails extends Component {
             return "STP"
         }
     }
+    
+    
     render() {
-        
-        return (
-            
+        return(
             <div className="container">
-            {this.state.redirectNTTNConnection ? <Redirect to='/nttn/connections' /> : ""}
-            <Header />
-              <br></br>
-              <br></br>
-              <br></br>
+               <ISPHeader data={this.state.name} id={this.state.isp_id} />
+               {this.state.redirectISPConnection ? <Redirect  to={{
+                   pathname: `/isp/${this.state.isp_id}/connections`,
+                   state: {
+                       data : this.state.name,
+                       id : this.state.isp_id
+                   }
+                }} /> : ""}
+                <br></br>
+                <br></br>
+                <br></br>
+
                 <center><h3 className="display-6" style={{"marginTop" : 20}}>Details of the request</h3></center>
                 <br/>
                 {this.state.connections.length > 0 && 
@@ -290,21 +409,16 @@ export class ConnectionDetails extends Component {
 
 
                      <nav className="navbar navbar-expand-lg" style={{ "color": "white"}}>
-                        <ul className="navbar-nav nav-pills ms-auto">
+                        <ul className="navbar-nav nav-pills">
                         <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":30, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleDetails}>Details of Request</button>
+                            <button style={{"marginRight":150, "width":150,  "fontWeight":"bolder", "marginLeft" : 20}} className="btn btn-outline-dark" onClick={this.handleDetails}>Details of Request</button>
                         </li>
                         <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":30,  "width":150, "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleLocation}>Location Details of ISP</button>
+                            <button style={{"marginRight":150,  "width":150, "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleLocation}>Location Details of User</button>
                         </li>
+                        
                         <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":30, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleHeadOffice}>Head Office Information</button>
-                        </li>
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":30, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleOffice}>Office Information</button>
-                        </li>
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":30,"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handlePersonnel}>Contact Person Information</button>
+                            <button style={{"marginRight":150,"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handlePersonnel}>Contact Information</button>
                         </li>
                         <li className="nav-item" style={{"paddingRight":20}}>
                             <button style={{"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleShowEmployee}>Employee Details</button>
@@ -321,19 +435,19 @@ export class ConnectionDetails extends Component {
                             <thead className="thead-dark">
                                 <tr>
 
-                                <th className="col-md-2">ISP Details</th>
+                                <th className="col-md-2">User Details</th>
                                 <th className="col-md-2">Information</th>
                                 
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td className="col-md-2"><b>ISP Name</b></td>
-                                    <td className="col-md-2">{this.getConnection(this.state.connection_id).isp_name}</td>
+                                    <td className="col-md-2"><b>User Name</b></td>
+                                    <td className="col-md-2">{this.getConnection(this.state.connection_id).user_name}</td>
                                 </tr>
                                 <tr>
-                                    <td className="col-md-2"><b>License ID</b></td>
-                                    <td className="col-md-2">{this.getConnection(this.state.connection_id).license_number}</td>
+                                    <td className="col-md-2"><b>NID</b></td>
+                                    <td className="col-md-2">{this.getConnection(this.state.connection_id).nid_number}</td>
                                 </tr>
                                 <tr>
                                     <td className="col-md-2"><b>Request Arrival Time</b></td>
@@ -382,82 +496,16 @@ export class ConnectionDetails extends Component {
                                  <td className="col-md-2"><b>Union</b></td>
                                  <td className="col-md-2">{this.getUnionName(this.getConnection(this.state.connection_id).union_id)}</td>
                              </tr>
-                         </tbody>
-                     </table>
-                 </div>
-
-
-                 <div hidden={!this.state.showHeadOffice} >
-                     
-                     <br/>
-             
-                     <table className="table table-bordered table-striped" >
-                         <thead className="thead-dark">
                              <tr>
-
-                             <th className="col-md-2">Head Office Details</th>
-                             <th className="col-md-2">Information</th>
-                             
+                                 <td className="col-md-2"><b>Area</b></td>
+                                 <td className="col-md-2">{this.getAreaName(this.getConnection(this.state.connection_id).area_id)}</td>
                              </tr>
-                         </thead>
-                         <tbody>
-                            <tr>
-                                <td className="col-md-2"><b>Address</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_address}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Telephone</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_telephone}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Mobile</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_mobile}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Email</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_email}</td>
-                            </tr>
-                           
                          </tbody>
                      </table>
                  </div>
 
 
-                 <div hidden={!this.state.showOffice} >
-                     
-                     <br/>
-             
-                     <table className="table table-bordered table-striped" >
-                         <thead className="thead-dark">
-                             <tr>
-
-                             <th className="col-md-2">Office Details</th>
-                             <th className="col-md-2">        </th>
-                             
-                             </tr>
-                         </thead>
-                         <tbody>
-                            <tr>
-                                <td className="col-md-2"><b>Address</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_address}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Telephone</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_telephone}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Mobile</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_mobile}</td>
-                            </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Email</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_email}</td>
-                            </tr>
-                           
-                         </tbody>
-                     </table>
-                 </div>
-
+                 
                  <div hidden={!this.state.showPersonnel} >
                      
                      <br/>
@@ -466,24 +514,18 @@ export class ConnectionDetails extends Component {
                          <thead className="thead-dark">
                              <tr>
 
-                             <th className="col-md-2">Contact Person Details</th>
+                             <th className="col-md-2">Contact Details</th>
                              <th className="col-md-2">Information</th>
                              
                              </tr>
                          </thead>
                          <tbody>
-                            <tr>
-                                <td className="col-md-2"><b>Name</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_name}</td>
-                            </tr>
+                           
                             <tr>
                                 <td className="col-md-2"><b>Address</b></td>
                                 <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_address}</td>
                             </tr>
-                            <tr>
-                                <td className="col-md-2"><b>Telephone</b></td>
-                                <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_telephone}</td>
-                            </tr>
+                            
                             <tr>
                                 <td className="col-md-2"><b>Mobile</b></td>
                                 <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_mobile}</td>
@@ -550,10 +592,10 @@ export class ConnectionDetails extends Component {
                 <button className="btn btn-danger" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.reject}><AiIcons.AiFillNotification size={20}/>  Reject</button>
                    
                 </div>}
-            
-        </div>
-        )
+               
+            </div>
+        );
     }
 }
 
-export default ConnectionDetails
+export default IspConnectionDetails;

@@ -61,5 +61,10 @@ router.post('/connections', ispRequestController.handleConnection);
 router.post('/connections/sortBy', ispRequestController.handleConnectionFetchingSorted);
 
 
+router.post('/connections/accept', ispRequestController.acceptConnection);
+
+router.post('/connections/reject', ispRequestController.rejectConnection);
+
+
 
 module.exports = router;

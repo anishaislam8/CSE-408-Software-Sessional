@@ -2,9 +2,13 @@ const router = require('express').Router();
 const apiController = require('./../controller/apiController');
 const loginController = require('./../controller/loginController');
 const apiRegistrationController = require('./../controller/apiRegistrationController');
+const apiNotificationController = require('./../controller/apiNotificationController');
 
 // get all isps
 router.get('/isp', apiController.getISP);
+
+// post isps
+router.post('/isp', apiController.postISP);
 
 // get all nttn
 router.get('/nttn', apiController.getNTTN);
@@ -72,6 +76,15 @@ router.post('/registerUser', apiRegistrationController.registerUser);
 
 // add employee
 router.post('/addEmployee', apiRegistrationController.addEmployee);
+
+//get employee nttn
+router.get('/employees', apiRegistrationController.getEmployeeNTTN);
+
+//get employee isp
+router.post('/employeesISP', apiRegistrationController.getEmployeeISP);
+
+//send isp notification
+router.post('/notificationToIsp', apiNotificationController.sendNotificationToISP);
 
 
 
