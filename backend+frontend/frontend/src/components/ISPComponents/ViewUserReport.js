@@ -22,8 +22,7 @@ const Report = (props) => {
     return(
         
         <tr> 
-            <td>{props.isp_name}</td>
-            <td>{props.union_name}</td>
+          
             <td>{props.user_name}</td>
             <td>{props.area_name}</td>
          
@@ -33,7 +32,7 @@ const Report = (props) => {
             <td>{new Date(props.report_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
             <td>{props.resolve_status}</td>
                      
-            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={()=>{props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString()}</td>
+            <td>{props.resolve_status === "False" ? <Button className="btn btn-success" onClick={()=>{props.handleSolveReport(props.report_id)}}><FaIcons.FaClipboardCheck size={20}/>  Solve</Button> : new Date(props.resolve_time).toString().split(" ").slice(0,5).join(" ")}</td>
            
         </tr>
               
@@ -775,7 +774,8 @@ class ViewUserReport extends React.Component{
                <div className="container">
              
                <div className="container">
-                    <center><h2 style={{"margin" : 30}}>User Complaints</h2></center>
+               <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>User Complaints</h3></center>
+               
                     <div className="row">
                     <div className="col">
                     <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Reports"/>
@@ -1011,8 +1011,7 @@ class ViewUserReport extends React.Component{
                     <thead className="thead-dark">
                         <tr>
                         
-                            <th>ISP Name</th>
-                            <th>Union Name</th>
+                           
                             <th>User Name</th>
                             <th>User Area</th>
                             <th>Problem Category</th>

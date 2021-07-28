@@ -12,7 +12,10 @@ import {NavDropdown} from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown'
 
 
+
 function ISPHeader(props) {
+
+ 
 
     
     return (
@@ -39,6 +42,9 @@ function ISPHeader(props) {
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to="/nttn/isplist"><FaIcons.FaList size={20}/>  ISP List</NavLink>
               </li>*/}
+             
+              
+              
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
                    pathname: `/isp/${props.id}/connections`,
@@ -57,6 +63,15 @@ function ISPHeader(props) {
                    }
                 }}><AiIcons.AiOutlineFieldTime size={30}/>  Pending Requests</NavLink>
               </li>
+              {/* <li className="nav-item" style={{"paddingRight":20}}>
+                <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
+                   pathname: `/isp/${props.id}/userList`,
+                   state: {
+                       data : props.data,
+                       id : props.id
+                   }
+                }}><FaIcons.FaList size={20}/>  User List</NavLink>
+              </li> */}
               <li className="nav-item" style={{"paddingRight":20}}>
                 <NavLink className="nav-link" activeClassName="active" style={{"color": "white"}} to={{
                    pathname: `/isp/${props.id}/userReports`,

@@ -64,7 +64,7 @@ class UserHome extends React.Component {
                                     <td>{this.state.user.nid}</td>
                                 </tr>
                               
-                                <tr>
+                                {/* <tr>
                                     <td><b>View Status Of Current Connections</b></td>
                                     <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
                                         pathname: `/user/${this.state.user_id}`,
@@ -72,7 +72,7 @@ class UserHome extends React.Component {
                                             data : this.state.user_name,
                                             id : this.state.user_id
                                         }}}><AiIcons.AiOutlineEye size={20}/>  View Connection Details</Link></td>
-                                </tr>
+                                </tr> */}
 
                                 <tr>
                                     <td><b>View Given Feedbacks</b></td>

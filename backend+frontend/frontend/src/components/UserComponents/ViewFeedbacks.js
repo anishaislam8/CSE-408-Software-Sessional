@@ -696,7 +696,7 @@ class ViewFeedbacks extends React.Component{
       
             
                <div className="container">
-                    <center><h2 style={{"margin":20}}>Feedbacks Sent</h2></center>
+               <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Feedbacks Sent</h3></center>
                     <div className = "row">
                 <div className="col">
                 <Button variant="warning" onClick={this.showAreaSearchDiv} style={{"marginBottom":20, "marginRight":10,"width" : 200}} ><FaIcons.FaSearchLocation size={30}/>{this.state.showAreaSearch ? "  Hide Search Bar" : "  Search by Location"}</Button>

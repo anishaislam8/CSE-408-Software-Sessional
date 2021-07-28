@@ -12,13 +12,13 @@ import * as BsIcons from "react-icons/bs";
 import * as AiIcons from "react-icons/ai";
 import * as VscIcons from "react-icons/vsc";
 import Header from "./Header";
-import './../styles/connection.css'
+import "./../styles/connection.css"
 
-class PendingDetails extends React.Component {
+class RenewalDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      pending_id: this.props.location.state.pending_id,
+      renewal_id: this.props.location.state.renewal_id,
       pendings: [],
       isps: [],
       unions: [],
@@ -38,13 +38,13 @@ class PendingDetails extends React.Component {
     this.getPackage = this.getPackage.bind(this);
     this.getPayment = this.getPayment.bind(this);
     this.updateAfterAccepted = this.updateAfterAccepted.bind(this);
-    //this.updateAfterRejected = this.updateAfterRejected.bind(this);
+    // this.updateAfterRejected = this.updateAfterRejected.bind(this);
     this.goPrevPage = this.goPrevPage.bind(this);
   }
 
   componentDidMount() {
     //console.log("component ");
-    let apiUrl = "http://localhost:7000/nttn/pending";
+    let apiUrl = "http://localhost:7000/nttn/renewal";
 
     axios
       .get(apiUrl)
@@ -53,8 +53,8 @@ class PendingDetails extends React.Component {
         this.setState(
           {
             pendings: response.data.data,
-            pending_id:
-              this.props.location.state.pending_id || this.state.pending_id,
+            renewal_id:
+              this.props.location.state.renewal_id || this.state.renewal_id,
           },
           () => {
             console.log("Balamar", this.state.pendings);
@@ -108,12 +108,11 @@ class PendingDetails extends React.Component {
   }
 
   updateAfterAccepted = () => {
-    let apiUrl = "http://localhost:7000/nttn/pendings/view/accept";
+    let apiUrl = "http://localhost:7000/nttn/renewal/view/accept";
 
     const object = {
-      pending_id: this.props.location.state.pending_id || this.state.pending_id,
+      pending_id: this.props.location.state.renewal_id || this.state.renewal_id,
     };
-    console.log("Object", object)
     axios
       .post(apiUrl, object)
       .then((response) => {
@@ -130,9 +129,8 @@ class PendingDetails extends React.Component {
   //   let apiUrl = "http://localhost:7000/nttn/pendings/view/accept";
 
   //   const object = {
-  //     pending_id: this.props.location.state.pending_id || this.state.pending_id,
+  //     pending_id: this.props.location.state.renewal_id || this.state.renewal_id,
   //   };
-
   //   axios
   //     .post(apiUrl, object)
   //     .then((response) => {
@@ -152,14 +150,14 @@ class PendingDetails extends React.Component {
   };
 
   getRequest = () => {
-    //console.log(this.state.pending_id);
+    console.log(this.state.renewal_id);
     //console.log("called");
-    //console.log(this.state.pendings.length);
+    console.log(this.state.pendings.length);
 
     for (let i = 0; i < this.state.pendings.length; i++) {
       if (
         this.state.pendings[i]._id.toString() ===
-        this.state.pending_id.toString()
+        this.state.renewal_id.toString()
       ) {
         console.log("hit");
 
@@ -205,7 +203,7 @@ class PendingDetails extends React.Component {
   render() {
     return (
       <div>
-        {this.state.redirectPending ? <Redirect to="/nttn/pendings" /> : ""}
+        {this.state.redirectPending ? <Redirect to="/nttn/renewals" /> : ""}
         <Header />
         <br></br>
         <br></br>
@@ -213,11 +211,10 @@ class PendingDetails extends React.Component {
         <div className="container">
           <div className="row">
             <center>
-            <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Pending Request Details</h3></center>
+            <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Request Details</h3></center>
               <br></br>
             </center>
-
-            {this.state.pendings.length > 0 && <div className="connectioninner">
+            <div className="connectioninner">
             <div className="col">
               <table className="table table-bordered table-striped">
                 {this.state.pendings.length > 0 && (
@@ -236,8 +233,8 @@ class PendingDetails extends React.Component {
                       <td>
                         {this.getUnion(
                           this.getRequest(
-                            this.state.pending_id ||
-                              this.props.location.state.pending_id
+                            this.state.renewal_id ||
+                              this.props.location.state.renewal_id
                           ).union_id
                         )}
                       </td>
@@ -250,8 +247,8 @@ class PendingDetails extends React.Component {
                       <td>
                         {new Date(
                           this.getRequest(
-                            this.state.pending_id ||
-                              this.props.location.state.pending_id
+                            this.state.renewal_id ||
+                              this.props.location.state.renewal_id
                           ).request_arrival_time
                         ).toString().split(" ").slice(0,5).join(" ")}
                       </td>
@@ -265,8 +262,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).name
                         }
@@ -281,8 +278,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).bandwidth
                         }{" "}
@@ -298,8 +295,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).up_speed
                         }{" "}
@@ -315,8 +312,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).down_speed
                         }{" "}
@@ -332,8 +329,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).duration
                         }{" "}
@@ -349,8 +346,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPackage(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).package_id
                           ).price
                         }{" "}
@@ -366,8 +363,8 @@ class PendingDetails extends React.Component {
                         {new Date(
                           this.getPayment(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).payment_id
                           ).payment_time
                         ).toString().split(" ").slice(0,5).join(" ")}
@@ -382,8 +379,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPayment(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).payment_id
                           ).gateway
                         }
@@ -397,8 +394,8 @@ class PendingDetails extends React.Component {
                         {
                           this.getPayment(
                             this.getRequest(
-                              this.state.pending_id ||
-                                this.props.location.state.pending_id
+                              this.state.renewal_id ||
+                                this.props.location.state.renewal_id
                             ).payment_id
                           ).transaction_id
                         }
@@ -411,8 +408,8 @@ class PendingDetails extends React.Component {
                       <td>
                         {this.getPayment(
                           this.getRequest(
-                            this.state.pending_id ||
-                              this.props.location.state.pending_id
+                            this.state.renewal_id ||
+                              this.props.location.state.renewal_id
                           ).payment_id
                         ).payment_status.toString()}
                       </td>
@@ -423,8 +420,7 @@ class PendingDetails extends React.Component {
             </div>
             <center>
               <form onSubmit={this.goPrevPage}>
-                
-                
+               
                     <button
                       onClick={this.updateAfterAccepted}
                       style={{ width: 200 }}
@@ -453,8 +449,7 @@ class PendingDetails extends React.Component {
                   
               </form>
             </center>
-            </div>}
-            
+            </div>
           </div>
         </div>
       </div>
@@ -462,4 +457,4 @@ class PendingDetails extends React.Component {
   }
 }
 
-export default PendingDetails;
+export default RenewalDetails;

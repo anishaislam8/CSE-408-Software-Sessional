@@ -20,6 +20,9 @@ router.post('/nttn', apiController.postNTTN);
 // get isp sorted
 router.post('/isp/sortBy', apiController.getISPSorted);
 
+// get user sorted
+router.post('/user/sortBy', apiController.getUserSorted);
+
 // get all districts
 router.get('/district', apiController.getDistrict);
 
@@ -65,6 +68,9 @@ router.post('/ispsOfDivision', apiController.getIspsOfDivision);
 //get all user contracts
 router.get('/userContracts', apiController.getUserContracts);
 
+//get all user contracts
+router.post('/userContracts', apiController.getPostUserContracts);
+
 //get hashed password
 router.post('/hashedPass', loginController.getHashedPassword);
 
@@ -88,6 +94,11 @@ router.post('/employeesISP', apiRegistrationController.getEmployeeISP);
 router.post('/notificationToIsp', apiNotificationController.sendNotificationToISP);
 
 router.post('/isp/payments', apiController.getPaymentOfOneISP);
+
+router.post('/verify', apiController.handleverify);
+
+
+router.post('/userConnections', apiController.getUserConnections);
 
 
 

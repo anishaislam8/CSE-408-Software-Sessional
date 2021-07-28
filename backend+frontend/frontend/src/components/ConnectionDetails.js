@@ -22,7 +22,9 @@ export class ConnectionDetails extends Component {
         unions:[],
         upazillas:[],
         redirectNTTNConnection:false,
-        employees :[]
+        employees :[],
+        verified:"",
+        showVerified:false
         
     }
 
@@ -272,6 +274,35 @@ export class ConnectionDetails extends Component {
         }  else if(cat === 4){
             return "STP"
         }
+    }
+
+    verify = () => {
+        let apiUrl = "http://localhost:7000/api/verify";
+        let object = {
+            license_id : this.getConnection(this.state.connection_id).license_number,
+            name : this.getConnection(this.state.connection_id).isp_name
+        }
+
+        axios.post(apiUrl, object)
+        .then(response => {
+            console.log(response.data.message)
+           if(response.data.message !== "Valid"){
+               // invalid
+               this.setState({
+                   verified : "License Invalid",
+                   showVerified : true
+               })
+           } else {
+            this.setState({
+
+                verified : "License Valid",
+                showVerified : true
+            })
+           }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     }
     render() {
         
@@ -545,10 +576,14 @@ export class ConnectionDetails extends Component {
                      </table>
                  </div>
 
-                <button className="btn btn-success" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.accept} style={{"marginLeft":850, "marginRight":20}}><FaIcons.FaClipboardCheck size={20}/>  Accept</button>
+                <button className="btn btn-success" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.accept} style={{"marginLeft":750, "marginRight":20}}><FaIcons.FaClipboardCheck size={20}/>  Accept</button>
                 <button className="btn btn-dark" onClick={this.back} style={{"marginRight" : 20}}><AiIcons.AiOutlineStepBackward size={20}/> Back</button>
+                <button className="btn btn-warning"style={{"marginRight" : 20}} onClick={this.verify}><FaIcons.FaClipboardCheck size={20}/>  Verify</button>
                 <button className="btn btn-danger" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.reject}><AiIcons.AiFillNotification size={20}/>  Reject</button>
                    
+                  <div hidden={!this.state.showVerified}>
+                      <h2>{this.state.verified}</h2>
+                    </div> 
                 </div>}
             
         </div>

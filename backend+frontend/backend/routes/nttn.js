@@ -70,5 +70,21 @@ router.post('/connections/accept', nttnRequestController.acceptConnection);
 
 router.post('/connections/reject', nttnRequestController.rejectConnection);
 
+router.post("/pendings/view", nttnRequestController.handleOnePending);
+
+
+router.post(
+    "/pendings/view/accept",
+    nttnRequestController.handlePendingAccepted
+  );
+
+  
+router.post(
+    "/renewal/view/accept",
+    nttnRequestController.handleRenewalAccepted
+  );
+
+router.post("/renewals/view", nttnRequestController.handleOneRenewal);
+
 
 module.exports = router;

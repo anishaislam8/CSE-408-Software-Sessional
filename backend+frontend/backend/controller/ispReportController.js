@@ -349,6 +349,7 @@ const handleReportFetchingSorted = async (request, response) => {
 
 const handleSolvedReport = async (request, response) => {
     let report_id = request.body.report_id;
+    let employee_id = ObjectID(request.body.employee_id);
     if(!report_id){
         return response.send({
             message : "Report ID invalid",
@@ -364,7 +365,8 @@ const handleSolvedReport = async (request, response) => {
             })
         }
         report.resolve_status = true;
-        report.report_resolve_time = new Date()
+        report.report_resolve_time = new Date();
+        report.employee_id = employee_id;
 
         let updatedReport = await report.save();
         return response.status(200).send({

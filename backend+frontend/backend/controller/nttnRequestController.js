@@ -3,6 +3,9 @@ let { ISP } = require('../models/ISP');
 let { Pending } = require('../models/Pending');
 const { PhysicalConnectionISP } = require('../models/PhysicalConnectionISP');
 let { Notification } = require("../models/Notification");
+let {Payment} = require('../models/Payment')
+let { Package } = require('../models/Package')
+let { Contract } = require('../models/Contract')
 
 let apiController = require('./apiController');
 
@@ -37,7 +40,7 @@ const handlePending = async (request, response) => {
             request_type : 0,
            
         }).sort({request_arrival_time : 1});
-
+        console.log("here",pendings);
         if(!pendings){
             return response.send({
                 message : "Nothing to show",
@@ -82,6 +85,7 @@ const handleRenewal = async (request, response) => {
     try{
         let pendings = await Pending.find({
             request_type : 0,
+            status : false
            
         }).sort({request_arrival_time : 1});
 
@@ -129,10 +133,11 @@ const insertPending = async (request, response) => {
     const isp_id = request.body.isp_id;
     const union_id = request.body.union_id;
     const package_id = request.body.package_id;
+    const payment_id = request.body.payment_id;
 
     try{
         var newPending = new Pending({
-            request_type,union_id,package_id,isp_id
+            request_type,union_id,package_id,isp_id, payment_id
         })
     
         let data = await newPending.save();
@@ -538,6 +543,298 @@ const handleRenewalFetchingSorted = async (request, response) => {
 
 }
 
+const handlePendingAccepted = async (request, response) => {
+    let pending_id = request.body.pending_id;
+    //console.log("shit1");
+    if (!pending_id) {
+      return response.status(400).send({
+        message: "Pending ID invalid",
+        data: [],
+      });
+    }
+  
+    try {
+      let pending = await Pending.findById(pending_id);
+      let payment = await Payment.findById(pending.payment_id);
+      let isp = await ISP.findById(pending.isp_id);
+  
+      if (!isp._id) {
+        return response.send({
+          message: "ISP ID invalid",
+          data: [],
+        });
+      }
+      if (!payment._id) {
+        return response.send({
+          message: "Payment ID invalid",
+          data: [],
+        });
+      }
+  
+      payment.payment_status = true;
+      let package = await Package.findById(payment.package_id);
+      if (!package._id) {
+        return response.send({
+          message: "Package ID invalid",
+          data: [],
+        });
+      }
+      if (isp.connection_status === false) {
+        isp.connection_status = true;
+        isp.average_rating = 5;
+        isp.connection_establishment_time = new Date();
+        isp.expiration_date = new Date() + package.duration;
+      } else if (isp.connection_status === true) {
+        isp.expiration_date = new Date(isp.expiration_date) + package.duration;
+      }
+  
+      let user_type = 0;
+      let isp_id = payment.isp_id;
+      let package_id = payment.package_id;
+      let union_id = payment.union_id;
+      let duration = package.duration;
+      let current = true;
+      let payment_id = payment._id;
+  
+      let newContract = new Contract({
+        user_type,
+        isp_id,
+        union_id,
+        package_id,
+        duration,
+        current,
+        payment_id
+      });
+  
+      let data = await newContract.save();
+      console.log("Contract", data)
+  
+      if (data.nInserted === 0) {
+        return response.status(400).send({
+          message: "Insertion Failed",
+          data: [],
+        });
+      }
+    //   pending.status = true;
+      pending.request_accept_time = new Date();
+  
+      let updatedpending = await pending.save();
+      let updatedisp = await isp.save();
+      let updatedpayment = await payment.save();
+  
+      //console.log("HIII");
+      return response.status(200).send({
+        message: "Contract insertion Successful and Payment and ISP updated",
+        data: data + "\n" + updatedisp + "\n" + updatedpayment,
+      });
+  
+      // return response.status(200).send({
+      //   message: "payment updated",
+      //   data: updatedpayment,
+      // });
+    } catch (e) {
+        console.log(e.message);
+      return response.send({
+         
+        message: e.message,
+        data: [],
+      });
+    }
+  };
+
+  const handleRenewalAccepted = async (request, response) => {
+    let pending_id = request.body.pending_id;
+    //console.log("shit1");
+    if (!pending_id) {
+      return response.status(400).send({
+        message: "Pending ID invalid",
+        data: [],
+      });
+    }
+  
+    try {
+      let pending = await Pending.findById(pending_id);
+      let payment = await Payment.findById(pending.payment_id);
+      let isp = await ISP.findById(pending.isp_id);
+  
+      if (!isp._id) {
+        return response.send({
+          message: "ISP ID invalid",
+          data: [],
+        });
+      }
+      if (!payment._id) {
+        return response.send({
+          message: "Payment ID invalid",
+          data: [],
+        });
+      }
+  
+      payment.payment_status = true;
+      let package = await Package.findById(payment.package_id);
+      if (!package._id) {
+        return response.send({
+          message: "Package ID invalid",
+          data: [],
+        });
+      }
+      if (isp.connection_status === false) {
+        isp.connection_status = true;
+        isp.average_rating = 5;
+        isp.connection_establishment_time = new Date();
+        isp.expiration_date = new Date() + package.duration;
+      } else if (isp.connection_status === true) {
+        isp.expiration_date = new Date(isp.expiration_date) + package.duration;
+      }
+  
+      let user_type = 0;
+      let isp_id = payment.isp_id;
+      let package_id = payment.package_id;
+      let union_id = payment.union_id;
+      let duration = package.duration;
+      let current = true;
+      let payment_id = payment._id;
+
+      // make the previous contracts inactive
+
+      let contracts = await Contract.find({
+          user_type,
+          isp_id
+      })
+
+      for(let i= 0; i < contracts.length; i++){
+          contracts[i].current = false;
+      }
+
+      for(let i= 0; i < contracts.length; i++){
+        await contracts[i].save()
+        }
+  
+        // create the new contract
+      let newContract = new Contract({
+        user_type,
+        isp_id,
+        union_id,
+        package_id,
+        duration,
+        current,
+        payment_id
+      });
+  
+      let data = await newContract.save();
+      console.log("Contract", data)
+  
+      if (data.nInserted === 0) {
+        return response.status(400).send({
+          message: "Insertion Failed",
+          data: [],
+        });
+      }
+      pending.status = true;
+      pending.request_accept_time = new Date();
+  
+      let updatedpending = await pending.save();
+      let updatedisp = await isp.save();
+      let updatedpayment = await payment.save();
+  
+      //console.log("HIII");
+      return response.status(200).send({
+        message: "Contract insertion Successful and Payment and ISP updated",
+        data: data + "\n" + updatedisp + "\n" + updatedpayment,
+      });
+  
+      // return response.status(200).send({
+      //   message: "payment updated",
+      //   data: updatedpayment,
+      // });
+    } catch (e) {
+        console.log(e.message);
+      return response.send({
+         
+        message: e.message,
+        data: [],
+      });
+    }
+  };
+  
+  const handleOnePending = async (request, response) => {
+    let request_id = request.body._id;
+    if (!request_id) {
+      return response.send({
+        message: "Pending ID invalid",
+        data: [],
+      });
+    }
+    try {
+      let pendings = await Pending.findById(request_id);
+      let isp = await ISP.findById(pendings.isp_id);
+  
+      if (!pendings || pendings.request_type !== 0) {
+        return response.send({
+          message: "Pending not found",
+          data: [],
+        });
+      }
+  
+      if (isp && isp.connection_status === true) {
+        return response.send({
+          message: "Not pending request",
+          data: [],
+        });
+      }
+  
+      return response.status(200).send({
+        message: "Pending found",
+        data: pendings,
+      });
+    } catch (e) {
+      return response.send({
+        message: e.message,
+        data: [],
+      });
+    }
+  };
+  
+  const handleOneRenewal = async (request, response) => {
+    let request_id = request.body._id;
+    if (!request_id) {
+      return response.send({
+        message: "Renewal ID invalid",
+        data: [],
+      });
+    }
+    try {
+      let pendings = await Pending.findById(request_id);
+      let isp = await ISP.findById(pendings.isp_id);
+  
+      if (!pendings || pendings.request_type !== 0) {
+        return response.send({
+          message: "Renewal not found",
+          data: [],
+        });
+      }
+  
+      if (isp && isp.connection_status === false) {
+        return response.send({
+          message: "Not renewal request",
+          data: [],
+        });
+      }
+  
+      return response.status(200).send({
+        message: "Renewal found",
+        data: pendings,
+      });
+    } catch (e) {
+      return response.send({
+        message: e.message,
+        data: [],
+      });
+    }
+  };
+  
+  
+
 const acceptConnection = async (request, response) => {
 
     //console.log("called");
@@ -687,5 +984,9 @@ module.exports = {
     handleConnectionFetchingSorted,
     getISPConnections,
     acceptConnection,
-    rejectConnection
+    rejectConnection,
+    handlePendingAccepted,
+    handleRenewalAccepted,
+  handleOnePending,
+  handleOneRenewal,
 }

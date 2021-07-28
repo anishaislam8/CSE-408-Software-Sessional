@@ -695,7 +695,7 @@ class IspPendings extends React.Component {
                 <br></br>
                 <br></br>
                 <br></br>
-                <center><h3 style={{"margin":20}}>Pending Requests from Users</h3><br></br></center>
+                <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Pending Requests From User</h3></center>
 
                 <div className="row">
                     <div className="col">

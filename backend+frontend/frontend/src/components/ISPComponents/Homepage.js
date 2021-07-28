@@ -70,17 +70,17 @@ class ISPHome extends React.Component {
 
                                 <tr>
                                     <td><b>Physical Connection Established</b></td>
-                                    <td>{new Date(this.state.isp.physical_connection_establishment_time).toString()}</td>
+                                    <td>{new Date(this.state.isp.physical_connection_establishment_time).toString().split(" ").slice(0,5).join(" ")}</td>
                                 </tr>
 
                                 <tr>
                                     <td><b>Current Connection Establishment Time</b></td>
-                                    <td>{new Date(this.state.isp.connection_establishment_time).toString()}</td>
+                                    <td>{new Date(this.state.isp.connection_establishment_time).toString().split(" ").slice(0,5).join(" ")}</td>
                                 </tr>
 
                                 
 
-                                <tr>
+                                {/* <tr>
                                     <td>View Status Of Current Connections</td>
                                     <td><Link type="button" style={{"width" : 250}} className="btn btn-info" to={{
                                         pathname: `/isp/${this.state.isp_id}`,
@@ -88,7 +88,7 @@ class ISPHome extends React.Component {
                                             data : this.state.isp_name,
                                             id : this.state.isp_id
                                         }}}><AiIcons.AiOutlineEye size={20}/>  View Connection Details</Link></td>
-                                </tr>
+                                </tr> */}
 
                                 <tr>
                                     <td>View User Feedbacks</td>

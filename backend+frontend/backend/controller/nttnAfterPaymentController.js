@@ -11,12 +11,11 @@ const findNewPayment = async (request, response) => {
     let payments;
     //if (type === 0 && status === false) {
     payments = await Payment.find({
-      payment_status: false,
       user_type: 0,
     }).sort({ payment_time: 1 }); // 1- ascending, -1 : descending
     //}
     if (!payments || payments.length === 0) {
-      return response.status(404).send({
+      return response.send({
         message: "No New Payment Found",
         data: [],
       });

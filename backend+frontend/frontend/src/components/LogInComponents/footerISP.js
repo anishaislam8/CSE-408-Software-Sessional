@@ -11,11 +11,11 @@ function FooterISP() {
             </p>
             </div>
 
-            <div className="col">
+            {/* <div className="col">
                     <p className="forgot-password text-right">
                     <b>Forgot <a href="#">password?</a></b>
                 </p>
-            </div>
+            </div> */}
         </div>
         
     )

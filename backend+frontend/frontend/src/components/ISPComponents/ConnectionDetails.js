@@ -4,14 +4,39 @@ import { Link, Redirect } from 'react-router-dom';
 import './../../styles/connection.css'
 import * as AiIcons from 'react-icons/ai';
 import * as FaIcons from 'react-icons/fa';
-import * as ImIcons from 'react-icons/im';
+import * as VscIcons from 'react-icons/vsc';
 import ISPHeader from './Header';
 
 
-class IspConnectionDetails extends React.Component {
+const Contract = (props) => {
+    return (
+        <tr>
+            <td>{new Date(props.start_date).toString().split(" ").slice(0,5).join(" ")}</td>
+            <td>{props.duration} Days</td>
+            <td>{props.current}</td>
+            <td><Link type="button" className="btn btn-info" to={{
+                pathname : "/nttn/ispList/details/package",
+                state : {
+                    package_id : props.package_id, 
+                    isp_id : props.isp_id
+                }}}><VscIcons.VscPackage size={30}/>  Package Details</Link></td>
 
-   state = {
-        connection_id : this.props.location.state.connection_id,
+            <td><Link type="button" className="btn btn-warning" to={{
+                pathname : "/nttn/ispList/details/payment",
+                state : {
+                    payment_id : props.payment_id, isp_id : props.isp_id
+                }}}><FaIcons.FaMoneyCheckAlt size={30}/>  Payment Details</Link></td>
+        </tr>
+    )
+}
+
+
+export class UserListDetails extends Component {
+    state = {
+        isp_id : this.props.location.state.isp_id,
+        user_id : this.props.location.state.user_id,
+        name : this.props.location.state.data,
+        connection_id:"",
         connections :[],
         showDetails:true,
         showPersonnel : false,
@@ -19,51 +44,30 @@ class IspConnectionDetails extends React.Component {
         showHeadOffice:false,
         showLocation: false,
         showEmployee : false,
+        showConnection:false,
         divisions:[],
         districts:[],
         unions:[],
         upazillas:[],
-        areas : [],
-        redirectISPConnection:false,
+        areas:[],
+        redirectNTTNConnection:false,
         employees :[],
-        name:this.props.location.state.data,
-        isp_id:this.props.location.state.id,
-        isp:"" // current isp
-           
+        isps:[],
+        contracts:[],
+        packages :[],
+        users:[]
         
-      
-
     }
 
-    
-
-    componentDidMount() {
-
-        let apiUrl = "http://localhost:7000/api/isp";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ 
-              isps: response.data.data, 
-              isp_id : this.props.location.state.id,
-              name : this.props.location.state.data 
-            }, () => {
-                this.setState({
-                    isp : this.state.isps.filter((isp) => isp._id.toString() === this.state.isp_id)[0]
-                })
-            })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        apiUrl = "http://localhost:7000/isp/connections";
-        let object = {
-            isp_id : this.state.isp_id ||  this.props.location.state.id
+    componentDidMount(){
+        let apiUrl = "http://localhost:7000/isp/connections";
+        let object={
+            isp_id : this.props.location.state.isp_id || this.state.isp_id
         }
         axios.post(apiUrl, object)
         .then(response => {
             
-          this.setState({ connections : response.data.data,connection_id : this.props.location.state.connection_id })
+          this.setState({ connections : response.data.data })
         })
         .catch((error) => {
           console.log(error);
@@ -77,7 +81,6 @@ class IspConnectionDetails extends React.Component {
         .catch((error) => {
           console.log(error);
         })
-
         apiUrl = "http://localhost:7000/api/area";
         axios.get(apiUrl)
         .then(response => {
@@ -86,7 +89,29 @@ class IspConnectionDetails extends React.Component {
         .catch((error) => {
           console.log(error);
         })
+        apiUrl = "http://localhost:7000/api/user";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ users: response.data.data })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
 
+        apiUrl = "http://localhost:7000/api/isp";
+        axios.get(apiUrl)
+        .then(response => {
+            this.setState({ isps: response.data.data, isp_id : this.props.location.state.isp_id, name : this.props.location.state.data }, () => {
+                console.log("location : ",this.props.location);
+                console.log("ISP_ID:",this.state.isp_id)
+                this.setState({
+                    connection_id : this.props.location.state.connection_id
+                })
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+        })
       
         apiUrl = "http://localhost:7000/api/division";
         axios.get(apiUrl)
@@ -116,82 +141,65 @@ class IspConnectionDetails extends React.Component {
         })
 
         apiUrl = "http://localhost:7000/api/employeesISP";
-        object = {
-            isp_id : this.state.isp_id ||  this.props.location.state.id
-        }
-        axios.post(apiUrl, object)
+        axios.post(apiUrl,object)
         .then(response => {
             this.setState({ employees: response.data.data })
         })
         .catch((error) => {
           console.log(error);
         })
+
+        apiUrl = "http://localhost:7000/api/userContracts";
         
-
-       
-
-        apiUrl = "http://localhost:7000/api/union";
-        axios.get(apiUrl)
+        object={
+            isp_id : this.props.location.state.isp_id || this.state.isp_id
+        }
+        axios.post(apiUrl, object)
         .then(response => {
-            this.setState({ unions: response.data.data, searchUnions : response.data.data })
+            this.setState({ contracts: response.data.data })
         })
         .catch((error) => {
           console.log(error);
         })
 
-        apiUrl = "http://localhost:7000/api/area";
+        apiUrl = "http://localhost:7000/api/userPackage";
         axios.get(apiUrl)
         .then(response => {
-            this.setState({ areas: response.data.data, searchAreas : response.data.data })
+            this.setState({ packages: response.data.data })
         })
         .catch((error) => {
           console.log(error);
         })
-
-        apiUrl = "http://localhost:7000/api/division";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ divisions: response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        apiUrl = "http://localhost:7000/api/district";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ districts: response.data.data, searchdistricts:response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        apiUrl = "http://localhost:7000/api/subdistrict";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ upazillas: response.data.data, searchupazillas:response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-        apiUrl = "http://localhost:7000/api/user";
-        axios.get(apiUrl)
-        .then(response => {
-            this.setState({ users: response.data.data })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-
-       
-        
     }
 
     getConnection = (connection_id) => {
         for(let i= 0; i < this.state.connections.length; i++){
             if(this.state.connections[i]._id.toString() === connection_id.toString()){
                 return this.state.connections[i]
+            }
+        }
+    }
+
+    getISP= (isp_id) => {
+        console.log("Get ISP", isp_id)
+        for(let i= 0; i < this.state.isps.length; i++){
+            if(this.state.isps[i]._id.toString() ===isp_id.toString()){
+                return this.state.isps[i]
+            }
+        }
+    }
+    getUser= (isp_id) => {
+        console.log("Get ISP", isp_id)
+        for(let i= 0; i < this.state.users.length; i++){
+            if(this.state.users[i]._id.toString() ===isp_id.toString()){
+                return this.state.users[i]
+            }
+        }
+    }
+    getPackage = (package_id) => {
+        for(let i= 0; i < this.state.packages.length; i++){
+            if(this.state.packages[i]._id.toString() ===package_id.toString()){
+                return this.state.packages[i]
             }
         }
     }
@@ -203,7 +211,8 @@ class IspConnectionDetails extends React.Component {
             showOffice : false,
             showHeadOffice:false,
             showLocation: false,
-            showEmployee : false
+            showEmployee : false,
+            showConnection:false
         })
     }
 
@@ -214,7 +223,8 @@ class IspConnectionDetails extends React.Component {
             showOffice : false,
             showHeadOffice:false,
             showLocation: false,
-            showEmployee : false
+            showEmployee : false,
+            showConnection:false
         })
     }
 
@@ -225,7 +235,8 @@ class IspConnectionDetails extends React.Component {
             showOffice : true,
             showHeadOffice:false,
             showLocation: false,
-            showEmployee : false
+            showEmployee : false,
+            showConnection:false
         })
     }
 
@@ -236,7 +247,8 @@ class IspConnectionDetails extends React.Component {
             showOffice : false,
             showHeadOffice:false,
             showLocation: false,
-            showEmployee : true
+            showEmployee : true,
+            showConnection:false
         })
     }
     
@@ -247,7 +259,8 @@ class IspConnectionDetails extends React.Component {
             showOffice : false,
             showHeadOffice:true,
             showLocation: false,
-            showEmployee : false
+            showEmployee : false,
+            showConnection:false
         })
     }
 
@@ -258,7 +271,20 @@ class IspConnectionDetails extends React.Component {
             showOffice : false,
             showHeadOffice:false,
             showLocation: true,
-            showEmployee : false
+            showEmployee : false,
+            showConnection:false
+        })
+    }
+
+    handleShowConnection = () => {
+        this.setState({
+            showDetails : false,
+            showPersonnel : false,
+            showOffice : false,
+            showHeadOffice:false,
+            showLocation: false,
+            showEmployee : false,
+            showConnection:true
         })
     }
 
@@ -314,63 +340,11 @@ class IspConnectionDetails extends React.Component {
 
     back = () =>{
         this.setState({
-            redirectISPConnection:true
+            redirectNTTNConnection:true
         })
     }
 
-    accept = () => {
-        // ei entry tar request_resolve_time, resolve_status, random employee id
-        const employeeLength = this.state.employees.length;
-        const index = Math.floor(Math.random() * employeeLength);
-
-        let apiUrl = "http://localhost:7000/isp/connections/accept";
-        let object = {
-            connection_id : this.state.connection_id,
-            employee_id : this.state.employees[index]._id,
-            user_name : this.getConnection(this.state.connection_id).user_name,
-            nid : this.getConnection(this.state.connection_id).nid,
-            isp_id : this.state.isp_id,
-            details : "Your connection request completed processing. Find your temporary account password in your email."
-        }
-
-        axios.post(apiUrl, object)
-        .then(response => {
-            console.log(response.data.message);
-            this.setState({
-                redirectISPConnection : true
-            })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-       
-        
-    }
-
-    reject = () => {
-        
-
-        let apiUrl = "http://localhost:7000/isp/connections/reject";
-        const object = {
-            connection_id : this.state.connection_id
-
-        }
-
-        axios.post(apiUrl, object)
-        .then(response => {
-            console.log(response.data.message);
-            this.setState({
-                redirectISPConnection : true
-            })
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-      
-        // notification pathano through email, not shown
-        
-    }
-
+    
     getWireName = (cat) => {
         //0-DSL, 1-ADSL, 2-OpticalFiber,4-UTP,5-STP
         if(cat === 0){
@@ -385,43 +359,45 @@ class IspConnectionDetails extends React.Component {
             return "STP"
         }
     }
-    
-    
     render() {
-        return(
+        
+        return (
+            
             <div className="container">
-               <ISPHeader data={this.state.name} id={this.state.isp_id} />
-               {this.state.redirectISPConnection ? <Redirect  to={{
-                   pathname: `/isp/${this.state.isp_id}/connections`,
-                   state: {
-                       data : this.state.name,
-                       id : this.state.isp_id
-                   }
-                }} /> : ""}
+            {this.state.redirectNTTNConnection ? <Redirect to='/isp/ispList' /> : ""}
+            <ISPHeader data={this.state.name} id={this.state.isp_id} />
+                
                 <br></br>
                 <br></br>
                 <br></br>
-
-                <center><h3 className="display-6" style={{"marginTop" : 20}}>Details of the request</h3></center>
+                <center><h3 className="display-6" style={{"marginTop" : 20}}>Details of this User</h3></center>
                 <br/>
-                {this.state.connections.length > 0 && 
+                {this.state.connection_id && this.state.isp_id &&  
                 <div  className="connectioninner">
 
 
                      <nav className="navbar navbar-expand-lg" style={{ "color": "white"}}>
-                        <ul className="navbar-nav nav-pills">
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":150, "width":150,  "fontWeight":"bolder", "marginLeft" : 20}} className="btn btn-outline-dark" onClick={this.handleDetails}>Details of Request</button>
+                        <ul className="navbar-nav nav-pills ms-auto">
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleDetails}>Basic Information</button>
                         </li>
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":150,  "width":150, "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleLocation}>Location Details of User</button>
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10,  "width":150, "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleLocation}>Location Details of User</button>
                         </li>
-                        
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"marginRight":150,"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handlePersonnel}>Contact Information</button>
+                        {/* <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleHeadOffice}>Head Office Information</button>
                         </li>
-                        <li className="nav-item" style={{"paddingRight":20}}>
-                            <button style={{"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleShowEmployee}>Employee Details</button>
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10, "width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleOffice}>Office Information</button>
+                        </li> */}
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10,"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handlePersonnel}>Contact Information</button>
+                        </li>
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"marginRight":10,"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleShowEmployee}>Employee Details</button>
+                        </li>
+                        <li className="nav-item" style={{"paddingRight":10}}>
+                            <button style={{"width":150,  "fontWeight":"bolder"}} className="btn btn-outline-dark" onClick={this.handleShowConnection}>Connection Details</button>
                         </li>
                         </ul>
                      </nav>
@@ -446,16 +422,16 @@ class IspConnectionDetails extends React.Component {
                                     <td className="col-md-2">{this.getConnection(this.state.connection_id).user_name}</td>
                                 </tr>
                                 <tr>
-                                    <td className="col-md-2"><b>NID</b></td>
+                                    <td className="col-md-2"><b>License ID</b></td>
                                     <td className="col-md-2">{this.getConnection(this.state.connection_id).nid_number}</td>
                                 </tr>
                                 <tr>
-                                    <td className="col-md-2"><b>Request Arrival Time</b></td>
+                                    <td className="col-md-2"><b>Connection Request Arrival Time</b></td>
                                     <td className="col-md-2">{new Date(this.getConnection(this.state.connection_id).request_arrival_time).toString().split(" ").slice(0,5).join(" ")}</td>
                                 </tr>
                                 {this.getConnection(this.state.connection_id).resolve_status && !this.getConnection(this.state.connection_id).rejected &&
                                 <tr>
-                                    <td className="col-md-2"><b>Request Acceptance Time</b></td>
+                                    <td className="col-md-2"><b>Physical Connection Establishment Time</b></td>
                                     <td className="col-md-2">{new Date(this.getConnection(this.state.connection_id).request_resolve_time).toString().split(" ").slice(0,5).join(" ")}</td>
                                 </tr>}
                                 <tr>
@@ -505,7 +481,77 @@ class IspConnectionDetails extends React.Component {
                  </div>
 
 
-                 
+                 {/* <div hidden={!this.state.showHeadOffice} >
+                     
+                     <br/>
+             
+                     <table className="table table-bordered table-striped" >
+                         <thead className="thead-dark">
+                             <tr>
+
+                             <th className="col-md-2">Head Office Details</th>
+                             <th className="col-md-2">Information</th>
+                             
+                             </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                                <td className="col-md-2"><b>Address</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_address}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Telephone</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_telephone}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Mobile</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_mobile}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Email</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).head_office_email}</td>
+                            </tr>
+                           
+                         </tbody>
+                     </table>
+                 </div>
+
+
+                 <div hidden={!this.state.showOffice} >
+                     
+                     <br/>
+             
+                     <table className="table table-bordered table-striped" >
+                         <thead className="thead-dark">
+                             <tr>
+
+                             <th className="col-md-2">Office Details</th>
+                             <th className="col-md-2">        </th>
+                             
+                             </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                                <td className="col-md-2"><b>Address</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_address}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Telephone</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_telephone}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Mobile</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_mobile}</td>
+                            </tr>
+                            <tr>
+                                <td className="col-md-2"><b>Email</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).office_email}</td>
+                            </tr>
+                           
+                         </tbody>
+                     </table>
+                 </div> */}
+
                  <div hidden={!this.state.showPersonnel} >
                      
                      <br/>
@@ -514,18 +560,24 @@ class IspConnectionDetails extends React.Component {
                          <thead className="thead-dark">
                              <tr>
 
-                             <th className="col-md-2">Contact Details</th>
+                             <th className="col-md-2">Contact  Details</th>
                              <th className="col-md-2">Information</th>
                              
                              </tr>
                          </thead>
                          <tbody>
-                           
+                            {/* <tr>
+                                <td className="col-md-2"><b>Name</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_name}</td>
+                            </tr> */}
                             <tr>
                                 <td className="col-md-2"><b>Address</b></td>
                                 <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_address}</td>
                             </tr>
-                            
+                            {/* <tr>
+                                <td className="col-md-2"><b>Telephone</b></td>
+                                <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_telephone}</td>
+                            </tr> */}
                             <tr>
                                 <td className="col-md-2"><b>Mobile</b></td>
                                 <td className="col-md-2">{this.getConnection(this.state.connection_id).contact_person_mobile}</td>
@@ -587,15 +639,68 @@ class IspConnectionDetails extends React.Component {
                      </table>
                  </div>
 
-                <button className="btn btn-success" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.accept} style={{"marginLeft":850, "marginRight":20}}><FaIcons.FaClipboardCheck size={20}/>  Accept</button>
-                <button className="btn btn-dark" onClick={this.back} style={{"marginRight" : 20}}><AiIcons.AiOutlineStepBackward size={20}/> Back</button>
-                {/* <button className="btn btn-danger" disabled={this.getConnection(this.state.connection_id).resolve_status} onClick={this.reject}><AiIcons.AiFillNotification size={20}/>  Reject</button> */}
+
+                 <div hidden={!this.state.showConnection} >
+                     
+                     <br/>
+             
+                     <table className="table table-bordered table-striped" >
+                         <thead className="thead-dark">
+                             <tr>
+
+                             <th>Connection Started</th>
+                             <th>Duration</th>
+                             <th>Active</th>
+                             <th>Package Detail</th>
+                             <th>Payment Detail</th>
+                            
+
+                             
+                             </tr>
+                         </thead>
+                        {this.state.contracts.length > 0 &&  <tbody>
+                           { this.state.contracts.map((contract, index) => {
+                           
+                           return <Contract 
+                              key={contract._id}
+                              union_name = {this.getUnionName(contract.union_id)}
+                              start_date = {contract.start_date} 
+                              duration={contract.duration}
+                              current={contract.current ? "Active" : "Inactive"}
+                              count={index + 1}
+                              contract_id={contract._id}
+                              package_id={contract.package_id}
+                              payment_id={contract.payment_id}
+                              isp_id ={contract.isp_id}
+                             
+                          />})}
+                           
+                         </tbody>}
+                         {
+                             !this.state.contracts.length > 0 &&
+                             <tbody>
+                                 <tr>
+                                     <td>No Previous Connections</td>
+                                     <td> </td>
+                                     <td> </td>
+                                     <td> </td>
+                                     <td> </td>
+                                     
+                                 </tr>
+                             </tbody>
+                         }
+                     </table>
+                 </div>
+
+                
+                <button className="btn btn-dark" onClick={this.back} style={{"marginLeft" : 1100}}><AiIcons.AiOutlineStepBackward size={20}/> Back</button>
+               
                    
                 </div>}
-               
-            </div>
-        );
+            
+        </div>
+        )
     }
 }
 
-export default IspConnectionDetails;
+export default UserListDetails

@@ -674,7 +674,8 @@ class ISPViewReport extends React.Component{
                <br></br>
                <br></br>
                <div className="container">
-               <center><h3 style={{"margin":20}}>Reports from {this.getIspName(this.state.isp_id)}</h3><br></br></center>
+               
+               <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Reports from {this.getIspName(this.state.isp_id)}</h3></center>
                 {/* <center> */}
                   <div className="row">
                     <div className="col">

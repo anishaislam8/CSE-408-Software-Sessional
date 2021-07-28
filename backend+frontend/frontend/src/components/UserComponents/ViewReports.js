@@ -769,7 +769,7 @@ class ViewReports extends React.Component{
              
             
                <div className="container" >
-                    <center><h2 style={{"margin":30}}>Reports Sent</h2></center>
+               <center><h3 className="display-6" style={{"marginBottom" : 50, "marginTop" : 50}}>Reports Sent</h3></center>
                     <div className="row">
                     <div className="col">
                     <input type="text" className="form-control" style={{"marginLeft":0,"marginTop": 0,"marginBottom":30, "width" : 700}} value={this.state.searchText} onChange={this.handleChangeSearchText} placeholder="Search Reports"/>

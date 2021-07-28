@@ -50,13 +50,13 @@ function UserHeader(props) {
                     <IoIcons.IoMdSettings size={20}/>
                     </button>
                     <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                    <Link className="dropdown-item" to={{
-                           pathname: `/user/${props.id}`,
+                    {/* <Link className="dropdown-item" to={{
+                           pathname: `/user/${props.id}/edit`,
                            state: {
                                data : props.data,
                                id : props.id
                             }
-                            }}>Edit Profile</Link>
+                            }}>Edit Profile</Link> */}
                     <Link className="dropdown-item" to={{
                         pathname: `/user/${props.id}/createReport`,
                         state: {

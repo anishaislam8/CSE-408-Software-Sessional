@@ -11,7 +11,9 @@ const { NTTN} = require('../models/NTTN');
 const { request, response } = require('express');
 const { connection } = require('mongoose');
 const { PhysicalConnectionISP } = require('../models/PhysicalConnectionISP');
+const {UserConnection} = require('../models/UserConnection');
 const { Payment } = require('../models/Payment');
+const {License} = require('../models/License');
 
 
 
@@ -823,9 +825,40 @@ const getUserContracts = async (request, response) => {
         })
     }
 }
+const getPostUserContracts = async (request, response) => {
+    let isp_id = request.body.isp_id;
+    try{
+       
+  
+        let contracts = await Contract.find({
+            user_type : 1,
+            isp_id 
+        });
+
+       
+        if(!contracts || contracts.length === 0){
+      
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : contracts
+        })
+
+    } catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+}
 
 const getConnection = async (connection_id) => {
     let connections = await PhysicalConnectionISP.find();
+    
     for(let i= 0; i < connections.length; i++){
         if(connections[i]._id.toString() === connection_id.toString()){
             //console.log("get connection", connections[i]);
@@ -834,7 +867,235 @@ const getConnection = async (connection_id) => {
     }
 }
 
+const getUserConnection = async (connection_id, isp_id) => {
+    let connections = await UserConnection.find();
+    
+    for(let i= 0; i < connections.length; i++){
+        if(connections[i]._id.toString() === connection_id.toString() && connections[i].isp_id.toString() === isp_id.toString()){
+            //console.log("get connection", connections[i]);
+            return connections[i];
+        }
+    }
+}
 
+const getUserConnections = async (request, response) => {
+    let isp_id = request.body.isp_id;
+    try{
+        let connections = await UserConnection.find({
+            isp_id
+        });
+        if(!connections || connections.length === 0){
+          
+            return response.send({
+                message : "Not found",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Found",
+            data : connections
+        })
+    }
+
+    catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+    
+   
+}
+
+const handleverify = async (request, response) => {
+    let license_id = request.body.license_id;
+    let name = request.body.name;
+    try{
+        if(!license_id){
+            return response.send({
+                message : "ID needed",
+                data : []
+            })
+        }
+        let license = await License.find({
+            license_id, name
+        })
+    
+        if(!license){
+            return response.send({
+                message : "License Not found",
+                data : []
+            })
+        }
+        var start = new Date(license.valid_until).setHours(0, 0, 0, 0);
+    
+        var end = new Date().setHours(0, 0, 0, 0);
+    
+        if (start < end) {
+            return response.send({
+                message : "License Expired",
+                data : []
+            })
+        }
+        return response.send({
+            message : "Valid",
+            data : license
+        })
+    }catch(e){
+        return response.send({
+            message : "EXCEPTION",
+            data : []
+        })
+    }
+
+}
+
+const getUserSorted = async (request, response) => {
+    //console.log("called");
+    let sortByDistrict = request.body.district_id;
+    let sortByDivision = request.body.division_id;
+    let sortBySubDistrict = request.body.upazilla_id;
+    let sortByUnion = request.body.union_id;
+    let sortByArea = request.body.area_id;
+    let connection_status = request.body.connection_status;
+    let isp_id = request.body.isp_id;
+    // console.log("District :", sortByDistrict);
+    // console.log("Division :", sortByDivision);
+    // console.log("SubDistrict :", sortBySubDistrict);
+    // console.log("Union :", sortByUnion);
+    // console.log("Connection status : ", connection_status);
+
+    try{
+        let isps=[];
+        let ispList= await User.find();
+
+        if(sortByArea){
+            
+
+            for(let i=0; i < ispList.length; i++){
+                let test = await getUserConnection(ispList[i].physical_connection_details[0].connection_id, isp_id);
+                if(test.area_id.toString() === sortByArea.toString()){
+                    isps.push(ispList[i]);
+                }
+            }
+
+           
+
+        }
+
+        else if(sortByUnion){
+            
+
+            for(let i=0; i < ispList.length; i++){
+                let test = await getUserConnection(ispList[i].physical_connection_details[0].connection_id,  isp_id);
+                if(test.union_id === sortByUnion){
+                    isps.push(ispList[i]);
+                }
+            }
+
+           
+
+        } else if(sortBySubDistrict){
+
+            for(let i=0; i < ispList.length; i++){
+                let test = await getUserConnection(ispList[i].physical_connection_details[0].connection_id,  isp_id);
+                if(test.upazilla_id === sortBySubDistrict){
+                    isps.push(ispList[i]);
+                }
+            }
+           
+
+        } else if(sortByDistrict){
+
+            for(let i=0; i < ispList.length; i++){
+                let test = await getUserConnection(ispList[i].physical_connection_details[0].connection_id,  isp_id);
+                if(test.district_id === sortByDistrict){
+                    isps.push(ispList[i]);
+                }
+            }
+
+        } else if(sortByDivision){
+           
+            for(let i=0; i < ispList.length; i++){
+               
+                let test = await getUserConnection(ispList[i].physical_connection_details[0].connection_id,  isp_id);
+              
+                if(test.division_id === sortByDivision){
+                    isps.push(ispList[i]);
+                }
+            }
+      
+
+        }
+
+        // console.log("isps", isps)
+        if(!isps || isps.length === 0){
+            if(sortByDistrict || sortByDivision || sortBySubDistrict || sortByUnion || sortByArea){
+                //empty
+                return response.send({
+                    message : "No ISP Found",
+                    data : []
+                })
+            } else {
+             
+                let connections = await UserConnection.find({
+                    isp_id
+                });
+                for(let i = 0; i < ispList.length; i++){
+                    for(let j = 0; j < connections.length; j++){
+                        if(ispList[i].physical_connection_details[0].connection_id.toString() === connections[j]._id.toString()){
+                            isps.push(ispList[i]);
+                            break;
+                        }
+                    
+                    }
+                }
+
+         
+            }
+        }
+
+        if(!isps || isps.length === 0){
+            return response.send({
+                message : "No ISP Found",
+                data : []
+            })
+        }
+        
+        if(connection_status !== undefined){
+            if(connection_status === "1"){
+                //connected
+                isps = isps.filter((isp)=> isp.connection_status === true);
+            } else if(connection_status === "0"){
+                //disconnected
+                isps = isps.filter((isp)=> isp.connection_status === false && isp.connection_establishment_time !== null);
+            } else if(connection_status === "-1"){
+                //not connected
+                isps = isps.filter((isp)=> isp.connection_status === false && isp.connection_establishment_time === null);
+            } 
+            
+        }
+
+        console.log(isps);
+
+       
+        
+
+       
+        return response.status(200).send({
+            message : "Users Found",
+            data : isps
+        })
+    } catch (e) {
+        return response.send({
+            message : e.message,
+            data : []
+        })
+    }
+
+    
+
+}
 const getISPSorted = async (request, response) => {
     //console.log("called");
     let sortByDistrict = request.body.district_id;
@@ -968,6 +1229,7 @@ module.exports = {
     findSubDistrictFromDivision,
     getISP,
     getISPSorted,
+    getUserSorted,
     getArea,
     getUnion,
     getIspPackage,
@@ -983,10 +1245,13 @@ module.exports = {
     getIspsOfDivision,
     getContracts,
     getUserContracts,
+    getPostUserContracts,
     getUnionFromArea,
     getRatingFromISP,
     getNTTN, postNTTN,
     getAllLocationData,
     postISP,
-    getPaymentOfOneISP
+    getPaymentOfOneISP,
+    handleverify,
+    getUserConnections
 }
