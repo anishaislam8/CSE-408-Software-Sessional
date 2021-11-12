@@ -16,4 +16,4 @@ Instruction for running the frontend:
 - Run "npm install" for installing all the dependencies.
 - Run "npm start" for starting the project on localhost.
 
-We used local mongo database for  this project. If you want to populate your local database with data, there is a folder called "backup data" which contains all the data that's been used for this project. To login as admin, type "admin" as username and "123456" as password. Also, to get an overall idea about this project, do checkout the ERD and Class Diagram files in ERD+Class Diagram folder.
+We used local mongo database for  this project. If you want to populate your local database with data, there is a folder called "backup data" which contains all the data that's been used for this project. To login as admin, type "admin" as username and "admin123" as password. Also, to get an overall idea about this project, do checkout the ERD and Class Diagram files in ERD+Class Diagram folder.
