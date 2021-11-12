@@ -5,4 +5,15 @@ requests from ISP and End Users, checking active user list and ISP list, check d
 and the frontend is implemented with React.
 
 
-### Instruction for running : 
+Instruction for running the backend server: 
+- At first set the current working directory to backend+frontend/backend.
+- Run "npm install" for installing all the dependencies.
+- Run "npm start" for starting the server.
+
+
+Instruction for running the frontend: 
+- At first set the current working directory to backend+frontend/frontend.
+- Run "npm install" for installing all the dependencies.
+- Run "npm start" for starting the project on localhost.
+
+Unfortunately, we used local mongo database for  this project. If you want to populate your local database with data, there is a folder called "backup data" which contains all the data that's been used for this project. Also, to get an overall idea about this project, do checkout the ERD and Class Diagram files in ERD+Class Diagram folder. In case you just want to get a simple overview of the project, I am attaching the step by step outlook of the project in the folder named "Overview", just run the ipynb file inside the folder.
