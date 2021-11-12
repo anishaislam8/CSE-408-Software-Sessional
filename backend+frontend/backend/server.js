@@ -28,11 +28,11 @@ const {License} = require('./models/License');
 const {Package} = require('./models/Package');
 
 //Database connection for atlas
-const uri = process.env.MONGODB_URI;
-const connection = mongoose.connection;
-connection.once('open', () => {
-    console.log("Mongodb database connection established successfully");
-})
+// const uri = process.env.MONGODB_URI;
+// const connection = mongoose.connection;
+// connection.once('open', () => {
+//     console.log("Mongodb database connection established successfully");
+// })
 //Finish connecting database
 
 //define the routes
