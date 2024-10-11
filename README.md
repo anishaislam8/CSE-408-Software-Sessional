@@ -25,7 +25,7 @@ To log in as an admin, use the following credentials:
 
 ## ERD of this project
 
-![ERD](ERD  + Class Diagram/EIS ERD(Connection).jpeg)
+![ERD](ERD+Class Diagram/EIS-ERD(Connection).jpeg)
 
 
 ## Partial demo of this project
@@ -44,7 +44,7 @@ After logging in as an admin, the homepage looks like this:
 
 Admin functionalities include viewing connection requests (filterable by time, location, date, keywords, and request type), managing renewal and pending requests, viewing the ISP list, reviewing complaints from ISPs, and logging out.
 
-![Admin connection requests](images/connection_requests_filter.png)
+![Admin connection requests](images/connection_request_filter.png)
 
 ![Details of a connection request](details_isp_request.png)
 
