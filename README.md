@@ -46,7 +46,7 @@ Admin functionalities include viewing connection requests (filterable by time, l
 
 ![Admin connection requests](images/connection_request_filter.png)
 
-![Details of a connection request](details_isp_request.png)
+![Details of a connection request](images/details_isp_request.png)
 
 ![Admin renewal requests](images/renewal.png)
 
