@@ -25,7 +25,7 @@ To log in as an admin, use the following credentials:
 
 ## ERD of this project
 
-![ERD](ERD+Class Diagram/EIS-ERD(Connection).jpeg)
+![ERD](ERD+Class Diagram/EIS-ERD-Connection.jpeg)
 
 
 ## Partial demo of this project
