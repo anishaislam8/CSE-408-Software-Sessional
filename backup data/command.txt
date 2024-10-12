@@ -1,12 +1,12 @@
 // whole database
 
- mongodump -d EasyInternetService -o "D:\Academics\4-1\Lab\CSE-408-Software-Sessional\backup"
+ mongodump -d EasyInternetService -o "backup"
 
 
 
 // individual collections
-mongoexport --collection=divisions --db=EasyInternetService --out="D:\Academics\4-1\Lab\CSE-408-Software-Sessional\divisions.json"
+mongoexport --collection=divisions --db=EasyInternetService --out="divisions.json"
 
 
 //restore
-mongorestore -d EasyInternetService "D:\Academics\4-1\Lab\CSE-408-Software-Sessional\backup"
+mongorestore -d EasyInternetService "backup"
