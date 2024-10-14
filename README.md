@@ -1,4 +1,4 @@
-# ISP-Connection-Subsystem-Project
+# Easy Internet Service
 
 This project focuses on developing a platform to streamline the internet connection establishment process between the NTTN (Nationwide Telecommunication Transmission Network), ISP (Internet Service Provider), and end users. Key features include sending connection requests to ISPs and NTTN, accepting requests from ISPs and end users, viewing the active users and ISPs list, and checking the details of ISPs and users. The platform's backend is built using Node.js, with MongoDB serving as the database, and the frontend is developed using React.
 
